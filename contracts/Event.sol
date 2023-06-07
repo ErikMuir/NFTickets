@@ -1,12 +1,18 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity >=0.7.0 <0.9.0;
 
+import "./HederaResponseCodes.sol";
+import "./IHederaTokenService.sol";
+import "./HederaTokenService.sol";
+import "./ExpiryHelper.sol";
+import "./KeyHelper.sol";
+
 import { PricingTemplate, PricingTemplateMap, PricingTemplateIterableMapping } from "./PricingTemplate.sol";
 import { OpenSection, OpenSectionMap, OpenSectionIterableMapping } from "./OpenSection.sol";
 import { ReservedSeatPricingMap, ReservedSeatPricingIterableMapping } from "./ReservedSeatPricing.sol";
 import { ReservedSeatsMap, ReservedSeatsIterableMapping } from "./ReservedSeats.sol";
 
-contract Event {
+contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
   // usings
   using PricingTemplateIterableMapping for PricingTemplateMap;
   using OpenSectionIterableMapping for OpenSectionMap;
@@ -21,12 +27,12 @@ contract Event {
   address public owner;
   address public venue;
   address public entertainer;
+  address public tokenId;
   bool public venueSigned;
   bool public entertainerSigned;
   bool public ticketSalesEnabled;
   uint public eventDateTime;
   string public defaultPricingTemplateKey;
-  string public tokenId;
   PricingTemplateMap pricingTemplates;
   OpenSectionMap openSections;
   ReservedSeatPricingMap reservedSeatPricing;
@@ -85,7 +91,64 @@ contract Event {
     entertainerSigned = false;
   }
 
+  modifier salesEnabled() {
+    require(ticketSalesEnabled, "Ticket sales are not enabled");
+    _;
+  }
+
   // event functions
+  function createNft(
+        string memory name,
+        string memory symbol,
+        string memory memo,
+        int64 maxSupply,
+        int64 autoRenewPeriod
+    ) external payable returns (address) {
+        IHederaTokenService.TokenKey[] memory keys = new IHederaTokenService.TokenKey[](1);
+        // Set this contract as supply
+        keys[0] = getSingleKey(KeyType.SUPPLY, KeyValueType.CONTRACT_ID, address(this));
+
+        IHederaTokenService.HederaToken memory token;
+        token.name = name;
+        token.symbol = symbol;
+        token.memo = memo;
+        token.treasury = address(this);
+        token.tokenSupplyType = true; // set supply to FINITE
+        token.maxSupply = maxSupply;
+        token.tokenKeys = keys;
+        token.freezeDefault = false;
+        token.expiry = createAutoRenewExpiry(address(this), autoRenewPeriod); // Contract automatically renew by himself
+
+        (int256 responseCode, address createdToken) = HederaTokenService.createNonFungibleToken(
+            token
+        );
+
+        require(responseCode == HederaResponseCodes.SUCCESS, "Failed to create NFT collection");
+        return createdToken;
+    }
+
+    function mintNft(address token, bytes[] memory metadata) external returns (int64) {
+        (int256 response, , int64[] memory serial) = HederaTokenService.mintToken(
+            token,
+            0,
+            metadata
+        );
+
+        require(response == HederaResponseCodes.SUCCESS, "Failed to mint NFTicket");
+        return serial[0];
+    }
+
+    function transferNft(
+        address token,
+        address receiver,
+        int64 serial
+    ) external returns (int256) {
+        HederaTokenService.associateToken(receiver, token);
+        int256 response = HederaTokenService.transferNFT(token, address(this), receiver, serial);
+
+        require(response == HederaResponseCodes.SUCCESS, "Failed to transfer NFTicket");
+        return response;
+    }
 
   // public getters
   function getPricingTemplateKeys() public view returns (string[] memory pricingTemplateKeys) {

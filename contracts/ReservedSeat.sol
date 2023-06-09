@@ -1,27 +1,32 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity >=0.7.0 <0.9.0;
 
-struct ReservedSeatPricingMap {
+struct ReservedSeat {
+  int64 serial;
+  bool ticketScanned;
+}
+
+struct ReservedSeatMap {
   string[] keys;
-  mapping(string key => string) values;
-  mapping(string key => uint) indexOf;
+  mapping(string key => ReservedSeat) values;
+  mapping(string key => uint256) indexOf;
   mapping(string key => bool) inserted;
 }
 
-library ReservedSeatPricingIterableMapping {
-  function get(ReservedSeatPricingMap storage self, string memory key) public view returns (string storage) {
+library ReservedSeatIterableMapping {
+  function get(ReservedSeatMap storage self, string memory key) public view returns (ReservedSeat storage) {
     return self.values[key];
   }
 
-  function getKeyAtIndex(ReservedSeatPricingMap storage self, uint index) public view returns (string storage) {
+  function getKeyAtIndex(ReservedSeatMap storage self, uint256 index) public view returns (string storage) {
     return self.keys[index];
   }
 
-  function size(ReservedSeatPricingMap storage self) public view returns (uint) {
+  function size(ReservedSeatMap storage self) public view returns (uint256) {
     return self.keys.length;
   }
 
-  function set(ReservedSeatPricingMap storage self, string memory key, string memory val) public {
+  function set(ReservedSeatMap storage self, string memory key, ReservedSeat memory val) public {
     if (self.inserted[key]) {
       self.values[key] = val;
     } else {
@@ -32,7 +37,7 @@ library ReservedSeatPricingIterableMapping {
     }
   }
 
-  function remove(ReservedSeatPricingMap storage self, string memory key) public {
+  function remove(ReservedSeatMap storage self, string memory key) public {
     if (!self.inserted[key]) {
       return;
     }

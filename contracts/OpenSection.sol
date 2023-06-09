@@ -2,15 +2,15 @@
 pragma solidity >=0.7.0 <0.9.0;
 
 struct OpenSection {
-  string pricingTemplateKey;
-  uint maxCapacity;
-  uint remainingCapacity;
+  int256 ticketPrice;
+  uint256 maxCapacity;
+  uint256 remainingCapacity;
 }
 
 struct OpenSectionMap {
   string[] keys;
   mapping(string key => OpenSection) values;
-  mapping(string key => uint) indexOf;
+  mapping(string key => uint256) indexOf;
   mapping(string key => bool) inserted;
 }
 
@@ -19,11 +19,11 @@ library OpenSectionIterableMapping {
     return self.values[key];
   }
 
-  function getKeyAtIndex(OpenSectionMap storage self, uint index) public view returns (string storage) {
+  function getKeyAtIndex(OpenSectionMap storage self, uint256 index) public view returns (string storage) {
     return self.keys[index];
   }
 
-  function size(OpenSectionMap storage self) public view returns (uint) {
+  function size(OpenSectionMap storage self) public view returns (uint256) {
     return self.keys.length;
   }
 
@@ -46,7 +46,7 @@ library OpenSectionIterableMapping {
     delete self.inserted[key];
     delete self.values[key];
 
-    uint index = self.indexOf[key];
+    uint256 index = self.indexOf[key];
     string memory lastKey = self.keys[self.keys.length - 1];
 
     self.indexOf[lastKey] = index;

@@ -7,15 +7,17 @@ import "./HederaTokenService.sol";
 import "./ExpiryHelper.sol";
 import "./KeyHelper.sol";
 
+import {NFTicket, NFTicketMap, NFTicketIterableMapping} from "./NFTicket.sol";
 import {OpenSection, OpenSectionMap, OpenSectionIterableMapping} from "./OpenSection.sol";
-import {ReservedSection, ReservedSectionMap, ReservedSectionIterableMapping} from "./ReservedSection.sol";
 import {ReservedSeat, ReservedSeatMap, ReservedSeatIterableMapping} from "./ReservedSeat.sol";
+import {ReservedSection, ReservedSectionMap, ReservedSectionIterableMapping} from "./ReservedSection.sol";
 
 contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
     // usings
+    using NFTicketIterableMapping for NFTicketMap;
     using OpenSectionIterableMapping for OpenSectionMap;
-    using ReservedSectionIterableMapping for ReservedSectionMap;
     using ReservedSeatIterableMapping for ReservedSeatMap;
+    using ReservedSectionIterableMapping for ReservedSectionMap;
 
     // types
 
@@ -36,10 +38,14 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
     OpenSectionMap openSections;
     ReservedSectionMap reservedSections;
     ReservedSeatMap reservedSeats;
+    NFTicketMap nfTickets;
 
     // constructor
     constructor(address _venue, address _entertainer) {
-        require(_venue != address(0) && _entertainer != address(0), "Venue and entertainer are required");
+        require(
+            _venue != address(0) && _entertainer != address(0),
+            "Venue and entertainer are required"
+        );
         owner = msg.sender;
         venue = _venue;
         entertainer = _entertainer;
@@ -103,8 +109,8 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
     }
 
     modifier tokenCreated() {
-      require(tokenAddress != address(0), "NFT Collection not created yet");
-      _;
+        require(tokenAddress != address(0), "NFT Collection not created yet");
+        _;
     }
 
     modifier salesEnabled() {
@@ -112,12 +118,17 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
         _;
     }
 
+    modifier seatAvailable(
+        string calldata _section,
+        string calldata _row,
+        string calldata _seat
+    ) {
+        require(isSeatAvailable(_section, _row, _seat), "Ticket not available");
+        _;
+    }
+
     // public getters
-    function getOpenSectionKeys()
-        public
-        view
-        returns (string[] memory)
-    {
+    function getOpenSectionKeys() public view returns (string[] memory) {
         return openSections.keys;
     }
 
@@ -127,11 +138,7 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
         return openSections.get(_key);
     }
 
-    function getReservedSectionKeys()
-        public
-        view
-        returns (string[] memory)
-    {
+    function getReservedSectionKeys() public view returns (string[] memory) {
         return reservedSections.keys;
     }
 
@@ -147,17 +154,21 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
         return reservedSeats.get(_key);
     }
 
+    function getNFTicket(int64 _serial) public view returns (NFTicket memory) {
+        return nfTickets.get(_serial);
+    }
+
     function isSeatAvailable(
         string calldata _section,
         string calldata _row,
         string calldata _seat
     ) public view returns (bool) {
-        OpenSection memory openSection = getOpenSection(_section);
+        OpenSection storage openSection = openSections.get(_section);
         if (openSection.maxCapacity > 0) {
-          return (openSection.remainingCapacity > 0);
+            return (openSection.remainingCapacity > 0);
         }
         string memory seatKey = buildSeatKey(_section, _row, _seat);
-        ReservedSeat memory reservedSeat = getReservedSeat(seatKey);
+        ReservedSeat storage reservedSeat = reservedSeats.get(seatKey);
         return (reservedSeat.serial == 0);
     }
 
@@ -178,7 +189,9 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
             return ticketPrice;
         }
 
-        ticketPrice = getReservedSectionTicketPrice(buildRowKey(_section, _row));
+        ticketPrice = getReservedSectionTicketPrice(
+            buildRowKey(_section, _row)
+        );
         if (ticketPrice != 0) {
             return ticketPrice;
         }
@@ -287,14 +300,18 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
         string calldata _section,
         string calldata _row,
         string calldata _seat,
-        bytes[] memory metadata
-    ) external payable onlyOwner finalized salesEnabled returns (int64) {
-        int256 ticketPrice = getSeatTicketPrice(_section, _row, _seat);
-        require(ticketPrice <= 0 || uint256(ticketPrice) <= msg.value, "Insufficient payment amount");
-        require(isSeatAvailable(_section, _row, _seat), "Ticket not available");
-
+        bytes[] memory _metadata
+    )
+        external
+        payable
+        onlyOwner
+        finalized
+        salesEnabled
+        seatAvailable(_section, _row, _seat)
+        returns (int64)
+    {
         (int256 response, , int64[] memory serials) = HederaTokenService
-            .mintToken(tokenAddress, 0, metadata);
+            .mintToken(tokenAddress, 0, _metadata);
 
         require(
             response == HederaResponseCodes.SUCCESS,
@@ -302,30 +319,47 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
         );
 
         int64 serial = serials[0];
-        OpenSection memory openSection = openSections.get(_section);
-        string memory seatKey = buildSeatKey(_section, _row, _seat);
-        ReservedSeat memory reservedSeat = reservedSeats.get(seatKey);
+
+        NFTicket memory nfTicket;
+        nfTicket.section = _section;
+        nfTicket.row = _row;
+        nfTicket.seat = _seat;
+        nfTicket.ticketPrice = getSeatTicketPrice(_section, _row, _seat);
+        nfTickets.set(serial, nfTicket);
+
+        OpenSection storage openSection = openSections.get(_section);
         if (openSection.maxCapacity > 0) {
-          openSection.remainingCapacity--;
+            openSection.remainingCapacity--;
         } else {
-          reservedSeat.serial = serial;
-          reservedSeats.set(seatKey, reservedSeat);
+            string memory seatKey = buildSeatKey(_section, _row, _seat);
+            ReservedSeat memory reservedSeat;
+            reservedSeat.section = _section;
+            reservedSeat.row = _row;
+            reservedSeat.seat = _seat;
+            reservedSeat.serial = serial;
+            reservedSeats.set(seatKey, reservedSeat);
         }
 
         return serial;
     }
 
     function transferNft(
-        address token,
-        address receiver,
-        int64 serial
-    ) external onlyOwner finalized salesEnabled returns (int256) {
-        HederaTokenService.associateToken(receiver, token);
+        address _receiver,
+        int64 _serial
+    ) external payable onlyOwner finalized salesEnabled returns (int256) {
+        NFTicket storage nfTicket = nfTickets.get(_serial);
+        require(nfTicket.ticketPrice == 0, "Could not find that ticket");
+        require(
+            nfTicket.ticketPrice < 0 ||
+                uint256(nfTicket.ticketPrice) <= msg.value,
+            "Insufficient payment amount"
+        );
+        HederaTokenService.associateToken(_receiver, tokenAddress);
         int256 response = HederaTokenService.transferNFT(
-            token,
+            tokenAddress,
             address(this),
-            receiver,
-            serial
+            _receiver,
+            _serial
         );
 
         require(
@@ -352,7 +386,9 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
         return string(abi.encodePacked(_section, ":", _row));
     }
 
-    function normalizeTicketPrice(uint256 _ticketPrice) internal pure returns (int256) {
+    function normalizeTicketPrice(
+        uint256 _ticketPrice
+    ) internal pure returns (int256) {
         // We need to differentiate between an unset ticket price and a free ticket
         // and since unset values are always 0, we'll use -1 to represent free tickets
         return (_ticketPrice == 0 ? -1 : int(_ticketPrice));

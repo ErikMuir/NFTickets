@@ -2,8 +2,10 @@
 pragma solidity >=0.7.0 <0.9.0;
 
 struct ReservedSeat {
+  string section;
+  string row;
+  string seat;
   int64 serial;
-  bool ticketScanned;
 }
 
 struct ReservedSeatMap {

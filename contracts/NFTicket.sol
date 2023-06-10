@@ -6,6 +6,7 @@ struct NFTicket {
   string row;
   string seat;
   int256 ticketPrice;
+  address originalBuyer;
   bool ticketScanned;
 }
 

@@ -9,14 +9,12 @@ import "./KeyHelper.sol";
 
 import {NFTicket, NFTicketMap, NFTicketIterableMapping} from "./NFTicket.sol";
 import {OpenSection, OpenSectionMap, OpenSectionIterableMapping} from "./OpenSection.sol";
-import {ReservedSeat, ReservedSeatMap, ReservedSeatIterableMapping} from "./ReservedSeat.sol";
 import {ReservedSection, ReservedSectionMap, ReservedSectionIterableMapping} from "./ReservedSection.sol";
 
 contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
     // usings
     using NFTicketIterableMapping for NFTicketMap;
     using OpenSectionIterableMapping for OpenSectionMap;
-    using ReservedSeatIterableMapping for ReservedSeatMap;
     using ReservedSectionIterableMapping for ReservedSectionMap;
 
     // types
@@ -35,10 +33,10 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
     uint8 public venueFeePercentage;
     uint8 public serviceFeePercentage;
     int256 public defaultTicketPrice;
+    mapping(string => int64) reservedSeats;
+    NFTicketMap nfTickets;
     OpenSectionMap openSections;
     ReservedSectionMap reservedSections;
-    ReservedSeatMap reservedSeats;
-    NFTicketMap nfTickets;
 
     // constructor
     constructor(address _venue, address _entertainer, uint8 _serviceFeePercentage) {
@@ -149,12 +147,6 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
         return reservedSections.get(_key);
     }
 
-    function getReservedSeat(
-        string memory _key
-    ) public view returns (ReservedSeat memory) {
-        return reservedSeats.get(_key);
-    }
-
     function getNFTicket(int64 _serial) public view returns (NFTicket memory) {
         return nfTickets.get(_serial);
     }
@@ -168,9 +160,7 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
         if (openSection.maxCapacity > 0) {
             return (openSection.remainingCapacity > 0);
         }
-        string memory seatKey = buildSeatKey(_section, _row, _seat);
-        ReservedSeat storage reservedSeat = reservedSeats.get(seatKey);
-        return (reservedSeat.serial == 0);
+        return (reservedSeats[buildSeatKey(_section, _row, _seat)] == 0);
     }
 
     function getSeatTicketPrice(
@@ -336,6 +326,7 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
         nfTicket.row = _row;
         nfTicket.seat = _seat;
         nfTicket.ticketPrice = ticketPrice;
+        nfTicket.originalBuyer = _receiver;
         nfTickets.set(serial, nfTicket);
 
         OpenSection storage openSection = openSections.get(_section);
@@ -343,12 +334,7 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
             openSection.remainingCapacity--;
         } else {
             string memory seatKey = buildSeatKey(_section, _row, _seat);
-            ReservedSeat memory reservedSeat;
-            reservedSeat.section = _section;
-            reservedSeat.row = _row;
-            reservedSeat.seat = _seat;
-            reservedSeat.serial = serial;
-            reservedSeats.set(seatKey, reservedSeat);
+            reservedSeats[seatKey] = serial;
         }
 
         HederaTokenService.associateToken(_receiver, tokenAddress);
@@ -366,12 +352,14 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
         return serial;
     }
 
+    // support function in case ticket was minted but failed to transfer
     function transferNft(
         address _receiver,
         int64 _serial
     ) external onlyOwner finalized salesEnabled returns (int256) {
         NFTicket storage nfTicket = nfTickets.get(_serial);
         require(nfTicket.ticketPrice == 0, "Could not find that ticket");
+        require(nfTicket.originalBuyer == _receiver, "Not the original buyer");
         HederaTokenService.associateToken(_receiver, tokenAddress);
         int256 response = HederaTokenService.transferNFT(
             tokenAddress,

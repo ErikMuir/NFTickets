@@ -12,16 +12,10 @@ import {OpenSection, OpenSectionMap, OpenSectionIterableMapping} from "./OpenSec
 import {ReservedSection, ReservedSectionMap, ReservedSectionIterableMapping} from "./ReservedSection.sol";
 
 contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
-    // usings
     using NFTicketIterableMapping for NFTicketMap;
     using OpenSectionIterableMapping for OpenSectionMap;
     using ReservedSectionIterableMapping for ReservedSectionMap;
 
-    // types
-
-    // constants
-
-    // properties
     address public owner;
     address public venue;
     address public entertainer;
@@ -38,7 +32,6 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
     OpenSectionMap openSections;
     ReservedSectionMap reservedSections;
 
-    // constructor
     constructor(address _venue, address _entertainer, uint8 _serviceFeePercentage) {
         require(
             _venue != address(0) && _entertainer != address(0),
@@ -246,14 +239,6 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
         entertainerSigned = true;
     }
 
-    function enableTicketSales() external onlyAdmin finalized tokenCreated {
-        ticketSalesEnabled = true;
-    }
-
-    function disableTicketSales() external onlyAdmin finalized salesEnabled {
-        ticketSalesEnabled = false;
-    }
-
     function createNft(
         string memory name,
         string memory symbol,
@@ -291,6 +276,14 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
         return createdToken;
     }
 
+    function enableTicketSales() external onlyAdmin tokenCreated {
+        ticketSalesEnabled = true;
+    }
+
+    function disableTicketSales() external onlyAdmin salesEnabled {
+        ticketSalesEnabled = false;
+    }
+
     function mintAndTransferNft(
         address _receiver,
         string calldata _section,
@@ -301,7 +294,6 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
         external
         payable
         onlyOwner
-        finalized
         salesEnabled
         seatAvailable(_section, _row, _seat)
         returns (int64)
@@ -356,7 +348,7 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
     function transferNft(
         address _receiver,
         int64 _serial
-    ) external onlyOwner finalized salesEnabled returns (int256) {
+    ) external onlyOwner returns (int256) {
         NFTicket storage nfTicket = nfTickets.get(_serial);
         require(nfTicket.ticketPrice == 0, "Could not find that ticket");
         require(nfTicket.originalBuyer == _receiver, "Not the original buyer");
@@ -374,6 +366,13 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
         );
 
         return response;
+    }
+
+    function scanTicket(int64 _serial) external onlyVenue {
+        NFTicket storage nfTicket = nfTickets.get(_serial);
+        require(nfTicket.ticketPrice == 0, "Could not find that ticket");
+        require(nfTicket.ticketScanned == false, "Ticket already scanned");
+        nfTicket.ticketScanned = true;
     }
 
     // internal functions

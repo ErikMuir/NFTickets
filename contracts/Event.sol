@@ -285,7 +285,6 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
     }
 
     function mintAndTransferNft(
-        address _receiver,
         string calldata _section,
         string calldata _row,
         string calldata _seat,
@@ -293,7 +292,6 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
     )
         external
         payable
-        onlyOwner
         salesEnabled
         seatAvailable(_section, _row, _seat)
         returns (int64)
@@ -311,6 +309,8 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
             "Failed to mint NFTicket"
         );
 
+        // TODO : distribute payment and fees
+
         int64 serial = serials[0];
 
         NFTicket memory nfTicket;
@@ -318,7 +318,7 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
         nfTicket.row = _row;
         nfTicket.seat = _seat;
         nfTicket.ticketPrice = ticketPrice;
-        nfTicket.originalBuyer = _receiver;
+        nfTicket.originalBuyer = msg.sender;
         nfTickets.set(serial, nfTicket);
 
         OpenSection storage openSection = openSections.get(_section);
@@ -329,11 +329,11 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
             reservedSeats[seatKey] = serial;
         }
 
-        HederaTokenService.associateToken(_receiver, tokenAddress);
+        HederaTokenService.associateToken(msg.sender, tokenAddress);
         int256 transferResponse = HederaTokenService.transferNFT(
             tokenAddress,
             address(this),
-            _receiver,
+            msg.sender,
             serial
         );
 

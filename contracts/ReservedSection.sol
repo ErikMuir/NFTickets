@@ -7,9 +7,9 @@ struct ReservedSection {
 
 struct ReservedSectionMap {
   string[] keys;
-  mapping(string key => ReservedSection) values;
-  mapping(string key => uint) indexOf;
-  mapping(string key => bool) inserted;
+  mapping(string => ReservedSection) values;
+  mapping(string => uint) indexOf;
+  mapping(string => bool) inserted;
 }
 
 library ReservedSectionIterableMapping {

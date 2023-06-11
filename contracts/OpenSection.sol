@@ -9,9 +9,9 @@ struct OpenSection {
 
 struct OpenSectionMap {
   string[] keys;
-  mapping(string key => OpenSection) values;
-  mapping(string key => uint256) indexOf;
-  mapping(string key => bool) inserted;
+  mapping(string => OpenSection) values;
+  mapping(string => uint256) indexOf;
+  mapping(string => bool) inserted;
 }
 
 library OpenSectionIterableMapping {

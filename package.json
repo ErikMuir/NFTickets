@@ -4,6 +4,12 @@
   "description": "A ledger-based ticketing system for live events built on the Hedera Hashgraph network",
   "main": "index.js",
   "scripts": {
+    "lint": "eslint --ext .js,.ts",
+    "hardhat:compile": "hardhat compile",
+    "hardhat:console": "hardhat console --network ${NETWORK:-hardhat}",
+    "hardhat:deploy": "hardhat run --network ${NETWORK:-hardhat} contracts/deploy.ts",
+    "hardhat:node": "hardhat node",
+    "hardhat:test": "hardhat test",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -17,7 +23,26 @@
     "@nomicfoundation/hardhat-chai-matchers": "^1.0.4",
     "@nomicfoundation/hardhat-network-helpers": "^1.0.7",
     "@nomicfoundation/hardhat-toolbox": "^2.0.0",
+    "@nomiclabs/hardhat-ethers": "^2.2.3",
+    "@types/chai": "^4.3.5",
+    "@types/node": "^20.1.5",
+    "@types/typescript": "^2.0.0",
+    "dotenv": "^16.0.3",
+    "eslint": "^8.40.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-airbnb-typescript": "^17.0.0",
+    "eslint-config-next": "^13.4.2",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-import-resolver-typescript": "^3.5.5",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-jest": "^27.2.1",
+    "eslint-plugin-prettier": "^4.2.1",
     "hardhat": "^2.14.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@ethersproject/providers": "^5.7.2",
+    "esbuild-runner": "^2.2.2",
+    "ethers": "^5.7.2",
+    "typescript": "^5.0.4"
+  }
 }

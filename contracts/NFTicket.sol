@@ -12,9 +12,9 @@ struct NFTicket {
 
 struct NFTicketMap {
   int64[] keys;
-  mapping(int64 key => NFTicket) values;
-  mapping(int64 key => uint256) indexOf;
-  mapping(int64 key => bool) inserted;
+  mapping(int64 => NFTicket) values;
+  mapping(int64 => uint256) indexOf;
+  mapping(int64 => bool) inserted;
 }
 
 library NFTicketIterableMapping {

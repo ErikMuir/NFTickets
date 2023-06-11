@@ -28,12 +28,12 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
     int256 public defaultTicketPrice;
     uint8 public serviceFeeBasePoints;
     uint8 public venueFeeBasePoints;
-    uint256 serviceFee;
-    uint256 venueFee;
-    uint256 entertainerProceeds;
-    bool serviceFeeCollected;
-    bool venueFeeCollected;
-    bool entertainerProceedsCollected;
+    uint256 public serviceFee;
+    uint256 public venueFee;
+    uint256 public entertainerProceeds;
+    bool public serviceFeeCollected;
+    bool public venueFeeCollected;
+    bool public entertainerProceedsCollected;
     mapping(string => int64) reservedSeats;
     NFTicketMap nfTickets;
     OpenSectionMap openSections;

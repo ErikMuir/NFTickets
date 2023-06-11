@@ -22,17 +22,28 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
     address public tokenAddress;
     bool public venueSigned;
     bool public entertainerSigned;
-    bool public ticketSalesEnabled;
     uint256 public eventDateTime;
-    uint8 public venueFeePercentage;
-    uint8 public serviceFeePercentage;
+    uint256 public ticketSalesStartDateTime;
+    uint256 public ticketSalesEndDateTime;
     int256 public defaultTicketPrice;
+    uint8 public serviceFeeBasePoints;
+    uint8 public venueFeeBasePoints;
+    uint256 serviceFee;
+    uint256 venueFee;
+    uint256 entertainerProceeds;
+    bool serviceFeeCollected;
+    bool venueFeeCollected;
+    bool entertainerProceedsCollected;
     mapping(string => int64) reservedSeats;
     NFTicketMap nfTickets;
     OpenSectionMap openSections;
     ReservedSectionMap reservedSections;
 
-    constructor(address _venue, address _entertainer, uint8 _serviceFeePercentage) {
+    constructor(
+        address _venue,
+        address _entertainer,
+        uint8 _serviceFeeBasePoints
+    ) {
         require(
             _venue != address(0) && _entertainer != address(0),
             "Venue and entertainer are required"
@@ -40,11 +51,12 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
         owner = msg.sender;
         venue = _venue;
         entertainer = _entertainer;
-        serviceFeePercentage = _serviceFeePercentage;
+        serviceFeeBasePoints = _serviceFeeBasePoints;
         venueSigned = false;
         entertainerSigned = false;
-        ticketSalesEnabled = false;
     }
+
+    receive() external payable {}
 
     // access modifiers
     modifier onlyOwner() {
@@ -71,10 +83,7 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
     }
 
     modifier finalized() {
-        require(
-            venueSigned && entertainerSigned,
-            "Contract not yet finalized"
-        );
+        require(venueSigned && entertainerSigned, "Contract not yet finalized");
         _;
     }
 
@@ -87,9 +96,19 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
     }
 
     modifier readyToSign() {
+        require(eventDateTime != 0, "Event date time not set");
+        require(defaultTicketPrice != 0, "Default ticket price not set");
         require(
-            eventDateTime > 0 && defaultTicketPrice != 0,
-            "Contract not ready to sign"
+            ticketSalesStartDateTime != 0,
+            "Ticket sales start date time not set"
+        );
+        require(
+            ticketSalesEndDateTime != 0,
+            "Ticket sales end date time not set"
+        );
+        require(
+            serviceFeeBasePoints + venueFeeBasePoints < 10_000,
+            "Fees are too high"
         );
         _;
     }
@@ -106,7 +125,13 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
     }
 
     modifier salesEnabled() {
-        require(ticketSalesEnabled, "Ticket sales not enabled");
+        bool ticketSalesHaveStarted = block.timestamp >=
+            ticketSalesStartDateTime;
+        bool ticketSalesHaveEnded = block.timestamp < ticketSalesEndDateTime;
+        require(
+            ticketSalesHaveStarted && !ticketSalesHaveEnded,
+            "Ticket sales not enabled"
+        );
         _;
     }
 
@@ -119,7 +144,19 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
         _;
     }
 
+    modifier salesEnded() {
+        require(
+            block.timestamp >= ticketSalesEndDateTime,
+            "Ticket sales are still active"
+        );
+        _;
+    }
+
     // public getters
+    function getBalance() public view returns (uint256) {
+        return address(this).balance;
+    }
+
     function getOpenSectionKeys() public view returns (string[] memory) {
         return openSections.keys;
     }
@@ -195,8 +232,22 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
         eventDateTime = _eventDateTime;
     }
 
-    function setVenueFeePercentage(uint8 _venueFeePercentage) external onlyAdmin notFinalized resetSignatures {
-        venueFeePercentage = _venueFeePercentage;
+    function setTicketSalesStartDateTime(
+        uint256 _ticketSalesStartDateTime
+    ) external onlyAdmin notFinalized resetSignatures {
+        ticketSalesStartDateTime = _ticketSalesStartDateTime;
+    }
+
+    function setTicketSalesEndDateTime(
+        uint256 _ticketSalesEndDateTime
+    ) external onlyAdmin notFinalized resetSignatures {
+        ticketSalesEndDateTime = _ticketSalesEndDateTime;
+    }
+
+    function setVenueFeeBasePoints(
+        uint8 _venueFeeBasePoints
+    ) external onlyAdmin notFinalized resetSignatures {
+        venueFeeBasePoints = _venueFeeBasePoints;
     }
 
     function setDefaultTicketPrice(
@@ -276,14 +327,65 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
         return createdToken;
     }
 
-    function enableTicketSales() external onlyAdmin tokenCreated {
-        ticketSalesEnabled = true;
+    function transferNft(
+        address _receiver,
+        int64 _serial
+    ) external onlyOwner returns (int256) {
+        // support function in case ticket was minted but failed to transfer
+        NFTicket storage nfTicket = nfTickets.get(_serial);
+        require(nfTicket.ticketPrice == 0, "Could not find that ticket");
+        require(nfTicket.originalBuyer == _receiver, "Not the original buyer");
+        HederaTokenService.associateToken(_receiver, tokenAddress);
+        int256 response = HederaTokenService.transferNFT(
+            tokenAddress,
+            address(this),
+            _receiver,
+            _serial
+        );
+
+        require(
+            response == HederaResponseCodes.SUCCESS,
+            "Failed to transfer NFTicket"
+        );
+
+        return response;
     }
 
-    function disableTicketSales() external onlyAdmin salesEnabled {
-        ticketSalesEnabled = false;
+    function scanTicket(int64 _serial) external onlyVenue {
+        NFTicket storage nfTicket = nfTickets.get(_serial);
+        require(nfTicket.ticketPrice == 0, "Could not find that ticket");
+        require(nfTicket.ticketScanned == false, "Ticket already scanned");
+        nfTicket.ticketScanned = true;
     }
 
+    function collectServiceFee() external onlyOwner salesEnded {
+        require(!serviceFeeCollected, "Service fee already collected");
+        distributeProceeds();
+        (bool success, ) = owner.call{value: serviceFee}("");
+        require(success, "Failed to transfer");
+        serviceFeeCollected = true;
+    }
+
+    function collectVenueFee() external onlyVenue salesEnded {
+        require(!venueFeeCollected, "Venue fee already collected");
+        distributeProceeds();
+        (bool success, ) = venue.call{value: venueFee}("");
+        require(success, "Failed to transfer");
+        venueFeeCollected = true;
+    }
+
+    function collectEntertainerProceeds() external onlyEntertainer salesEnded {
+        require(
+            !entertainerProceedsCollected,
+            "Entertainer proceeds already collected"
+        );
+        distributeProceeds();
+        (bool success, ) = entertainer.call{value: entertainerProceeds}("");
+        require(success, "Failed to transfer");
+        entertainerProceedsCollected = true;
+    }
+
+    // public payable
     function mintAndTransferNft(
         string calldata _section,
         string calldata _row,
@@ -298,7 +400,10 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
     {
         int256 ticketPrice = getSeatTicketPrice(_section, _row, _seat);
         if (ticketPrice > 0) {
-          require(uint256(ticketPrice) <= msg.value, "Insufficient payment amount");
+            require(
+                uint256(ticketPrice) <= msg.value,
+                "Insufficient payment amount"
+            );
         }
 
         (int256 mintResponse, , int64[] memory serials) = HederaTokenService
@@ -308,8 +413,6 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
             mintResponse == HederaResponseCodes.SUCCESS,
             "Failed to mint NFTicket"
         );
-
-        // TODO : distribute payment and fees
 
         int64 serial = serials[0];
 
@@ -338,41 +441,10 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
         );
 
         if (transferResponse != HederaResponseCodes.SUCCESS) {
-          // TODO : do something to let user know their ticket was minted but not transferred yet
+            // TODO : do something to let user know their ticket was minted but not transferred yet
         }
 
         return serial;
-    }
-
-    // support function in case ticket was minted but failed to transfer
-    function transferNft(
-        address _receiver,
-        int64 _serial
-    ) external onlyOwner returns (int256) {
-        NFTicket storage nfTicket = nfTickets.get(_serial);
-        require(nfTicket.ticketPrice == 0, "Could not find that ticket");
-        require(nfTicket.originalBuyer == _receiver, "Not the original buyer");
-        HederaTokenService.associateToken(_receiver, tokenAddress);
-        int256 response = HederaTokenService.transferNFT(
-            tokenAddress,
-            address(this),
-            _receiver,
-            _serial
-        );
-
-        require(
-            response == HederaResponseCodes.SUCCESS,
-            "Failed to transfer NFTicket"
-        );
-
-        return response;
-    }
-
-    function scanTicket(int64 _serial) external onlyVenue {
-        NFTicket storage nfTicket = nfTickets.get(_serial);
-        require(nfTicket.ticketPrice == 0, "Could not find that ticket");
-        require(nfTicket.ticketScanned == false, "Ticket already scanned");
-        nfTicket.ticketScanned = true;
     }
 
     // internal functions
@@ -409,5 +481,14 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
         string memory _reservedSectionKey
     ) internal view returns (int256) {
         return reservedSections.get(_reservedSectionKey).ticketPrice;
+    }
+
+    function distributeProceeds() internal salesEnded {
+        if (serviceFee == 0 && venueFee == 0 && entertainerProceeds == 0) {
+            uint256 totalBalance = address(this).balance;
+            serviceFee = (totalBalance * serviceFeeBasePoints) / 10_000;
+            venueFee = (totalBalance * venueFeeBasePoints) / 10_000;
+            entertainerProceeds = totalBalance - (serviceFee + venueFee);
+        }
     }
 }

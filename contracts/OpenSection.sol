@@ -15,19 +15,19 @@ struct OpenSectionMap {
 }
 
 library OpenSectionIterableMapping {
-  function get(OpenSectionMap storage self, string memory key) public view returns (OpenSection storage) {
+  function get(OpenSectionMap storage self, string memory key) internal view returns (OpenSection storage) {
     return self.values[key];
   }
 
-  function getKeyAtIndex(OpenSectionMap storage self, uint256 index) public view returns (string storage) {
+  function getKeyAtIndex(OpenSectionMap storage self, uint256 index) internal view returns (string storage) {
     return self.keys[index];
   }
 
-  function size(OpenSectionMap storage self) public view returns (uint256) {
+  function size(OpenSectionMap storage self) internal view returns (uint256) {
     return self.keys.length;
   }
 
-  function set(OpenSectionMap storage self, string memory key, OpenSection memory val) public {
+  function set(OpenSectionMap storage self, string memory key, OpenSection memory val) internal {
     if (self.inserted[key]) {
       self.values[key] = val;
     } else {
@@ -38,7 +38,7 @@ library OpenSectionIterableMapping {
     }
   }
 
-  function remove(OpenSectionMap storage self, string memory key) public {
+  function remove(OpenSectionMap storage self, string memory key) internal {
     if (!self.inserted[key]) {
       return;
     }

@@ -9,7 +9,7 @@ const config: HardhatUserConfig = {
     timeout: 3600000,
   },
   solidity: {
-    version: "0.8.20",
+    version: "0.8.17",
     settings: {
       optimizer: {
         enabled: true,
@@ -29,7 +29,6 @@ const config: HardhatUserConfig = {
       accounts: [getRequired("OPERATOR_KEY")],
     },
   },
-  defaultNetwork: "testnet",
 };
 
 export default config;

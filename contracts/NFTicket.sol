@@ -2,12 +2,10 @@
 pragma solidity >=0.7.0 <0.9.0;
 
 struct NFTicket {
-  string section;
-  string row;
-  string seat;
-  int256 ticketPrice;
-  address originalBuyer;
-  bool ticketScanned;
+  string seatKey;
+  int256 price;
+  address buyer;
+  bool scanned;
 }
 
 struct NFTicketMap {
@@ -18,19 +16,19 @@ struct NFTicketMap {
 }
 
 library NFTicketIterableMapping {
-  function get(NFTicketMap storage self, int64 key) public view returns (NFTicket storage) {
+  function get(NFTicketMap storage self, int64 key) internal view returns (NFTicket storage) {
     return self.values[key];
   }
 
-  function getKeyAtIndex(NFTicketMap storage self, uint256 index) public view returns (int64) {
+  function getKeyAtIndex(NFTicketMap storage self, uint256 index) internal view returns (int64) {
     return self.keys[index];
   }
 
-  function size(NFTicketMap storage self) public view returns (uint256) {
+  function size(NFTicketMap storage self) internal view returns (uint256) {
     return self.keys.length;
   }
 
-  function set(NFTicketMap storage self, int64 key, NFTicket memory val) public {
+  function set(NFTicketMap storage self, int64 key, NFTicket memory val) internal {
     if (self.inserted[key]) {
       self.values[key] = val;
     } else {
@@ -41,7 +39,7 @@ library NFTicketIterableMapping {
     }
   }
 
-  function remove(NFTicketMap storage self, int64 key) public {
+  function remove(NFTicketMap storage self, int64 key) internal {
     if (!self.inserted[key]) {
       return;
     }

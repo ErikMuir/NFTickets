@@ -6,10 +6,9 @@ import "./IHederaTokenService.sol";
 import "./HederaTokenService.sol";
 import "./ExpiryHelper.sol";
 import "./KeyHelper.sol";
-
-import {NFTicket, NFTicketMap, NFTicketIterableMapping} from "./NFTicket.sol";
-import {OpenSection, OpenSectionMap, OpenSectionIterableMapping} from "./OpenSection.sol";
-import {ReservedSection, ReservedSectionMap, ReservedSectionIterableMapping} from "./ReservedSection.sol";
+import "./NFTicket.sol";
+import "./OpenSection.sol";
+import "./ReservedSection.sol";
 
 contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
     using NFTicketIterableMapping for NFTicketMap;
@@ -26,8 +25,8 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
     uint256 public ticketSalesStartDateTime;
     uint256 public ticketSalesEndDateTime;
     int256 public defaultTicketPrice;
-    uint8 public serviceFeeBasePoints;
-    uint8 public venueFeeBasePoints;
+    uint256 public serviceFeeBasePoints;
+    uint256 public venueFeeBasePoints;
     uint256 public serviceFee;
     uint256 public venueFee;
     uint256 public entertainerProceeds;
@@ -42,7 +41,7 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
     constructor(
         address _venue,
         address _entertainer,
-        uint8 _serviceFeeBasePoints
+        uint256 _serviceFeeBasePoints
     ) {
         require(
             _venue != address(0) && _entertainer != address(0),
@@ -135,15 +134,6 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
         _;
     }
 
-    modifier seatAvailable(
-        string calldata _section,
-        string calldata _row,
-        string calldata _seat
-    ) {
-        require(isSeatAvailable(_section, _row, _seat), "Ticket not available");
-        _;
-    }
-
     modifier salesEnded() {
         require(
             block.timestamp >= ticketSalesEndDateTime,
@@ -181,18 +171,6 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
         return nfTickets.get(_serial);
     }
 
-    function isSeatAvailable(
-        string calldata _section,
-        string calldata _row,
-        string calldata _seat
-    ) public view returns (bool) {
-        OpenSection storage openSection = openSections.get(_section);
-        if (openSection.maxCapacity > 0) {
-            return (openSection.remainingCapacity > 0);
-        }
-        return (reservedSeats[buildSeatKey(_section, _row, _seat)] == 0);
-    }
-
     function getSeatTicketPrice(
         string calldata _section,
         string calldata _row,
@@ -204,14 +182,14 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
         }
 
         ticketPrice = getReservedSectionTicketPrice(
-            buildSeatKey(_section, _row, _seat)
+            buildTicketKey(_section, _row, _seat)
         );
         if (ticketPrice != 0) {
             return ticketPrice;
         }
 
         ticketPrice = getReservedSectionTicketPrice(
-            buildRowKey(_section, _row)
+            buildTicketKey(_section, _row, "")
         );
         if (ticketPrice != 0) {
             return ticketPrice;
@@ -245,7 +223,7 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
     }
 
     function setVenueFeeBasePoints(
-        uint8 _venueFeeBasePoints
+        uint256 _venueFeeBasePoints
     ) external onlyAdmin notFinalized resetSignatures {
         venueFeeBasePoints = _venueFeeBasePoints;
     }
@@ -261,20 +239,14 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
         uint256 _ticketPrice,
         uint256 _capacity
     ) external onlyAdmin notFinalized resetSignatures {
-        OpenSection memory openSection;
-        openSection.ticketPrice = normalizeTicketPrice(_ticketPrice);
-        openSection.maxCapacity = _capacity;
-        openSection.remainingCapacity = _capacity;
-        openSections.set(_key, openSection);
+        openSections.set(_key, OpenSection(normalizeTicketPrice(_ticketPrice), _capacity, _capacity));
     }
 
     function setReservedSection(
         string calldata _key,
         uint256 _ticketPrice
     ) external onlyAdmin notFinalized resetSignatures {
-        ReservedSection memory reservedSection;
-        reservedSection.ticketPrice = normalizeTicketPrice(_ticketPrice);
-        reservedSections.set(_key, reservedSection);
+        reservedSections.set(_key, ReservedSection(normalizeTicketPrice(_ticketPrice)));
     }
 
     function venueSign() external onlyVenue notFinalized readyToSign {
@@ -333,8 +305,8 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
     ) external onlyOwner returns (int256) {
         // support function in case ticket was minted but failed to transfer
         NFTicket storage nfTicket = nfTickets.get(_serial);
-        require(nfTicket.ticketPrice == 0, "Could not find that ticket");
-        require(nfTicket.originalBuyer == _receiver, "Not the original buyer");
+        require(nfTicket.price == 0, "Could not find that ticket");
+        require(nfTicket.buyer == _receiver, "Not the original buyer");
         HederaTokenService.associateToken(_receiver, tokenAddress);
         int256 response = HederaTokenService.transferNFT(
             tokenAddress,
@@ -353,9 +325,9 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
 
     function scanTicket(int64 _serial) external onlyVenue {
         NFTicket storage nfTicket = nfTickets.get(_serial);
-        require(nfTicket.ticketPrice == 0, "Could not find that ticket");
-        require(nfTicket.ticketScanned == false, "Ticket already scanned");
-        nfTicket.ticketScanned = true;
+        require(nfTicket.price == 0, "Could not find that ticket");
+        require(nfTicket.scanned == false, "Ticket already scanned");
+        nfTicket.scanned = true;
     }
 
     function collectServiceFee() external onlyOwner salesEnded {
@@ -391,13 +363,15 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
         string calldata _row,
         string calldata _seat,
         bytes[] memory _metadata
-    )
-        external
-        payable
-        salesEnabled
-        seatAvailable(_section, _row, _seat)
-        returns (int64)
-    {
+    ) external payable salesEnabled returns (int64) {
+        OpenSection storage openSection = openSections.get(_section);
+        string memory ticketKey = buildTicketKey(_section, _row, _seat);
+
+        bool seatAvailable = openSection.maxCapacity > 0
+            ? openSection.remainingCapacity > 0
+            : reservedSeats[ticketKey] == 0;
+        require(seatAvailable, "Ticket not available");
+
         int256 ticketPrice = getSeatTicketPrice(_section, _row, _seat);
         if (ticketPrice > 0) {
             require(
@@ -414,22 +388,15 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
             "Failed to mint NFTicket"
         );
 
-        int64 serial = serials[0];
+        nfTickets.set(
+            serials[0],
+            NFTicket(ticketKey, ticketPrice, msg.sender, false)
+        );
 
-        NFTicket memory nfTicket;
-        nfTicket.section = _section;
-        nfTicket.row = _row;
-        nfTicket.seat = _seat;
-        nfTicket.ticketPrice = ticketPrice;
-        nfTicket.originalBuyer = msg.sender;
-        nfTickets.set(serial, nfTicket);
-
-        OpenSection storage openSection = openSections.get(_section);
         if (openSection.maxCapacity > 0) {
             openSection.remainingCapacity--;
         } else {
-            string memory seatKey = buildSeatKey(_section, _row, _seat);
-            reservedSeats[seatKey] = serial;
+            reservedSeats[ticketKey] = serials[0];
         }
 
         HederaTokenService.associateToken(msg.sender, tokenAddress);
@@ -437,30 +404,29 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
             tokenAddress,
             address(this),
             msg.sender,
-            serial
+            serials[0]
         );
 
         if (transferResponse != HederaResponseCodes.SUCCESS) {
             // TODO : do something to let user know their ticket was minted but not transferred yet
         }
 
-        return serial;
+        return serials[0];
     }
 
     // internal functions
-    function buildSeatKey(
-        string calldata _section,
-        string calldata _row,
-        string calldata _seat
+    function buildTicketKey(
+        string memory _section,
+        string memory _row,
+        string memory _seat
     ) internal pure returns (string memory) {
+      if (bytes(_seat).length > 0) {
         return string(abi.encodePacked(_section, ":", _row, ":", _seat));
-    }
-
-    function buildRowKey(
-        string calldata _section,
-        string calldata _row
-    ) internal pure returns (string memory) {
+      }
+      if (bytes(_row).length > 0) {
         return string(abi.encodePacked(_section, ":", _row));
+      }
+      return _section;
     }
 
     function normalizeTicketPrice(

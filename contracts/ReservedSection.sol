@@ -13,19 +13,19 @@ struct ReservedSectionMap {
 }
 
 library ReservedSectionIterableMapping {
-  function get(ReservedSectionMap storage self, string memory key) public view returns (ReservedSection storage) {
+  function get(ReservedSectionMap storage self, string memory key) internal view returns (ReservedSection storage) {
     return self.values[key];
   }
 
-  function getKeyAtIndex(ReservedSectionMap storage self, uint256 index) public view returns (string storage) {
+  function getKeyAtIndex(ReservedSectionMap storage self, uint256 index) internal view returns (string storage) {
     return self.keys[index];
   }
 
-  function size(ReservedSectionMap storage self) public view returns (uint256) {
+  function size(ReservedSectionMap storage self) internal view returns (uint256) {
     return self.keys.length;
   }
 
-  function set(ReservedSectionMap storage self, string memory key, ReservedSection memory val) public {
+  function set(ReservedSectionMap storage self, string memory key, ReservedSection memory val) internal {
     if (self.inserted[key]) {
       self.values[key] = val;
     } else {
@@ -36,7 +36,7 @@ library ReservedSectionIterableMapping {
     }
   }
 
-  function remove(ReservedSectionMap storage self, string memory key) public {
+  function remove(ReservedSectionMap storage self, string memory key) internal {
     if (!self.inserted[key]) {
       return;
     }

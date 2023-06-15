@@ -16,6 +16,10 @@ struct NFTicketMap {
 }
 
 library NFTicketIterableMapping {
+  function exists(NFTicketMap storage self, int64 key) internal view returns (bool) {
+    return self.inserted[key];
+  }
+
   function get(NFTicketMap storage self, int64 key) internal view returns (NFTicket storage) {
     return self.values[key];
   }

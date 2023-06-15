@@ -13,6 +13,10 @@ struct ReservedSectionMap {
 }
 
 library ReservedSectionIterableMapping {
+  function exists(ReservedSectionMap storage self, string memory key) internal view returns (bool) {
+    return self.inserted[key];
+  }
+
   function get(ReservedSectionMap storage self, string memory key) internal view returns (ReservedSection storage) {
     return self.values[key];
   }

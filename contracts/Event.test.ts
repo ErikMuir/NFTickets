@@ -10,7 +10,7 @@ const toEther = (val: number): BigNumberish =>
 
 async function deployContract() {
   const serviceFeeBasePoints = toEther(300);
-  const [owner, venue, entertainer] = await ethers.getSigners();
+  const [owner, venue, entertainer, attendee] = await ethers.getSigners();
   const factory = await ethers.getContractFactory("Event");
   const contract = await factory.deploy(
     venue.address,
@@ -18,7 +18,15 @@ async function deployContract() {
     serviceFeeBasePoints
   );
   await contract.deployed();
-  return { serviceFeeBasePoints, owner, venue, entertainer, factory, contract };
+  return {
+    serviceFeeBasePoints,
+    owner,
+    venue,
+    entertainer,
+    attendee,
+    factory,
+    contract,
+  };
 }
 
 describe("Event", () => {
@@ -26,12 +34,20 @@ describe("Event", () => {
   let owner: SignerWithAddress;
   let venue: SignerWithAddress;
   let entertainer: SignerWithAddress;
+  let attendee: SignerWithAddress;
   let factory: ContractFactory;
   let contract: Contract;
 
   beforeEach(async () => {
-    ({ serviceFeeBasePoints, venue, entertainer, contract, factory, owner } =
-      await loadFixture(deployContract));
+    ({
+      serviceFeeBasePoints,
+      venue,
+      entertainer,
+      attendee,
+      contract,
+      factory,
+      owner,
+    } = await loadFixture(deployContract));
   });
 
   describe("constructor", () => {
@@ -82,87 +98,295 @@ describe("Event", () => {
     });
   });
 
-  describe("terms", () => {
-    describe("open sections", () => {
-      describe("setOpenSection", () => {
-        it("should set the open section", async () => {
-          await contract
-            .connect(venue)
-            .setOpenSection("foobar", ethers.constants.One, ethers.constants.Two);
-          const actual = await contract.getOpenSection("foobar");
-          expect(actual.ticketPrice).to.equal(ethers.constants.One);
-          expect(actual.maxCapacity).to.equal(ethers.constants.Two);
-          expect(actual.remainingCapacity).to.equal(ethers.constants.Two);
+  describe("terms phase", () => {
+    describe("dates and times", () => {
+      const dt = toEther(Date.now() / 1_000);
+
+      describe("setEventDateTime", () => {
+        it("should set the event date time", async () => {
+          await contract.connect(venue).setEventDateTime(dt);
+          expect(await contract.eventDateTime()).to.equal(dt);
+        });
+  
+        [owner, attendee].forEach((signer: SignerWithAddress) => {
+          it("should revert when called by non-admin", async () => {
+            contract.connect(signer);
+            await expect(
+              contract.setEventDateTime(dt)
+            ).to.be.revertedWith("Unauthorized");
+          });
+        });
+      });
+
+      describe("setTicketSalesStartDateTime", () => {
+        it("should set the ticket sales start date time", async () => {
+          await contract.connect(venue).setTicketSalesStartDateTime(dt);
+          expect(await contract.ticketSalesStartDateTime()).to.equal(dt);
+        });
+
+        [owner, attendee].forEach((signer: SignerWithAddress) => {
+          it("should revert when called by non-admin", async () => {
+            contract.connect(signer);
+            await expect(
+              contract.setTicketSalesStartDateTime(dt)
+            ).to.be.revertedWith("Unauthorized");
+          });
+        });
+      });
+
+      describe("setTicketSalesEndDateTime", () => {
+        it("should set the ticket sales end date time", async () => {
+          await contract.connect(venue).setTicketSalesEndDateTime(dt);
+          expect(await contract.ticketSalesEndDateTime()).to.equal(dt);
+        });
+
+        [owner, attendee].forEach((signer: SignerWithAddress) => {
+          it("should revert when called by non-admin", async () => {
+            contract.connect(signer);
+            await expect(
+              contract.setTicketSalesEndDateTime(dt)
+            ).to.be.revertedWith("Unauthorized");
+          });
         });
       });
     });
 
-    describe("getOpenSectionKeys", () => {
-      it("should return openSection keys", async () => {
-        await contract
-          .connect(venue)
-          .setOpenSection("foo", ethers.constants.One, ethers.constants.Two);
-        await contract
-          .connect(venue)
-          .setOpenSection("bar", ethers.constants.One, ethers.constants.Two);
-        expect(await contract.getOpenSectionKeys()).to.deep.equal([
-          "foo",
-          "bar",
-        ]);
+    describe("setVenueFeeBasePoints", () => {
+      const basePoints = toEther(300);
+
+      it("should set the venue fee base points", async () => {
+        await contract.connect(venue).setVenueFeeBasePoints(basePoints);
+        expect(await contract.venueFeeBasePoints()).to.equal(basePoints);
+      });
+
+      [owner, attendee].forEach((signer: SignerWithAddress) => {
+        it("should revert when called by non-admin", async () => {
+          contract.connect(signer);
+          await expect(
+            contract.setVenueFeeBasePoints(basePoints)
+          ).to.be.revertedWith("Unauthorized");
+        });
       });
     });
 
-    describe("getOpenSection", () => {
-      it("should return an openSection", async () => {
-        await contract
-          .connect(venue)
-          .setOpenSection("foobar", ethers.constants.One, ethers.constants.Two);
-        const actual = await contract.getOpenSection("foobar");
-        expect(actual.ticketPrice).to.equal(ethers.constants.One);
-        expect(actual.maxCapacity).to.equal(ethers.constants.Two);
-        expect(actual.remainingCapacity).to.equal(ethers.constants.Two);
+    describe("setDefaultTicketPrice", () => {
+      const ticketPrice = toEther(50);
+
+      it("should set the default ticket price when greater than 0", async () => {
+        await contract.connect(venue).setDefaultTicketPrice(ticketPrice);
+        expect(await contract.defaultTicketPrice()).to.equal(ticketPrice);
       });
 
-      it("should return an empty openSection", async () => {
-        const actual = await contract.getOpenSection("foobar");
-        expect(actual.ticketPrice).to.equal(ethers.constants.Zero);
-        expect(actual.maxCapacity).to.equal(ethers.constants.Zero);
-        expect(actual.remainingCapacity).to.equal(ethers.constants.Zero);
+      it("should set the default ticket price to -1 when free", async () => {
+        await contract.connect(venue).setDefaultTicketPrice(ethers.constants.Zero);
+        expect(await contract.defaultTicketPrice()).to.equal(-1);
       });
-    });
 
-    describe("getReservedSectionKeys", () => {
-      it("should return reservedSection keys", async () => {
-        await contract
-          .connect(venue)
-          .setReservedSection("foobar", ethers.constants.One);
-        expect(await contract.getReservedSectionKeys()).to.deep.equal([
-          "foobar",
-        ]);
+      [owner, attendee].forEach((signer: SignerWithAddress) => {
+        it("should revert when called by non-admin", async () => {
+          contract.connect(signer);
+          await expect(
+            contract.setDefaultTicketPrice(ticketPrice)
+          ).to.be.revertedWith("Unauthorized");
+        });
       });
     });
 
-    describe("getReservedSection", () => {
-      it("should return a reservedSection", async () => {
-        await contract
-          .connect(venue)
-          .setReservedSection("foobar", ethers.constants.One);
-        const actual = await contract.getReservedSection("foobar");
-        expect(actual.ticketPrice).to.equal(ethers.constants.One);
+    describe("open sections", () => {
+      const key = "foobar";
+      const capacity = toEther(500);
+
+      beforeEach(async () => {
+        await contract.connect(venue).addOpenSection(key, capacity);
       });
 
-      it("should return an empty reservedSection", async () => {
-        const actual = await contract.getOpenSection("foobar");
-        expect(actual.ticketPrice).to.equal(ethers.constants.Zero);
+      describe("addOpenSection", () => {
+        it("should add the open section", async () => {
+          const actual = await contract.getOpenSection(key);
+          expect(actual.ticketPrice).to.equal(ethers.constants.Zero);
+          expect(actual.maxCapacity).to.equal(capacity);
+          expect(actual.remainingCapacity).to.equal(capacity);
+        });
+
+        it("should revert if the section already exists", async () => {
+          await expect(
+            contract.connect(venue).addOpenSection(key, capacity)
+          ).to.be.revertedWith("Open section already exists");
+        });
+
+        [owner, entertainer, attendee].forEach((signer: SignerWithAddress) => {
+          it("should revert when called by non-venue", async () => {
+            contract.connect(signer);
+            await expect(
+              contract.addOpenSection("baz", capacity)
+            ).to.be.revertedWith("Unauthorized");
+          });
+        });
+      });
+
+      describe("setOpenSectionTicketPrice", () => {
+        const ticketPrice = toEther(75);
+
+        it("should set the ticket price", async () => {
+          await contract
+            .connect(entertainer)
+            .setOpenSectionTicketPrice(key, ticketPrice);
+          const actual = await contract.getOpenSection(key);
+          expect(actual.ticketPrice).to.equal(ticketPrice);
+        });
+
+        it("should revert when section not found", async () => {
+          await expect(
+            contract
+              .connect(entertainer)
+              .setOpenSectionTicketPrice("baz", ticketPrice)
+          ).to.be.revertedWith("Open section not found");
+        });
+
+        [owner, venue, attendee].forEach((signer: SignerWithAddress) => {
+          it("should revert when called by non-entertainer", async () => {
+            contract.connect(signer);
+            await expect(
+              contract.setOpenSectionTicketPrice(key, ticketPrice)
+            ).to.be.revertedWith("Unauthorized");
+          });
+        });
+      });
+
+      describe("setOpenSectionCapacity", () => {
+        const newCapacity = toEther(250);
+
+        it("should set the capacity", async () => {
+          await contract
+            .connect(venue)
+            .setOpenSectionCapacity(key, newCapacity);
+          const actual = await contract.getOpenSection(key);
+          expect(actual.maxCapacity).to.equal(newCapacity);
+          expect(actual.remainingCapacity).to.equal(newCapacity);
+        });
+
+        it("should revert when section not found", async () => {
+          await expect(
+            contract.connect(venue).setOpenSectionCapacity("baz", newCapacity)
+          ).to.be.revertedWith("Open section not found");
+        });
+
+        [owner, entertainer, attendee].forEach((signer: SignerWithAddress) => {
+          it("should revert when called by non-entertainer", async () => {
+            contract.connect(signer);
+            await expect(
+              contract.setOpenSectionCapacity(key, newCapacity)
+            ).to.be.revertedWith("Unauthorized");
+          });
+        });
+      });
+
+      describe("removeOpenSection", () => {
+        it("should remove the section", async () => {
+          await contract.connect(venue).removeOpenSection(key);
+          const actualKeys = await contract.getOpenSectionKeys();
+          expect(actualKeys.includes(key)).to.equal(false);
+          const actual = await contract.getOpenSection(key);
+          expect(actual.ticketPrice).to.equal(ethers.constants.Zero);
+          expect(actual.maxCapacity).to.equal(ethers.constants.Zero);
+          expect(actual.remainingCapacity).to.equal(ethers.constants.Zero);
+        });
+
+        [owner, entertainer, attendee].forEach((signer: SignerWithAddress) => {
+          it("should revert when called by non-venue", async () => {
+            contract.connect(signer);
+            await expect(contract.removeOpenSection(key)).to.be.revertedWith(
+              "Unauthorized"
+            );
+          });
+        });
+      });
+    });
+
+    describe("reserved sections", () => {
+      const key = "foobar";
+
+      beforeEach(async () => {
+        await contract.connect(venue).addReservedSection(key);
+      });
+
+      describe("addReservedSection", () => {
+        it("should add the reserved section", async () => {
+          const actual = await contract.getOpenSection(key);
+          expect(actual.ticketPrice).to.equal(ethers.constants.Zero);
+        });
+
+        it("should revert if the section already exists", async () => {
+          await expect(
+            contract.connect(venue).addReservedSection(key)
+          ).to.be.revertedWith("Reserved section already exists");
+        });
+
+        [owner, entertainer, attendee].forEach((signer: SignerWithAddress) => {
+          it("should revert when called by non-venue", async () => {
+            contract.connect(signer);
+            await expect(contract.addReservedSection(key)).to.be.revertedWith(
+              "Unauthorized"
+            );
+          });
+        });
+      });
+
+      describe("setReservedSectionTicketPrice", () => {
+        const ticketPrice = toEther(60);
+
+        it("should set the ticket price", async () => {
+          await contract
+            .connect(entertainer)
+            .setReservedSectionTicketPrice(key, ticketPrice);
+          const actual = await contract.getReservedSection(key);
+          expect(actual.ticketPrice).to.equal(ticketPrice);
+        });
+
+        it("should revert when section not found", async () => {
+          await expect(
+            contract
+              .connect(entertainer)
+              .setReservedSectionTicketPrice("baz", ticketPrice)
+          ).to.be.revertedWith("Reserved section not found");
+        });
+
+        [owner, venue, attendee].forEach((signer: SignerWithAddress) => {
+          it("should revert when called by non-entertainer", async () => {
+            contract.connect(signer);
+            await expect(
+              contract.setReservedSectionTicketPrice(key, ticketPrice)
+            ).to.be.revertedWith("Unauthorized");
+          });
+        });
+      });
+
+      describe("removeReservedSection", () => {
+        it("should remove the section", async () => {
+          await contract.connect(venue).removeReservedSection(key);
+          const actualKeys = await contract.getReservedSectionKeys();
+          expect(actualKeys.includes(key)).to.equal(false);
+          const actual = await contract.getReservedSection(key);
+          expect(actual.ticketPrice).to.equal(ethers.constants.Zero);
+        });
+
+        [owner, entertainer, attendee].forEach((signer: SignerWithAddress) => {
+          it("should revert when called by non-venue", async () => {
+            contract.connect(signer);
+            await expect(
+              contract.removeReservedSection(key)
+            ).to.be.revertedWith("Unauthorized");
+          });
+        });
       });
     });
   });
 
-  describe("pre-sales", () => {
+  describe("pre-sales phase", () => {
     it("", () => {});
   });
 
-  describe("sales", () => {
+  describe("sales phase", () => {
     describe("getNFTicket", () => {
       it("should return an NFTicket", async () => {
         // await contract.connect(venue)
@@ -178,7 +402,7 @@ describe("Event", () => {
     });
   });
 
-  describe("post-sales", () => {
+  describe("post-sales phase", () => {
     it("", () => {});
   });
 

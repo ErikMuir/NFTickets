@@ -15,6 +15,10 @@ struct OpenSectionMap {
 }
 
 library OpenSectionIterableMapping {
+  function exists(OpenSectionMap storage self, string memory key) internal view returns (bool) {
+    return self.inserted[key];
+  }
+
   function get(OpenSectionMap storage self, string memory key) internal view returns (OpenSection storage) {
     return self.values[key];
   }

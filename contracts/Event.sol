@@ -234,19 +234,63 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
         defaultTicketPrice = normalizeTicketPrice(_ticketPrice);
     }
 
-    function setOpenSection(
+    function addOpenSection(
         string calldata _key,
-        uint256 _ticketPrice,
         uint256 _capacity
-    ) external onlyAdmin notFinalized resetSignatures {
-        openSections.set(_key, OpenSection(normalizeTicketPrice(_ticketPrice), _capacity, _capacity));
+    ) external onlyVenue notFinalized resetSignatures {
+        require(!openSections.exists(_key), "Open section already exists");
+        OpenSection memory openSection;
+        openSection.maxCapacity = _capacity;
+        openSection.remainingCapacity = _capacity;
+        openSections.set(_key, openSection);
     }
 
-    function setReservedSection(
+    function setOpenSectionTicketPrice(
         string calldata _key,
         uint256 _ticketPrice
-    ) external onlyAdmin notFinalized resetSignatures {
-        reservedSections.set(_key, ReservedSection(normalizeTicketPrice(_ticketPrice)));
+    ) external onlyEntertainer notFinalized resetSignatures {
+        require(openSections.exists(_key), "Open section not found");
+        OpenSection storage openSection = openSections.get(_key);
+        openSection.ticketPrice = normalizeTicketPrice(_ticketPrice);
+    }
+
+    function setOpenSectionCapacity(
+        string calldata _key,
+        uint256 _capacity
+    ) external onlyVenue notFinalized resetSignatures {
+        require(openSections.exists(_key), "Open section not found");
+        OpenSection storage openSection = openSections.get(_key);
+        openSection.maxCapacity = _capacity;
+        openSection.remainingCapacity = _capacity;
+    }
+
+    function removeOpenSection(
+        string calldata _key
+    ) external onlyVenue notFinalized resetSignatures {
+        openSections.remove(_key);
+    }
+
+    function addReservedSection(
+        string calldata _key
+    ) external onlyVenue notFinalized resetSignatures {
+        require(!reservedSections.exists(_key), "Reserved section already exists");
+        ReservedSection memory reservedSection;
+        reservedSections.set(_key, reservedSection);
+    }
+
+    function setReservedSectionTicketPrice(
+        string calldata _key,
+        uint256 _ticketPrice
+    ) external onlyEntertainer notFinalized resetSignatures {
+        require(reservedSections.exists(_key), "Reserved section not found");
+        ReservedSection storage reservedSection = reservedSections.get(_key);
+        reservedSection.ticketPrice = normalizeTicketPrice(_ticketPrice);
+    }
+
+    function removeReservedSection(
+        string calldata _key
+    ) external onlyVenue notFinalized resetSignatures {
+        reservedSections.remove(_key);
     }
 
     function venueSign() external onlyVenue notFinalized readyToSign {
@@ -297,30 +341,6 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
         );
         tokenAddress = createdToken;
         return createdToken;
-    }
-
-    function transferNft(
-        address _receiver,
-        int64 _serial
-    ) external onlyOwner returns (int256) {
-        // support function in case ticket was minted but failed to transfer
-        NFTicket storage nfTicket = nfTickets.get(_serial);
-        require(nfTicket.price == 0, "Could not find that ticket");
-        require(nfTicket.buyer == _receiver, "Not the original buyer");
-        HederaTokenService.associateToken(_receiver, tokenAddress);
-        int256 response = HederaTokenService.transferNFT(
-            tokenAddress,
-            address(this),
-            _receiver,
-            _serial
-        );
-
-        require(
-            response == HederaResponseCodes.SUCCESS,
-            "Failed to transfer NFTicket"
-        );
-
-        return response;
     }
 
     function scanTicket(int64 _serial) external onlyVenue {
@@ -400,16 +420,14 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
         }
 
         HederaTokenService.associateToken(msg.sender, tokenAddress);
-        int256 transferResponse = HederaTokenService.transferNFT(
+        HederaTokenService.transferNFT(
             tokenAddress,
             address(this),
             msg.sender,
             serials[0]
         );
 
-        if (transferResponse != HederaResponseCodes.SUCCESS) {
-            // TODO : do something to let user know their ticket was minted but not transferred yet
-        }
+        // TODO : handle when ticket was successfully minted but failed to transfer for some reason
 
         return serials[0];
     }

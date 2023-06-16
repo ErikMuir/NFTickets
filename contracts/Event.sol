@@ -96,7 +96,6 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
 
     modifier readyToSign() {
         require(eventDateTime != 0, "Event date time not set");
-        require(defaultTicketPrice != 0, "Default ticket price not set");
         require(
             ticketSalesStartDateTime != 0,
             "Ticket sales start date time not set"
@@ -105,10 +104,7 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
             ticketSalesEndDateTime != 0,
             "Ticket sales end date time not set"
         );
-        require(
-            serviceFeeBasePoints + venueFeeBasePoints < 10_000,
-            "Fees are too high"
-        );
+        require(defaultTicketPrice != 0, "Default ticket price not set");
         _;
     }
 
@@ -206,31 +202,32 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
     // admin functions
     function setEventDateTime(
         uint256 _eventDateTime
-    ) external onlyAdmin notFinalized resetSignatures {
+    ) external onlyEntertainer notFinalized resetSignatures {
         eventDateTime = _eventDateTime;
     }
 
     function setTicketSalesStartDateTime(
         uint256 _ticketSalesStartDateTime
-    ) external onlyAdmin notFinalized resetSignatures {
+    ) external onlyEntertainer notFinalized resetSignatures {
         ticketSalesStartDateTime = _ticketSalesStartDateTime;
     }
 
     function setTicketSalesEndDateTime(
         uint256 _ticketSalesEndDateTime
-    ) external onlyAdmin notFinalized resetSignatures {
+    ) external onlyEntertainer notFinalized resetSignatures {
         ticketSalesEndDateTime = _ticketSalesEndDateTime;
     }
 
     function setVenueFeeBasePoints(
         uint256 _venueFeeBasePoints
-    ) external onlyAdmin notFinalized resetSignatures {
+    ) external onlyEntertainer notFinalized resetSignatures {
+        require(_venueFeeBasePoints + serviceFeeBasePoints < 10_000, "Venue fee too high");
         venueFeeBasePoints = _venueFeeBasePoints;
     }
 
     function setDefaultTicketPrice(
         uint256 _ticketPrice
-    ) external onlyAdmin notFinalized resetSignatures {
+    ) external onlyEntertainer notFinalized resetSignatures {
         defaultTicketPrice = normalizeTicketPrice(_ticketPrice);
     }
 
@@ -293,17 +290,13 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
         reservedSections.remove(_key);
     }
 
-    function venueSign() external onlyVenue notFinalized readyToSign {
+    function signContract() external onlyAdmin notFinalized readyToSign {
+      if (msg.sender == venue) {
         venueSigned = true;
-    }
-
-    function entertainerSign()
-        external
-        onlyEntertainer
-        notFinalized
-        readyToSign
-    {
+      }
+      if (msg.sender == entertainer) {
         entertainerSigned = true;
+      }
     }
 
     function createNft(

@@ -9,6 +9,7 @@ import "./KeyHelper.sol";
 import "./NFTicket.sol";
 import "./OpenSection.sol";
 import "./ReservedSection.sol";
+// import "hardhat/console.sol";
 
 contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
     using NFTicketIterableMapping for NFTicketMap;
@@ -122,11 +123,9 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
     modifier salesEnabled() {
         bool ticketSalesHaveStarted = block.timestamp >=
             ticketSalesStartDateTime;
-        bool ticketSalesHaveEnded = block.timestamp < ticketSalesEndDateTime;
-        require(
-            ticketSalesHaveStarted && !ticketSalesHaveEnded,
-            "Ticket sales not enabled"
-        );
+        require(ticketSalesHaveStarted, "Ticket sales have not started");
+        bool ticketSalesHaveEnded = block.timestamp >= ticketSalesEndDateTime;
+        require(!ticketSalesHaveEnded, "Ticket sales have ended");
         _;
     }
 
@@ -371,7 +370,7 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
     }
 
     // public payable
-    function mintAndTransferNft(
+    function purchaseTicket(
         string calldata _section,
         string calldata _row,
         string calldata _seat,
@@ -380,10 +379,11 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
         OpenSection storage openSection = openSections.get(_section);
         string memory ticketKey = buildTicketKey(_section, _row, _seat);
 
-        bool seatAvailable = openSection.maxCapacity > 0
-            ? openSection.remainingCapacity > 0
-            : reservedSeats[ticketKey] == 0;
-        require(seatAvailable, "Ticket not available");
+        if (openSection.maxCapacity > 0) {
+          require(openSection.remainingCapacity > 0, "Section is full");
+        } else {
+          require(reservedSeats[ticketKey] == 0, "Seat no longer available");
+        }
 
         int256 ticketPrice = getSeatTicketPrice(_section, _row, _seat);
         if (ticketPrice > 0) {

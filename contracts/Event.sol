@@ -48,12 +48,20 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
             _venue != address(0) && _entertainer != address(0),
             "Venue and entertainer are required"
         );
+
         owner = msg.sender;
         venue = _venue;
         entertainer = _entertainer;
         serviceFeeBasePoints = _serviceFeeBasePoints;
         venueSigned = false;
         entertainerSigned = false;
+
+        // test data
+        openSections.set("os-test", OpenSection(-1, 1, 0));
+        reservedSections.set("rs-test", ReservedSection(-1));
+        nfTickets.set(-1, NFTicket("os-test", -1, owner, false));
+        nfTickets.set(-2, NFTicket("rs-test", -1, owner, false));
+        reservedSeats["rs-test"] = -2;
     }
 
     receive() external payable {}
@@ -337,7 +345,7 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
 
     function scanTicket(int64 _serial) external onlyVenue {
         NFTicket storage nfTicket = nfTickets.get(_serial);
-        require(nfTicket.price == 0, "Could not find that ticket");
+        require(nfTicket.price != 0, "Could not find that ticket");
         require(nfTicket.scanned == false, "Ticket already scanned");
         nfTicket.scanned = true;
     }

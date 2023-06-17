@@ -13,6 +13,10 @@ const futureTs = toTimestamp(new Date(Date.now() + 10_000_000));
 const serviceFeeBasePoints = 300;
 const sectionKey = "foobar";
 const capacity = 500;
+const testOpenSectionKey = "os-test";
+const testReservedSectionKey = "rs-test";
+const testOpenSectionTicketSerial = -1;
+const testReservedSectionTicketSerial = -2;
 
 async function newContract() {
   const [owner, venue, entertainer, attendee] = await ethers.getSigners();
@@ -853,11 +857,11 @@ describe("Event contract", () => {
       });
 
       it("should return created token ID", async () => {
-        // TODO : figure out how to mock Hedera Token Service
+        // TODO
       });
     });
 
-    describe("mintAndTransfer function", () => {
+    describe("purchaseTicket function", () => {
       it("should revert if sales haven't started", async () => {
         const { venue, entertainer, attendee, contract } = await loadFixture(
           readyToSignContract
@@ -904,55 +908,92 @@ describe("Event contract", () => {
       });
 
       it("should revert if open section is full", async () => {
-        // TODO
+        const { attendee, contract } = await loadFixture(finalizedContract);
+        await expect(
+          contract.connect(attendee).purchaseTicket(testOpenSectionKey, "", "", [Buffer.from("{}")])
+        ).to.be.revertedWith("Section is full");
       });
 
       it("should revert if reserved seat is no longer available", async () => {
-        // TODO
+        const { attendee, contract } = await loadFixture(finalizedContract);
+        await expect(
+          contract.connect(attendee).purchaseTicket(testReservedSectionKey, "", "", [Buffer.from("{}")])
+        ).to.be.revertedWith("Seat no longer available");
       });
 
       it("should mint the NFTicket", async () => {
-        // TODO : figure out how to mock the Hedera Token Service
+        // TODO
       });
 
       it("should add the NFTicket to the contract", async () => {
-        // TODO : figure out how to mock the Hedera Token Service
+        // TODO
       });
 
       it("should decrement the remaining capacity of open section", async () => {
-        // TODO : figure out how to mock the Hedera Token Service
+        // TODO
       });
 
       it("should set the serial of the ticket key", async () => {
-        // TODO : figure out how to mock the Hedera Token Service
+        // TODO
       });
 
       it("should associate the token", async () => {
-        // TODO : figure out how to mock the Hedera Token Service
+        // TODO
       });
 
       it("should transfer the ticket", async () => {
-        // TODO : figure out how to mock the Hedera Token Service
+        // TODO
       });
 
       it("should return the serial", async () => {
-        // TODO : figure out how to mock the Hedera Token Service
+        // TODO
       });
     });
   });
 
   describe("event", () => {
     describe("scanTicket function", () => {
-      it("should mark ticket as scanned", async () => {
-        // TODO
+      it("should revert if ticket not found", async () => {
+        const { venue, contract } = await loadFixture(finalizedContract);
+        await expect(
+          contract.connect(venue).scanTicket(1)
+        ).to.be.revertedWith("Could not find that ticket");
       });
 
-      it("should revert if ticket not found", async () => {
-        // TODO
+      it("should mark ticket as scanned", async () => {
+        const { venue, contract } = await loadFixture(finalizedContract);
+        await contract.connect(venue).scanTicket(testOpenSectionTicketSerial);
+        const nfTicket = await contract.getNFTicket(testOpenSectionTicketSerial);
+        expect(nfTicket.scanned).to.equal(true);
       });
 
       it("should revert if ticket already scanned", async () => {
-        // TODO
+        const { venue, contract } = await loadFixture(finalizedContract);
+        await contract.connect(venue).scanTicket(testOpenSectionTicketSerial);
+        await expect(
+          contract.connect(venue).scanTicket(testOpenSectionTicketSerial)
+        ).to.be.revertedWith("Ticket already scanned");
+      });
+
+      it("should revert if called by owner", async () => {
+        const { owner, contract } = await loadFixture(finalizedContract);
+        await expect(
+          contract.connect(owner).scanTicket(testOpenSectionTicketSerial)
+        ).to.be.revertedWith("Unauthorized");
+      });
+
+      it("should revert if called by entertainer", async () => {
+        const { entertainer, contract } = await loadFixture(finalizedContract);
+        await expect(
+          contract.connect(entertainer).scanTicket(testOpenSectionTicketSerial)
+        ).to.be.revertedWith("Unauthorized");
+      });
+
+      it("should revert if called by attendee", async () => {
+        const { attendee, contract } = await loadFixture(finalizedContract);
+        await expect(
+          contract.connect(attendee).scanTicket(testOpenSectionTicketSerial)
+        ).to.be.revertedWith("Unauthorized");
       });
     });
   });
@@ -963,20 +1004,66 @@ describe("Event contract", () => {
         // TODO
       });
 
+      it("should set serviceFeeCollected", async () => {
+        const { owner, venue, entertainer, contract } = await loadFixture(
+          readyToSignContract
+        );
+        await contract
+          .connect(entertainer)
+          .setTicketSalesStartDateTime(pastTs);
+        await contract
+          .connect(entertainer)
+          .setTicketSalesEndDateTime(pastTs);
+        await contract.connect(entertainer).signContract();
+        await contract.connect(venue).signContract();
+        await contract.connect(owner).collectServiceFee();
+        expect(await contract.serviceFeeCollected()).to.equal(true);
+      });
+
+      it("should revert if already collected", async () => {
+        const { owner, venue, entertainer, contract } = await loadFixture(
+          readyToSignContract
+        );
+        await contract
+          .connect(entertainer)
+          .setTicketSalesStartDateTime(pastTs);
+        await contract
+          .connect(entertainer)
+          .setTicketSalesEndDateTime(pastTs);
+        await contract.connect(entertainer).signContract();
+        await contract.connect(venue).signContract();
+        await contract.connect(owner).collectServiceFee();
+        await expect(
+          contract.connect(owner).collectServiceFee()
+        ).to.be.revertedWith("Service fee already collected");
+      });
+
       it("should revert if called before sales ended", async () => {
-        // TODO
+        const { owner, contract } = await loadFixture(finalizedContract);
+        await expect(
+          contract.connect(owner).collectServiceFee()
+        ).to.be.revertedWith("Ticket sales are still active");
       });
 
       it("should revert if called by venue", async () => {
-        // TODO
+        const { venue, contract } = await loadFixture(finalizedContract);
+        await expect(
+          contract.connect(venue).collectServiceFee()
+        ).to.be.revertedWith("Unauthorized");
       });
 
       it("should revert if called by entertainer", async () => {
-        // TODO
+        const { entertainer, contract } = await loadFixture(finalizedContract);
+        await expect(
+          contract.connect(entertainer).collectServiceFee()
+        ).to.be.revertedWith("Unauthorized");
       });
 
       it("should revert if called by attendee", async () => {
-        // TODO
+        const { attendee, contract } = await loadFixture(finalizedContract);
+        await expect(
+          contract.connect(attendee).collectServiceFee()
+        ).to.be.revertedWith("Unauthorized");
       });
     });
 
@@ -985,20 +1072,66 @@ describe("Event contract", () => {
         // TODO
       });
 
+      it("should set venueFeeCollected", async () => {
+        const { venue, entertainer, contract } = await loadFixture(
+          readyToSignContract
+        );
+        await contract
+          .connect(entertainer)
+          .setTicketSalesStartDateTime(pastTs);
+        await contract
+          .connect(entertainer)
+          .setTicketSalesEndDateTime(pastTs);
+        await contract.connect(entertainer).signContract();
+        await contract.connect(venue).signContract();
+        await contract.connect(venue).collectVenueFee();
+        expect(await contract.venueFeeCollected()).to.equal(true);
+      });
+
+      it("should revert if already collected", async () => {
+        const { venue, entertainer, contract } = await loadFixture(
+          readyToSignContract
+        );
+        await contract
+          .connect(entertainer)
+          .setTicketSalesStartDateTime(pastTs);
+        await contract
+          .connect(entertainer)
+          .setTicketSalesEndDateTime(pastTs);
+        await contract.connect(entertainer).signContract();
+        await contract.connect(venue).signContract();
+        await contract.connect(venue).collectVenueFee();
+        await expect(
+          contract.connect(venue).collectVenueFee()
+        ).to.be.revertedWith("Venue fee already collected");
+      });
+
       it("should revert if called before sales ended", async () => {
-        // TODO
+        const { venue, contract } = await loadFixture(finalizedContract);
+        await expect(
+          contract.connect(venue).collectVenueFee()
+        ).to.be.revertedWith("Ticket sales are still active");
       });
 
       it("should revert if called by owner", async () => {
-        // TODO
+        const { owner, contract } = await loadFixture(finalizedContract);
+        await expect(
+          contract.connect(owner).collectVenueFee()
+        ).to.be.revertedWith("Unauthorized");
       });
 
       it("should revert if called by entertainer", async () => {
-        // TODO
+        const { entertainer, contract } = await loadFixture(finalizedContract);
+        await expect(
+          contract.connect(entertainer).collectVenueFee()
+        ).to.be.revertedWith("Unauthorized");
       });
 
       it("should revert if called by attendee", async () => {
-        // TODO
+        const { attendee, contract } = await loadFixture(finalizedContract);
+        await expect(
+          contract.connect(attendee).collectVenueFee()
+        ).to.be.revertedWith("Unauthorized");
       });
     });
 
@@ -1007,20 +1140,66 @@ describe("Event contract", () => {
         // TODO
       });
 
+      it("should set entertainerProceedsCollected", async () => {
+        const { venue, entertainer, contract } = await loadFixture(
+          readyToSignContract
+        );
+        await contract
+          .connect(entertainer)
+          .setTicketSalesStartDateTime(pastTs);
+        await contract
+          .connect(entertainer)
+          .setTicketSalesEndDateTime(pastTs);
+        await contract.connect(entertainer).signContract();
+        await contract.connect(venue).signContract();
+        await contract.connect(entertainer).collectEntertainerProceeds();
+        expect(await contract.entertainerProceedsCollected()).to.equal(true);
+      });
+
+      it("should revert if already collected", async () => {
+        const { venue, entertainer, contract } = await loadFixture(
+          readyToSignContract
+        );
+        await contract
+          .connect(entertainer)
+          .setTicketSalesStartDateTime(pastTs);
+        await contract
+          .connect(entertainer)
+          .setTicketSalesEndDateTime(pastTs);
+        await contract.connect(entertainer).signContract();
+        await contract.connect(venue).signContract();
+        await contract.connect(entertainer).collectEntertainerProceeds();
+        await expect(
+          contract.connect(entertainer).collectEntertainerProceeds()
+        ).to.be.revertedWith("Entertainer proceeds already collected");
+      });
+
       it("should revert if called before sales ended", async () => {
-        // TODO
+        const { entertainer, contract } = await loadFixture(finalizedContract);
+        await expect(
+          contract.connect(entertainer).collectEntertainerProceeds()
+        ).to.be.revertedWith("Ticket sales are still active");
       });
 
       it("should revert if called by owner", async () => {
-        // TODO
+        const { owner, contract } = await loadFixture(finalizedContract);
+        await expect(
+          contract.connect(owner).collectEntertainerProceeds()
+        ).to.be.revertedWith("Unauthorized");
       });
 
       it("should revert if called by venue", async () => {
-        // TODO
+        const { venue, contract } = await loadFixture(finalizedContract);
+        await expect(
+          contract.connect(venue).collectEntertainerProceeds()
+        ).to.be.revertedWith("Unauthorized");
       });
 
       it("should revert if called by attendee", async () => {
-        // TODO
+        const { attendee, contract } = await loadFixture(finalizedContract);
+        await expect(
+          contract.connect(attendee).collectEntertainerProceeds()
+        ).to.be.revertedWith("Unauthorized");
       });
     });
   });

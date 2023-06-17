@@ -22,9 +22,9 @@ Live event promotors and ticket marketplaces (e.g. Live Nation, TicketMaster, St
 1. Venues create an event, assigning an entertainer, date, time, and desired fee structure
 1. Entertainers, if they agree to the terms of the event as set by the venue, can then create an NFT collection tied to the event, providing base image(s) and metadata
 1. Attendees connect to the dApp, filter events by entertainer, attraction type, and/or date range, and mint an NFTicket
-1. NFTickets can be bought, sold, and traded second-hand prior to the event (similar to StubHub), or after the event as collectibles
-1. At the time of the event, attendees will pull up the NFTicket on their mobile device's wallet and the venue will scan it to grant entry, which will mark the NFTicket as "fulfilled"
-1. Once an NFTicket is marked as "fulfilled" it cannot be used again to gain entry to the venue
+1. NFTickets can be bought, sold, and traded second-hand prior to the event, or after the event as collectibles
+1. At the time of the event, attendees will pull up the NFTicket on their mobile device's wallet and the venue will scan it to grant entry
+1. Once an NFTicket is scanned it cannot be used again to gain entry to the venue (preventing someone from getting into the venue and then sending it to a friend still waiting in line)
 
 ## Leveraging Hedera Technology
 

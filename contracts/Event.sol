@@ -28,12 +28,13 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
     int256 public defaultTicketPrice;
     uint256 public serviceFeeBasePoints;
     uint256 public venueFeeBasePoints;
-    uint256 public serviceFee;
-    uint256 public venueFee;
-    uint256 public entertainerProceeds;
-    bool public serviceFeeCollected;
-    bool public venueFeeCollected;
-    bool public entertainerProceedsCollected;
+    uint256 public servicePayout;
+    uint256 public venuePayout;
+    uint256 public entertainerPayout;
+    bool public servicePayoutCollected;
+    bool public venuePayoutCollected;
+    bool public entertainerPayoutCollected;
+    bool public payoutsCalculated;
     mapping(string => int64) reservedSeats;
     NFTicketMap nfTickets;
     OpenSectionMap openSections;
@@ -343,41 +344,6 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
         return createdToken;
     }
 
-    function scanTicket(int64 _serial) external onlyVenue {
-        NFTicket storage nfTicket = nfTickets.get(_serial);
-        require(nfTicket.price != 0, "Could not find that ticket");
-        require(nfTicket.scanned == false, "Ticket already scanned");
-        nfTicket.scanned = true;
-    }
-
-    function collectServiceFee() external onlyOwner salesEnded {
-        require(!serviceFeeCollected, "Service fee already collected");
-        distributeProceeds();
-        (bool success, ) = owner.call{value: serviceFee}("");
-        require(success, "Failed to transfer");
-        serviceFeeCollected = true;
-    }
-
-    function collectVenueFee() external onlyVenue salesEnded {
-        require(!venueFeeCollected, "Venue fee already collected");
-        distributeProceeds();
-        (bool success, ) = venue.call{value: venueFee}("");
-        require(success, "Failed to transfer");
-        venueFeeCollected = true;
-    }
-
-    function collectEntertainerProceeds() external onlyEntertainer salesEnded {
-        require(
-            !entertainerProceedsCollected,
-            "Entertainer proceeds already collected"
-        );
-        distributeProceeds();
-        (bool success, ) = entertainer.call{value: entertainerProceeds}("");
-        require(success, "Failed to transfer");
-        entertainerProceedsCollected = true;
-    }
-
-    // public payable
     function purchaseTicket(
         string calldata _section,
         string calldata _row,
@@ -428,9 +394,41 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
             serials[0]
         );
 
-        // TODO : handle when ticket was successfully minted but failed to transfer for some reason
-
         return serials[0];
+    }
+
+    function scanTicket(int64 _serial) external onlyVenue {
+        NFTicket storage nfTicket = nfTickets.get(_serial);
+        require(nfTicket.price != 0, "Could not find that ticket");
+        require(nfTicket.scanned == false, "Ticket already scanned");
+        nfTicket.scanned = true;
+    }
+
+    function collectPayout() external salesEnded {
+        require(
+            msg.sender == owner || msg.sender == venue || msg.sender == entertainer,
+            "Unauthorized"
+        );
+        calculatePayouts();
+        if (msg.sender == owner) {
+            require(!servicePayoutCollected, "Service payout already collected");
+            (bool success, ) = owner.call{value: servicePayout}("");
+            require(success, "Failed to transfer");
+            servicePayoutCollected = true;
+        } else if (msg.sender == venue) {
+            require(!venuePayoutCollected, "Venue payout already collected");
+            (bool success, ) = venue.call{value: venuePayout}("");
+            require(success, "Failed to transfer");
+            venuePayoutCollected = true;
+        } else if (msg.sender == entertainer) {
+            require(
+                !entertainerPayoutCollected,
+                "Entertainer payout already collected"
+            );
+            (bool success, ) = entertainer.call{value: entertainerPayout}("");
+            require(success, "Failed to transfer");
+            entertainerPayoutCollected = true;
+        }
     }
 
     // internal functions
@@ -468,12 +466,13 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
         return reservedSections.get(_reservedSectionKey).ticketPrice;
     }
 
-    function distributeProceeds() internal salesEnded {
-        if (serviceFee == 0 && venueFee == 0 && entertainerProceeds == 0) {
+    function calculatePayouts() internal salesEnded {
+        if (!payoutsCalculated) {
             uint256 totalBalance = address(this).balance;
-            serviceFee = (totalBalance * serviceFeeBasePoints) / 10_000;
-            venueFee = (totalBalance * venueFeeBasePoints) / 10_000;
-            entertainerProceeds = totalBalance - (serviceFee + venueFee);
+            servicePayout = (totalBalance * serviceFeeBasePoints) / 10_000;
+            venuePayout = (totalBalance * venueFeeBasePoints) / 10_000;
+            entertainerPayout = totalBalance - (servicePayout + venuePayout);
+            payoutsCalculated = true;
         }
     }
 }

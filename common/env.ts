@@ -12,5 +12,10 @@ export const getRequired = (key: string): string => {
 
 export const getOptional = (key: string, defaultValue?: string): string | undefined => {
   const value = `${process.env[key]}`;
-  return value ?? defaultValue;
+  return value || defaultValue;
+};
+
+export const getOptionalWithDefault = (key: string, defaultValue: string): string => {
+  const value = `${process.env[key]}`;
+  return value || defaultValue;
 };

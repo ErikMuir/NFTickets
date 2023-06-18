@@ -1,68 +1,57 @@
 import "@nomiclabs/hardhat-ethers";
 import { ethers, network } from "hardhat";
+import { getOptionalWithDefault } from "../common/env";
 
-type DeploymentResult = {
-  name: string;
-  address: string;
-};
+const isAddress = (address: string) => address.length === 42 && address.startsWith("0x");
 
-type DeploymentBuilder = {
-  name: string;
-  constructorArgBuilder: (
-    previousDeployments: Record<string, DeploymentResult>
-  ) => unknown[];
-};
+function parseArgs() {
+  const validationErrors: string[] = [];
 
-/**
- * Given a map of previous deployments and a deployment builder, run the deployment using the
- * deployment builder. This pattern allows constructing "dependent deployments" that may need
- * the address of previous ones (e.g. delgating contracts with constructor injection)
- * @param previousDeployments Previously completed deployments that can be looked up by contract name
- * @param deploymentBuilder A deployment builder for the current deployment
- * @returns The deployment result for the current deployment
- */
-async function deploy(
-  previousDeployments: Record<string, DeploymentResult>,
-  deploymentBuilder: DeploymentBuilder
-): Promise<DeploymentResult> {
-  const contract = await ethers.getContractFactory(deploymentBuilder.name);
-  const constructorArgs =
-    deploymentBuilder.constructorArgBuilder(previousDeployments);
-  const deployment = await contract.deploy(...constructorArgs);
-  await deployment.deployed();
-  const argsString = constructorArgs.length
-    ? `Constructor args: ${constructorArgs}, `
-    : "";
-  console.info(
-    `Deployed ${deploymentBuilder.name} to the ${network.name} network. ${argsString}Address: ${deployment.address}`
-  );
-  return { name: deploymentBuilder.name, address: deployment.address };
+  const venue = getOptionalWithDefault("VENUE_ADDRESS", "0x...");
+  const entertainer = getOptionalWithDefault("ENTERTAINER_ADDRESS", "0x...");
+  const serviceFee = getOptionalWithDefault("SERVICE_FEE", "3.5");
+
+  if (!venue) {
+    validationErrors.push("Venue address is required");
+  } else if (!isAddress(venue)) {
+    validationErrors.push("Venue address is invalid");
+  }
+
+  if (!entertainer) {
+    validationErrors.push("Entertainer address is required");
+  } else if (!isAddress(entertainer)) {
+    validationErrors.push("Entertainer address is invalid");
+  }
+
+  const parsedServiceFee = parseInt(serviceFee, 10);
+  if (!serviceFee) {
+    validationErrors.push("Service fee is required");
+  } else if (Number.isNaN(parsedServiceFee) || parsedServiceFee < 0 || parsedServiceFee > 100) {
+    validationErrors.push("Service fee is invalid");
+  }
+
+  if (validationErrors.length) {
+    validationErrors.forEach(console.warn);
+    process.exit(1);
+  }
+
+  const serviceFeeBasePoints = Math.trunc(parsedServiceFee * 100);
+
+  return { venue, entertainer, serviceFeeBasePoints };
 }
-
-function independentDeployment(
-  name: string,
-  ...constructorArgs: unknown[]
-): DeploymentBuilder {
-  return {
-    name,
-    constructorArgBuilder: () => constructorArgs,
-  };
-}
-
-const deployments: DeploymentBuilder[] = [independentDeployment("Event")];
 
 async function main() {
-  await deployments.reduce(async (pendingDeployments, deploymentBuilder) => {
-    const previousDeployments = await pendingDeployments;
-    const deploymentResult = await deploy(
-      previousDeployments,
-      deploymentBuilder
-    );
-    return {
-      ...previousDeployments,
-      [deploymentBuilder.name]: deploymentResult,
-    };
-  }, Promise.resolve({} as Record<string, DeploymentResult>));
+  const { venue, entertainer, serviceFeeBasePoints } = parseArgs();
+  const factory = await ethers.getContractFactory("Event");
+  const contract = await factory.deploy(
+    venue,
+    entertainer,
+    serviceFeeBasePoints
+  );
+  await contract.deployed();
+  console.info(
+    `Deployed "Event" to the ${network.name} network. Address: ${contract.address}`
+  );
 }
 
 main().catch((error) => {

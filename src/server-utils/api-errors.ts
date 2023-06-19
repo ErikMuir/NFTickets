@@ -1,4 +1,4 @@
-import { NextApiResponse } from "next/types";
+import { NextApiResponse } from "next";
 
 import { errorResponse, StandardPayload } from "./api-responses";
 

@@ -10,22 +10,22 @@ import {
   Network,
 } from "@/types";
 
-import { fetchJson } from "./fetch-json";
+import { fetchStandardJson } from "./fetch-json";
 import { hashconnect } from "./hashconnect";
 
 const appMetadata: HashConnectTypes.AppMetadata = {
   name: "NFTicket",
-  description: "A ledger-based ticketing system for live events built on the Hedera Hashgraph network",
-  icon: "https://nfticket.vercel.app/logo.png", // TODO : is this where it will be hosted?
+  description:
+    "A ledger-based ticketing system for live events built on the Hedera Hashgraph network",
+  icon: "https://nftickets.vercel.app/logo.png", // TODO : is this where it will be hosted?
 };
 
 export type HashconnectConnectionData = HashConnectTypes.InitilizationData;
 
 let hashconnectWallet: HashconnectWallet | undefined;
-export function getHashConnectWallet(network?: Network): HashconnectWallet {
+export function getHashConnectWallet(): HashconnectWallet {
   if (!hashconnectWallet) {
-    invariant(network, "getHashConnectWallet must be initialized with network");
-    hashconnectWallet = new HashconnectWallet(network);
+    hashconnectWallet = new HashconnectWallet(Network.Testnet);
   }
   return hashconnectWallet;
 }
@@ -55,7 +55,11 @@ class HashconnectWallet {
     hashconnect.connectToLocalWallet();
   }
 
-  async sendTransaction(trans: Transaction, acctToSign: string, hashConnectTopic: string) {
+  async sendTransaction(
+    trans: Transaction,
+    acctToSign: string,
+    hashConnectTopic: string
+  ) {
     const transId = TransactionId.generate(acctToSign);
     trans.setTransactionId(transId);
     trans.setNodeAccountIds([new AccountId(3)]);
@@ -65,7 +69,11 @@ class HashconnectWallet {
     return this.sendTransactionBytes(transBytes, acctToSign, hashConnectTopic);
   }
 
-  async sendTransactionBytes(transBytes: Uint8Array, acctToSign: string, hashConnectTopic: string) {
+  async sendTransactionBytes(
+    transBytes: Uint8Array,
+    acctToSign: string,
+    hashConnectTopic: string
+  ) {
     await this.initialize();
 
     const transaction: MessageTypes.Transaction = {
@@ -81,25 +89,30 @@ class HashconnectWallet {
     return hashconnect.sendTransaction(hashConnectTopic, transaction);
   }
 
-  private async serverInitiateAuth(accountId: string): Promise<HashconnectInitiateAuthResult> {
+  private async serverInitiateAuth(
+    accountId: string
+  ): Promise<HashconnectInitiateAuthResult> {
     if (!this._connectionData) {
       throw new Error("Not connected");
     }
     const { topic } = this._connectionData;
     const initiateAuthRequest = { topic, accountId, network: this._network };
-    return fetchJson<HashconnectInitiateAuthResult>(`/api/user/initiate-auth`, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-      },
-      body: JSON.stringify(initiateAuthRequest),
-    });
+    return fetchStandardJson<HashconnectInitiateAuthResult>(
+      `/api/user/initiate-auth`,
+      {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(initiateAuthRequest),
+      }
+    );
   }
 
   private async serverAuthenticate(
     authenticationPayload: HashconnectAuthenticationRequest
   ): Promise<LoggedInUser> {
-    return fetchJson<LoggedInUser>(`/api/user/authenticate`, {
+    return fetchStandardJson<LoggedInUser>(`/api/user/authenticate`, {
       method: "POST",
       headers: {
         "content-type": "application/json",
@@ -114,7 +127,11 @@ class HashconnectWallet {
     }
 
     try {
-      this._connectionData = await hashconnect.init(appMetadata, this._network, true);
+      this._connectionData = await hashconnect.init(
+        appMetadata,
+        this._network,
+        true
+      );
     } catch (e) {
       console.error((e as Error).message);
       throw e;

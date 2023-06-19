@@ -26,7 +26,7 @@ const config: HardhatUserConfig = {
   networks: {
     testnet: {
       url: getRequired("RPC_ENDPOINT"),
-      accounts: [getRequired("OPERATOR_KEY")],
+      accounts: [getRequired("OPERATOR_HEX_KEY")],
     },
   },
 };

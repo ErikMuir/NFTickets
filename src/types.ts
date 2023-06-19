@@ -65,3 +65,52 @@ export type HashconnectAuthenticationRequest = {
     };
   };
 };
+
+export type OpenSection = {
+  name: string;
+  capacity: number;
+};
+
+export type Seat = {
+  name: string;
+};
+
+export type Row = {
+  name: string;
+  seats: Seat[];
+};
+
+export type ReservedSection = {
+  name: string;
+  rows: Row[];
+};
+
+export type Venue = {
+  name: string;
+  address: string;
+  city: string;
+  state: string;
+  zip: string;
+  openSections?: OpenSection[];
+  reservedSections?: ReservedSection[];
+};
+
+export enum EntertainerType {
+  Unknown = "N/A",
+  Music = "Music",
+  Sports = "Sports",
+  Comedy = "Comedy",
+}
+
+export type Entertainer = {
+  name: string;
+  type: EntertainerType;
+  description: string;
+  currentIteration: string;
+};
+
+export type Event = {
+  venue: Venue;
+  entertainer: Entertainer;
+  contractAddress: string;
+};

@@ -1,5 +1,5 @@
 {
-  "name": "nfticket",
+  "name": "nftickets",
   "version": "0.1.0",
   "description": "A ledger-based ticketing system for live events built on the Hedera Hashgraph network",
   "main": "index.js",
@@ -18,11 +18,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ErikMuir/NFTicket.git"
+    "url": "git+https://github.com/ErikMuir/NFTickets.git"
   },
   "author": "solar-garlic",
   "license": "BSD-3-Clause",
-  "homepage": "https://github.com/ErikMuir/NFTicket#readme",
+  "homepage": "https://github.com/ErikMuir/NFTickets#readme",
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^1.0.4",
     "@nomicfoundation/hardhat-network-helpers": "^1.0.7",

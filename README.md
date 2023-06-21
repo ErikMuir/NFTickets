@@ -1,4 +1,4 @@
-# NFTicket
+# NFTickets
 
 ## Summary
 

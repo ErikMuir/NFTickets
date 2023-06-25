@@ -66,24 +66,11 @@ export type HashconnectAuthenticationRequest = {
   };
 };
 
-export type OpenSection = {
-  name: string;
-  capacity: number;
-};
+export type Seat = string;
 
-export type Seat = {
-  name: string;
-};
+export type Row = Seat[];
 
-export type Row = {
-  name: string;
-  seats: Seat[];
-};
-
-export type ReservedSection = {
-  name: string;
-  rows: Row[];
-};
+export type ReservedSection = Record<string, Row>;
 
 export type Venue = {
   name: string;
@@ -91,8 +78,8 @@ export type Venue = {
   city: string;
   state: string;
   zip: string;
-  openSections?: OpenSection[];
-  reservedSections?: ReservedSection[];
+  openSections?: Record<string, number>;
+  reservedSections?: Record<string, ReservedSection>;
 };
 
 export enum EntertainerType {
@@ -110,7 +97,9 @@ export type Entertainer = {
 };
 
 export type Event = {
-  venue: Venue;
-  entertainer: Entertainer;
-  contractAddress: string;
+  venue: string;
+  entertainer: string;
+  dateTime: Date;
+  ticketSalesBegin: Date;
+  ticketSalesEnd: Date;
 };

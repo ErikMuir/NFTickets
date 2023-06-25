@@ -15,8 +15,6 @@ import { ConnectModal } from "./ConnectModal";
 import { hashconnect } from "@/lib/hashconnect";
 import { getHashConnectWallet } from "@/lib/HashconnectWallet";
 import useUser from "@/lib/useUser";
-import { SWRConfig } from "swr";
-import { fetchStandardJson } from "@/lib/fetch-json";
 
 export const AccountMenu = () => {
   const router = useRouter();
@@ -156,12 +154,12 @@ export const AccountMenu = () => {
     <>
       <Button
         className="text-right inline-flex gap-2 text-white hover:bg-inherit"
-        size="small"
+        size="medium"
         aria-controls="accountMenu"
         aria-haspopup="true"
         onClick={handleOpenMenu}
       >
-        <div className="ds-body-4 truncate">{user?.accountId}</div>
+        <div className="truncate">{user?.accountId}</div>
         <div className="flex items-center">
           <AccountBalanceWalletIcon fontSize="small" />
           <ArrowDropDownIcon fontSize="small" />

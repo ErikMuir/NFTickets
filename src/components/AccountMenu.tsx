@@ -88,7 +88,7 @@ export const AccountMenu = () => {
 
     const onFoundIframeEvent = () => {
       alert(
-        "The Dapp browser is currently not supported! Please visit https://nftickets.vercel.app on your browser."
+        "The Dapp browser is currently not supported! Please visit https://nftickets-beta.vercel.app on your browser."
       );
     };
 

@@ -17,7 +17,7 @@ const appMetadata: HashConnectTypes.AppMetadata = {
   name: "NFTicket",
   description:
     "A ledger-based ticketing system for live events built on the Hedera Hashgraph network",
-  icon: "https://nftickets.vercel.app/logo.png", // TODO : is this where it will be hosted?
+  icon: "https://nftickets-beta.vercel.app/logo.png",
 };
 
 export type HashconnectConnectionData = HashConnectTypes.InitilizationData;

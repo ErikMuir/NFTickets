@@ -33,7 +33,7 @@ async function initiateAuthRoute(
 
   const token = randomUUID();
   const payload = {
-    url: "https://nftickets.vercel.app",
+    url: "https://nftickets-beta.vercel.app",
     data: { token, date: Date.now() },
   };
 

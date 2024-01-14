@@ -55,11 +55,16 @@ This can't really ever achieve widespread adoption until Hedera gets its act tog
 
 ## Revenue Model
 
-Revenue can be collected by the dApp in the following three ways:
+Revenue can be collected by the dApp through one or more of these methods:
 
-1. Charge a fee to venues each time a new event is created
-1. Charge a fee to entertainers each time a new NFT collection is created
-1. Collect a royalty fee from each sale of an NFTicket
+- Registration Fees
+  - **Venue Registration Fee** - a one-time fee for registering as a Venue
+  - **Entertainer Registration Fee** - a one-time fee for registering as an Entertainer
+- Event Fees
+  - **Venue Event Fee** - a fee when a Venue creates a new Event
+  - **Entertainer Event Fee** - a fee when an Entertainer creates a new NFT collection
+- Rotalties
+  - collect a royalty fee from each sale of an NFTicket
 
 ## solar-garlic team members
 

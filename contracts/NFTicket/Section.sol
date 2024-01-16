@@ -1,35 +1,37 @@
 // SPDX-License-Identifier: GPL-3.0
-pragma solidity >=0.7.0 <0.9.0;
+pragma solidity >=0.8.0 <0.9.0;
 
-struct ReservedSection {
+struct Section {
   int256 ticketPrice;
+  int256 maxCapacity;
+  int256 remainingCapacity;
 }
 
-struct ReservedSectionMap {
+struct SectionMap {
   string[] keys;
-  mapping(string => ReservedSection) values;
-  mapping(string => uint) indexOf;
+  mapping(string => Section) values;
+  mapping(string => uint256) indexOf;
   mapping(string => bool) inserted;
 }
 
-library ReservedSectionIterableMapping {
-  function exists(ReservedSectionMap storage self, string memory key) internal view returns (bool) {
+library SectionIterableMapping {
+  function exists(SectionMap storage self, string memory key) internal view returns (bool) {
     return self.inserted[key];
   }
 
-  function get(ReservedSectionMap storage self, string memory key) internal view returns (ReservedSection storage) {
+  function get(SectionMap storage self, string memory key) internal view returns (Section storage) {
     return self.values[key];
   }
 
-  function getKeyAtIndex(ReservedSectionMap storage self, uint256 index) internal view returns (string storage) {
+  function getKeyAtIndex(SectionMap storage self, uint256 index) internal view returns (string storage) {
     return self.keys[index];
   }
 
-  function size(ReservedSectionMap storage self) internal view returns (uint256) {
+  function size(SectionMap storage self) internal view returns (uint256) {
     return self.keys.length;
   }
 
-  function set(ReservedSectionMap storage self, string memory key, ReservedSection memory val) internal {
+  function set(SectionMap storage self, string memory key, Section memory val) internal {
     if (self.inserted[key]) {
       self.values[key] = val;
     } else {
@@ -40,7 +42,7 @@ library ReservedSectionIterableMapping {
     }
   }
 
-  function remove(ReservedSectionMap storage self, string memory key) internal {
+  function remove(SectionMap storage self, string memory key) internal {
     if (!self.inserted[key]) {
       return;
     }

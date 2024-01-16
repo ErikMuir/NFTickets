@@ -1,38 +1,38 @@
 // SPDX-License-Identifier: GPL-3.0
-pragma solidity >=0.7.0 <0.9.0;
+pragma solidity >=0.8.0 <0.9.0;
 
-struct NFTicket {
+struct Ticket {
   string seatKey;
   int256 price;
   address buyer;
   bool scanned;
 }
 
-struct NFTicketMap {
+struct TicketMap {
   int64[] keys;
-  mapping(int64 => NFTicket) values;
+  mapping(int64 => Ticket) values;
   mapping(int64 => uint256) indexOf;
   mapping(int64 => bool) inserted;
 }
 
-library NFTicketIterableMapping {
-  function exists(NFTicketMap storage self, int64 key) internal view returns (bool) {
+library TicketIterableMapping {
+  function exists(TicketMap storage self, int64 key) internal view returns (bool) {
     return self.inserted[key];
   }
 
-  function get(NFTicketMap storage self, int64 key) internal view returns (NFTicket storage) {
+  function get(TicketMap storage self, int64 key) internal view returns (Ticket storage) {
     return self.values[key];
   }
 
-  function getKeyAtIndex(NFTicketMap storage self, uint256 index) internal view returns (int64) {
+  function getKeyAtIndex(TicketMap storage self, uint256 index) internal view returns (int64) {
     return self.keys[index];
   }
 
-  function size(NFTicketMap storage self) internal view returns (uint256) {
+  function size(TicketMap storage self) internal view returns (uint256) {
     return self.keys.length;
   }
 
-  function set(NFTicketMap storage self, int64 key, NFTicket memory val) internal {
+  function set(TicketMap storage self, int64 key, Ticket memory val) internal {
     if (self.inserted[key]) {
       self.values[key] = val;
     } else {
@@ -43,7 +43,7 @@ library NFTicketIterableMapping {
     }
   }
 
-  function remove(NFTicketMap storage self, int64 key) internal {
+  function remove(TicketMap storage self, int64 key) internal {
     if (!self.inserted[key]) {
       return;
     }

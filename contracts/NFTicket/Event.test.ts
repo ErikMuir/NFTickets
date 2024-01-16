@@ -15,9 +15,8 @@ const serviceFeeBasePoints = 300;
 const venueFeeBasePoints = 1_500;
 const sectionKey = "foobar";
 const capacity = 500;
-const testOpenSectionKey = "os-test";
-const testReservedSectionKey = "rs-test";
-const testOpenSectionTicketSerial = -1;
+const testSectionKey = "test-section";
+const testSectionTicketSerial = -1;
 const totalSales = toEther(5_000);
 
 async function newContract() {
@@ -46,6 +45,8 @@ async function readyToSignContract() {
   await contract.connect(entertainer).setTicketSalesStartDateTime(currentTs);
   await contract.connect(entertainer).setTicketSalesEndDateTime(futureTs);
   await contract.connect(entertainer).setDefaultTicketPrice(ticketPrice);
+  await contract.connect(venue).addSection("GA", 250);
+  await contract.connect(entertainer).setSectionTicketPrice("GA", 1);
   return {
     owner,
     venue,
@@ -153,7 +154,7 @@ describe("Event contract", () => {
           entertainer.address,
           serviceFeeBasePoints
         )
-      ).to.be.revertedWith("Venue and entertainer are required");
+      ).to.be.revertedWithCustomError(factory, "VenueAndEntertainerAreRequired");
     });
 
     it("should revert if no entertainer provided", async () => {
@@ -164,7 +165,7 @@ describe("Event contract", () => {
           ethers.constants.AddressZero,
           serviceFeeBasePoints
         )
-      ).to.be.revertedWith("Venue and entertainer are required");
+      ).to.be.revertedWithCustomError(factory, "VenueAndEntertainerAreRequired");
     });
   });
 
@@ -180,21 +181,21 @@ describe("Event contract", () => {
         const { owner, contract } = await loadFixture(newContract);
         await expect(
           contract.connect(owner).setEventDateTime(currentTs)
-        ).to.be.revertedWith("Unauthorized");
+        ).to.be.revertedWithCustomError(contract, "Unauthorized");
       });
 
       it("should revert when called by venue", async () => {
         const { venue, contract } = await loadFixture(newContract);
         await expect(
           contract.connect(venue).setEventDateTime(currentTs)
-        ).to.be.revertedWith("Unauthorized");
+        ).to.be.revertedWithCustomError(contract, "Unauthorized");
       });
 
       it("should revert when called by attendee", async () => {
         const { attendee, contract } = await loadFixture(newContract);
         await expect(
           contract.connect(attendee).setEventDateTime(currentTs)
-        ).to.be.revertedWith("Unauthorized");
+        ).to.be.revertedWithCustomError(contract, "Unauthorized");
       });
     });
 
@@ -211,21 +212,21 @@ describe("Event contract", () => {
         const { owner, contract } = await loadFixture(newContract);
         await expect(
           contract.connect(owner).setTicketSalesStartDateTime(currentTs)
-        ).to.be.revertedWith("Unauthorized");
+        ).to.be.revertedWithCustomError(contract, "Unauthorized");
       });
 
       it("should revert when called by venue", async () => {
         const { venue, contract } = await loadFixture(newContract);
         await expect(
           contract.connect(venue).setTicketSalesStartDateTime(currentTs)
-        ).to.be.revertedWith("Unauthorized");
+        ).to.be.revertedWithCustomError(contract, "Unauthorized");
       });
 
       it("should revert when called by attendee", async () => {
         const { attendee, contract } = await loadFixture(newContract);
         await expect(
           contract.connect(attendee).setTicketSalesStartDateTime(currentTs)
-        ).to.be.revertedWith("Unauthorized");
+        ).to.be.revertedWithCustomError(contract, "Unauthorized");
       });
     });
 
@@ -242,21 +243,21 @@ describe("Event contract", () => {
         const { owner, contract } = await loadFixture(newContract);
         await expect(
           contract.connect(owner).setTicketSalesEndDateTime(currentTs)
-        ).to.be.revertedWith("Unauthorized");
+        ).to.be.revertedWithCustomError(contract, "Unauthorized");
       });
 
       it("should revert when called by venue", async () => {
         const { venue, contract } = await loadFixture(newContract);
         await expect(
           contract.connect(venue).setTicketSalesEndDateTime(currentTs)
-        ).to.be.revertedWith("Unauthorized");
+        ).to.be.revertedWithCustomError(contract, "Unauthorized");
       });
 
       it("should revert when called by attendee", async () => {
         const { attendee, contract } = await loadFixture(newContract);
         await expect(
           contract.connect(attendee).setTicketSalesEndDateTime(currentTs)
-        ).to.be.revertedWith("Unauthorized");
+        ).to.be.revertedWithCustomError(contract, "Unauthorized");
       });
     });
 
@@ -275,21 +276,21 @@ describe("Event contract", () => {
         const { owner, contract } = await loadFixture(newContract);
         await expect(
           contract.connect(owner).setVenueFeeBasePoints(venueFeeBasePoints)
-        ).to.be.revertedWith("Unauthorized");
+        ).to.be.revertedWithCustomError(contract, "Unauthorized");
       });
 
       it("should revert when called by venue", async () => {
         const { venue, contract } = await loadFixture(newContract);
         await expect(
           contract.connect(venue).setVenueFeeBasePoints(venueFeeBasePoints)
-        ).to.be.revertedWith("Unauthorized");
+        ).to.be.revertedWithCustomError(contract, "Unauthorized");
       });
 
       it("should revert when called by attendee", async () => {
         const { attendee, contract } = await loadFixture(newContract);
         await expect(
           contract.connect(attendee).setVenueFeeBasePoints(venueFeeBasePoints)
-        ).to.be.revertedWith("Unauthorized");
+        ).to.be.revertedWithCustomError(contract, "Unauthorized");
       });
     });
 
@@ -312,72 +313,80 @@ describe("Event contract", () => {
         const { owner, contract } = await loadFixture(newContract);
         await expect(
           contract.connect(owner).setDefaultTicketPrice(ticketPrice)
-        ).to.be.revertedWith("Unauthorized");
+        ).to.be.revertedWithCustomError(contract, "Unauthorized");
       });
 
       it("should revert when called by venue", async () => {
         const { venue, contract } = await loadFixture(newContract);
         await expect(
           contract.connect(venue).setDefaultTicketPrice(ticketPrice)
-        ).to.be.revertedWith("Unauthorized");
+        ).to.be.revertedWithCustomError(contract, "Unauthorized");
       });
 
       it("should revert when called by attendee", async () => {
         const { attendee, contract } = await loadFixture(newContract);
         await expect(
           contract.connect(attendee).setDefaultTicketPrice(ticketPrice)
-        ).to.be.revertedWith("Unauthorized");
+        ).to.be.revertedWithCustomError(contract, "Unauthorized");
       });
     });
 
-    describe("addOpenSection function", () => {
-      it("should add the open section", async () => {
+    describe("addSection function", () => {
+      it("should add the section", async () => {
         const { venue, contract } = await loadFixture(newContract);
-        await contract.connect(venue).addOpenSection(sectionKey, capacity);
-        const actual = await contract.getOpenSection(sectionKey);
+        await contract.connect(venue).addSection(sectionKey, capacity);
+        const actual = await contract.getSection(sectionKey);
         expect(actual.ticketPrice).to.equal(ethers.constants.Zero);
         expect(actual.maxCapacity).to.equal(capacity);
         expect(actual.remainingCapacity).to.equal(capacity);
       });
 
+      it("should default capacity to -1", async () => {
+        const { venue, contract } = await loadFixture(newContract);
+        await contract.connect(venue).addSection(sectionKey, 0);
+        const actual = await contract.getSection(sectionKey);
+        expect(actual.maxCapacity).to.equal(-1);
+        expect(actual.remainingCapacity).to.equal(-1);
+      });
+
       it("should revert if the section already exists", async () => {
         const { venue, contract } = await loadFixture(newContract);
-        await contract.connect(venue).addOpenSection(sectionKey, capacity);
+        await contract.connect(venue).addSection(sectionKey, capacity);
         await expect(
-          contract.connect(venue).addOpenSection(sectionKey, capacity)
-        ).to.be.revertedWith("Open section already exists");
+          contract.connect(venue).addSection(sectionKey, capacity)
+        ).to.be.revertedWithCustomError(contract, "SectionAlreadyExists");
       });
 
       it("should revert when called by owner", async () => {
         const { owner, contract } = await loadFixture(newContract);
         await expect(
-          contract.connect(owner).addOpenSection(sectionKey, capacity)
-        ).to.be.revertedWith("Unauthorized");
+          contract.connect(owner).addSection(sectionKey, capacity)
+        ).to.be.revertedWithCustomError(contract, "Unauthorized");
       });
 
       it("should revert when called by entertainer", async () => {
         const { entertainer, contract } = await loadFixture(newContract);
         await expect(
-          contract.connect(entertainer).addOpenSection(sectionKey, capacity)
-        ).to.be.revertedWith("Unauthorized");
+          contract.connect(entertainer).addSection(sectionKey, capacity)
+        ).to.be.revertedWithCustomError(contract, "Unauthorized");
       });
 
       it("should revert when called by attendee", async () => {
         const { attendee, contract } = await loadFixture(newContract);
         await expect(
-          contract.connect(attendee).addOpenSection(sectionKey, capacity)
-        ).to.be.revertedWith("Unauthorized");
+          contract.connect(attendee).addSection(sectionKey, capacity)
+        ).to.be.revertedWithCustomError(contract, "Unauthorized");
       });
     });
 
-    describe("setOpenSectionTicketPrice function", () => {
+    describe("setSectionTicketPrice function", () => {
       it("should set the ticket price", async () => {
         const { venue, entertainer, contract } = await loadFixture(newContract);
-        await contract.connect(venue).addOpenSection(sectionKey, capacity);
+        await contract.connect(venue).addSection(sectionKey, capacity);
         await contract
           .connect(entertainer)
-          .setOpenSectionTicketPrice(sectionKey, ticketPrice);
-        const actual = await contract.getOpenSection(sectionKey);
+          .setSectionTicketPrice(sectionKey, ticketPrice);
+        const actual = await contract.getSection(sectionKey);
         expect(actual.ticketPrice).to.equal(ticketPrice);
       });
 
@@ -386,101 +395,112 @@ describe("Event contract", () => {
         await expect(
           contract
             .connect(entertainer)
-            .setOpenSectionTicketPrice(sectionKey, ticketPrice)
-        ).to.be.revertedWith("Open section not found");
+            .setSectionTicketPrice(sectionKey, ticketPrice)
+        ).to.be.revertedWithCustomError(contract, "SectionNotFound");
       });
 
       it("should revert when called by owner", async () => {
         const { venue, owner, contract } = await loadFixture(newContract);
-        await contract.connect(venue).addOpenSection(sectionKey, capacity);
+        await contract.connect(venue).addSection(sectionKey, capacity);
         await expect(
           contract
             .connect(owner)
-            .setOpenSectionTicketPrice(sectionKey, ticketPrice)
-        ).to.be.revertedWith("Unauthorized");
+            .setSectionTicketPrice(sectionKey, ticketPrice)
+        ).to.be.revertedWithCustomError(contract, "Unauthorized");
       });
 
       it("should revert when called by venue", async () => {
         const { venue, contract } = await loadFixture(newContract);
-        await contract.connect(venue).addOpenSection(sectionKey, capacity);
+        await contract.connect(venue).addSection(sectionKey, capacity);
         await expect(
           contract
             .connect(venue)
-            .setOpenSectionTicketPrice(sectionKey, ticketPrice)
-        ).to.be.revertedWith("Unauthorized");
+            .setSectionTicketPrice(sectionKey, ticketPrice)
+        ).to.be.revertedWithCustomError(contract, "Unauthorized");
       });
 
       it("should revert when called by attendee", async () => {
         const { venue, attendee, contract } = await loadFixture(newContract);
-        await contract.connect(venue).addOpenSection(sectionKey, capacity);
+        await contract.connect(venue).addSection(sectionKey, capacity);
         await expect(
           contract
             .connect(attendee)
-            .setOpenSectionTicketPrice(sectionKey, ticketPrice)
-        ).to.be.revertedWith("Unauthorized");
+            .setSectionTicketPrice(sectionKey, ticketPrice)
+        ).to.be.revertedWithCustomError(contract, "Unauthorized");
       });
     });
 
-    describe("setOpenSectionCapacity function", () => {
+    describe("setSectionCapacity function", () => {
       const newCapacity = toEther(250);
 
       it("should set the capacity", async () => {
         const { venue, contract } = await loadFixture(newContract);
-        await contract.connect(venue).addOpenSection(sectionKey, capacity);
+        await contract.connect(venue).addSection(sectionKey, capacity);
         await contract
           .connect(venue)
-          .setOpenSectionCapacity(sectionKey, newCapacity);
-        const actual = await contract.getOpenSection(sectionKey);
+          .setSectionCapacity(sectionKey, newCapacity);
+        const actual = await contract.getSection(sectionKey);
         expect(actual.maxCapacity).to.equal(newCapacity);
         expect(actual.remainingCapacity).to.equal(newCapacity);
+      });
+
+      it("should default the capacity to -1", async () => {
+        const { venue, contract } = await loadFixture(newContract);
+        await contract.connect(venue).addSection(sectionKey, capacity);
+        await contract
+          .connect(venue)
+          .setSectionCapacity(sectionKey, 0);
+        const actual = await contract.getSection(sectionKey);
+        expect(actual.maxCapacity).to.equal(-1);
+        expect(actual.remainingCapacity).to.equal(-1);
       });
 
       it("should revert when section not found", async () => {
         const { venue, contract } = await loadFixture(newContract);
         await expect(
-          contract.connect(venue).setOpenSectionCapacity("baz", newCapacity)
-        ).to.be.revertedWith("Open section not found");
+          contract.connect(venue).setSectionCapacity("baz", newCapacity)
+        ).to.be.revertedWithCustomError(contract, "SectionNotFound");
       });
 
       it("should revert when called by owner", async () => {
         const { venue, owner, contract } = await loadFixture(newContract);
-        await contract.connect(venue).addOpenSection(sectionKey, capacity);
+        await contract.connect(venue).addSection(sectionKey, capacity);
         await expect(
           contract
             .connect(owner)
-            .setOpenSectionCapacity(sectionKey, newCapacity)
-        ).to.be.revertedWith("Unauthorized");
+            .setSectionCapacity(sectionKey, newCapacity)
+        ).to.be.revertedWithCustomError(contract, "Unauthorized");
       });
 
       it("should revert when called by entertainer", async () => {
         const { venue, entertainer, contract } = await loadFixture(newContract);
-        await contract.connect(venue).addOpenSection(sectionKey, capacity);
+        await contract.connect(venue).addSection(sectionKey, capacity);
         await expect(
           contract
             .connect(entertainer)
-            .setOpenSectionCapacity(sectionKey, newCapacity)
-        ).to.be.revertedWith("Unauthorized");
+            .setSectionCapacity(sectionKey, newCapacity)
+        ).to.be.revertedWithCustomError(contract, "Unauthorized");
       });
 
       it("should revert when called by attendee", async () => {
         const { venue, attendee, contract } = await loadFixture(newContract);
-        await contract.connect(venue).addOpenSection(sectionKey, capacity);
+        await contract.connect(venue).addSection(sectionKey, capacity);
         await expect(
           contract
             .connect(attendee)
-            .setOpenSectionCapacity(sectionKey, newCapacity)
-        ).to.be.revertedWith("Unauthorized");
+            .setSectionCapacity(sectionKey, newCapacity)
+        ).to.be.revertedWithCustomError(contract, "Unauthorized");
       });
     });
 
-    describe("removeOpenSection function", () => {
+    describe("removeSection function", () => {
       it("should remove the section", async () => {
         const { venue, contract } = await loadFixture(newContract);
-        await contract.connect(venue).addOpenSection(sectionKey, capacity);
-        await contract.connect(venue).removeOpenSection(sectionKey);
-        const actualKeys = await contract.getOpenSectionKeys();
+        await contract.connect(venue).addSection(sectionKey, capacity);
+        await contract.connect(venue).removeSection(sectionKey);
+        const actualKeys = await contract.getSectionKeys();
         expect(actualKeys.includes(sectionKey)).to.equal(false);
-        const actual = await contract.getOpenSection(sectionKey);
+        const actual = await contract.getSection(sectionKey);
         expect(actual.ticketPrice).to.equal(ethers.constants.Zero);
         expect(actual.maxCapacity).to.equal(ethers.constants.Zero);
         expect(actual.remainingCapacity).to.equal(ethers.constants.Zero);
@@ -488,155 +508,26 @@ describe("Event contract", () => {
 
       it("should revert when called by owner", async () => {
         const { venue, owner, contract } = await loadFixture(newContract);
-        await contract.connect(venue).addOpenSection(sectionKey, capacity);
+        await contract.connect(venue).addSection(sectionKey, capacity);
         await expect(
-          contract.connect(owner).removeOpenSection(sectionKey)
-        ).to.be.revertedWith("Unauthorized");
+          contract.connect(owner).removeSection(sectionKey)
+        ).to.be.revertedWithCustomError(contract, "Unauthorized");
       });
 
       it("should revert when called by entertainer", async () => {
         const { venue, entertainer, contract } = await loadFixture(newContract);
-        await contract.connect(venue).addOpenSection(sectionKey, capacity);
+        await contract.connect(venue).addSection(sectionKey, capacity);
         await expect(
-          contract.connect(entertainer).removeOpenSection(sectionKey)
-        ).to.be.revertedWith("Unauthorized");
+          contract.connect(entertainer).removeSection(sectionKey)
+        ).to.be.revertedWithCustomError(contract, "Unauthorized");
       });
 
       it("should revert when called by attendee", async () => {
         const { venue, attendee, contract } = await loadFixture(newContract);
-        await contract.connect(venue).addOpenSection(sectionKey, capacity);
+        await contract.connect(venue).addSection(sectionKey, capacity);
         await expect(
-          contract.connect(attendee).removeOpenSection(sectionKey)
-        ).to.be.revertedWith("Unauthorized");
-      });
-    });
-
-    describe("addReservedSection function", () => {
-      it("should add the reserved section", async () => {
-        const { venue, contract } = await loadFixture(newContract);
-        await contract.connect(venue).addReservedSection(sectionKey);
-        const actual = await contract.getOpenSection(sectionKey);
-        expect(actual.ticketPrice).to.equal(ethers.constants.Zero);
-      });
-
-      it("should revert if the section already exists", async () => {
-        const { venue, contract } = await loadFixture(newContract);
-        await contract.connect(venue).addReservedSection(sectionKey);
-        await expect(
-          contract.connect(venue).addReservedSection(sectionKey)
-        ).to.be.revertedWith("Reserved section already exists");
-      });
-
-      it("should revert when called by owner", async () => {
-        const { venue, owner, contract } = await loadFixture(newContract);
-        await contract.connect(venue).addReservedSection(sectionKey);
-        await expect(
-          contract.connect(owner).removeOpenSection(sectionKey)
-        ).to.be.revertedWith("Unauthorized");
-      });
-
-      it("should revert when called by entertainer", async () => {
-        const { venue, entertainer, contract } = await loadFixture(newContract);
-        await contract.connect(venue).addReservedSection(sectionKey);
-        await expect(
-          contract.connect(entertainer).removeOpenSection(sectionKey)
-        ).to.be.revertedWith("Unauthorized");
-      });
-
-      it("should revert when called by attendee", async () => {
-        const { venue, attendee, contract } = await loadFixture(newContract);
-        await contract.connect(venue).addReservedSection(sectionKey);
-        await expect(
-          contract.connect(attendee).removeOpenSection(sectionKey)
-        ).to.be.revertedWith("Unauthorized");
-      });
-    });
-
-    describe("setReservedSectionTicketPrice function", () => {
-      it("should set the ticket price", async () => {
-        const { venue, entertainer, contract } = await loadFixture(newContract);
-        await contract.connect(venue).addReservedSection(sectionKey);
-        await contract
-          .connect(entertainer)
-          .setReservedSectionTicketPrice(sectionKey, ticketPrice);
-        const actual = await contract.getReservedSection(sectionKey);
-        expect(actual.ticketPrice).to.equal(ticketPrice);
-      });
-
-      it("should revert when section not found", async () => {
-        const { venue, entertainer, contract } = await loadFixture(newContract);
-        await contract.connect(venue).addReservedSection(sectionKey);
-        await expect(
-          contract
-            .connect(entertainer)
-            .setReservedSectionTicketPrice("baz", ticketPrice)
-        ).to.be.revertedWith("Reserved section not found");
-      });
-
-      it("should revert when called by owner", async () => {
-        const { venue, owner, contract } = await loadFixture(newContract);
-        await contract.connect(venue).addReservedSection(sectionKey);
-        await expect(
-          contract
-            .connect(owner)
-            .setReservedSectionTicketPrice(sectionKey, ticketPrice)
-        ).to.be.revertedWith("Unauthorized");
-      });
-
-      it("should revert when called by venue", async () => {
-        const { venue, contract } = await loadFixture(newContract);
-        await contract.connect(venue).addReservedSection(sectionKey);
-        await expect(
-          contract
-            .connect(venue)
-            .setReservedSectionTicketPrice(sectionKey, ticketPrice)
-        ).to.be.revertedWith("Unauthorized");
-      });
-
-      it("should revert when called by attendee", async () => {
-        const { venue, attendee, contract } = await loadFixture(newContract);
-        await contract.connect(venue).addReservedSection(sectionKey);
-        await expect(
-          contract
-            .connect(attendee)
-            .setReservedSectionTicketPrice(sectionKey, ticketPrice)
-        ).to.be.revertedWith("Unauthorized");
-      });
-    });
-
-    describe("removeReservedSection function", () => {
-      it("should remove the section", async () => {
-        const { venue, contract } = await loadFixture(newContract);
-        await contract.connect(venue).addReservedSection(sectionKey);
-        await contract.connect(venue).removeReservedSection(sectionKey);
-        const actualKeys = await contract.getReservedSectionKeys();
-        expect(actualKeys.includes(sectionKey)).to.equal(false);
-        const actual = await contract.getReservedSection(sectionKey);
-        expect(actual.ticketPrice).to.equal(ethers.constants.Zero);
-      });
-
-      it("should revert when called by owner", async () => {
-        const { venue, owner, contract } = await loadFixture(newContract);
-        await contract.connect(venue).addReservedSection(sectionKey);
-        await expect(
-          contract.connect(owner).removeReservedSection(sectionKey)
-        ).to.be.revertedWith("Unauthorized");
-      });
-
-      it("should revert when called by entertainer", async () => {
-        const { venue, entertainer, contract } = await loadFixture(newContract);
-        await contract.connect(venue).addReservedSection(sectionKey);
-        await expect(
-          contract.connect(entertainer).removeReservedSection(sectionKey)
-        ).to.be.revertedWith("Unauthorized");
-      });
-
-      it("should revert when called by attendee", async () => {
-        const { venue, attendee, contract } = await loadFixture(newContract);
-        await contract.connect(venue).addReservedSection(sectionKey);
-        await expect(
-          contract.connect(attendee).removeReservedSection(sectionKey)
-        ).to.be.revertedWith("Unauthorized");
+          contract.connect(attendee).removeSection(sectionKey)
+        ).to.be.revertedWithCustomError(contract, "Unauthorized");
       });
     });
   });
@@ -699,82 +590,48 @@ describe("Event contract", () => {
         expect(await contract.venueSigned()).to.equal(false);
       });
 
-      it("should reset signatures when open section is added", async () => {
+      it("should reset signatures when section is added", async () => {
         const { venue, entertainer, contract } = await loadFixture(
           readyToSignContract
         );
         await contract.connect(entertainer).signContract();
         expect(await contract.entertainerSigned()).to.equal(true);
-        await contract.connect(venue).addOpenSection(sectionKey, capacity);
+        await contract.connect(venue).addSection(sectionKey, capacity);
         expect(await contract.entertainerSigned()).to.equal(false);
       });
 
-      it("should reset signatures when open section ticket price is updated", async () => {
+      it("should reset signatures when section ticket price is updated", async () => {
         const { venue, entertainer, contract } = await loadFixture(
           readyToSignContract
         );
-        await contract.connect(venue).addOpenSection(sectionKey, capacity);
+        await contract.connect(venue).addSection(sectionKey, capacity);
         await contract.connect(venue).signContract();
         expect(await contract.venueSigned()).to.equal(true);
         await contract
           .connect(entertainer)
-          .setOpenSectionTicketPrice(sectionKey, ticketPrice);
+          .setSectionTicketPrice(sectionKey, ticketPrice);
         expect(await contract.venueSigned()).to.equal(false);
       });
 
-      it("should reset signatures when open section capacity is updated", async () => {
+      it("should reset signatures when section capacity is updated", async () => {
         const { venue, entertainer, contract } = await loadFixture(
           readyToSignContract
         );
-        await contract.connect(venue).addOpenSection(sectionKey, capacity);
+        await contract.connect(venue).addSection(sectionKey, capacity);
         await contract.connect(entertainer).signContract();
         expect(await contract.entertainerSigned()).to.equal(true);
-        await contract.connect(venue).setOpenSectionCapacity(sectionKey, 1001);
+        await contract.connect(venue).setSectionCapacity(sectionKey, 1001);
         expect(await contract.entertainerSigned()).to.equal(false);
       });
 
-      it("should reset signatures when open section is removed", async () => {
+      it("should reset signatures when section is removed", async () => {
         const { venue, entertainer, contract } = await loadFixture(
           readyToSignContract
         );
-        await contract.connect(venue).addOpenSection(sectionKey, capacity);
+        await contract.connect(venue).addSection(sectionKey, capacity);
         await contract.connect(entertainer).signContract();
         expect(await contract.entertainerSigned()).to.equal(true);
-        await contract.connect(venue).removeOpenSection(sectionKey);
-        expect(await contract.entertainerSigned()).to.equal(false);
-      });
-
-      it("should reset signatures when reserved section is added", async () => {
-        const { venue, entertainer, contract } = await loadFixture(
-          readyToSignContract
-        );
-        await contract.connect(entertainer).signContract();
-        expect(await contract.entertainerSigned()).to.equal(true);
-        await contract.connect(venue).addReservedSection(sectionKey);
-        expect(await contract.entertainerSigned()).to.equal(false);
-      });
-
-      it("should reset signatures when reserved section ticket price is updated", async () => {
-        const { venue, entertainer, contract } = await loadFixture(
-          readyToSignContract
-        );
-        await contract.connect(venue).addReservedSection(sectionKey);
-        await contract.connect(venue).signContract();
-        expect(await contract.venueSigned()).to.equal(true);
-        await contract
-          .connect(entertainer)
-          .setReservedSectionTicketPrice(sectionKey, toEther(1001));
-        expect(await contract.venueSigned()).to.equal(false);
-      });
-
-      it("should reset signatures when reserved section is removed", async () => {
-        const { venue, entertainer, contract } = await loadFixture(
-          readyToSignContract
-        );
-        await contract.connect(venue).addReservedSection(sectionKey);
-        await contract.connect(entertainer).signContract();
-        expect(await contract.entertainerSigned()).to.equal(true);
-        await contract.connect(venue).removeReservedSection(sectionKey);
+        await contract.connect(venue).removeSection(sectionKey);
         expect(await contract.entertainerSigned()).to.equal(false);
       });
     });
@@ -782,17 +639,15 @@ describe("Event contract", () => {
     describe("readyToSign modifier", () => {
       it("should revert signContract if eventDateTime not set", async () => {
         const { venue, contract } = await loadFixture(newContract);
-        await expect(contract.connect(venue).signContract()).to.be.revertedWith(
-          "Event date time not set"
-        );
+        await expect(contract.connect(venue).signContract())
+          .to.be.revertedWithCustomError(contract, "ContractNotReadyToSign");
       });
 
       it("should revert signContract if ticketSalesStartDateTime not set", async () => {
         const { venue, entertainer, contract } = await loadFixture(newContract);
         await contract.connect(entertainer).setEventDateTime(currentTs);
-        await expect(contract.connect(venue).signContract()).to.be.revertedWith(
-          "Ticket sales start date time not set"
-        );
+        await expect(contract.connect(venue).signContract())
+          .to.be.revertedWithCustomError(contract, "ContractNotReadyToSign");
       });
 
       it("should revert signContract if ticketSalesEndDateTime not set", async () => {
@@ -801,9 +656,8 @@ describe("Event contract", () => {
         await contract
           .connect(entertainer)
           .setTicketSalesStartDateTime(currentTs);
-        await expect(contract.connect(venue).signContract()).to.be.revertedWith(
-          "Ticket sales end date time not set"
-        );
+        await expect(contract.connect(venue).signContract())
+          .to.be.revertedWithCustomError(contract, "ContractNotReadyToSign");
       });
 
       it("should revert signContract if defaultTicketPrice not set", async () => {
@@ -815,9 +669,8 @@ describe("Event contract", () => {
         await contract
           .connect(entertainer)
           .setTicketSalesEndDateTime(currentTs);
-        await expect(contract.connect(venue).signContract()).to.be.revertedWith(
-          "Default ticket price not set"
-        );
+        await expect(contract.connect(venue).signContract())
+          .to.be.revertedWithCustomError(contract, "ContractNotReadyToSign");
       });
     });
 
@@ -838,23 +691,20 @@ describe("Event contract", () => {
 
       it("should revert if called by owner", async () => {
         const { owner, contract } = await loadFixture(readyToSignContract);
-        await expect(contract.connect(owner).signContract()).to.be.revertedWith(
-          "Unauthorized"
-        );
+        await expect(contract.connect(owner).signContract())
+          .to.be.revertedWithCustomError(contract, "Unauthorized");
       });
 
       it("should revert if called by attendee", async () => {
         const { attendee, contract } = await loadFixture(readyToSignContract);
         await expect(
           contract.connect(attendee).signContract()
-        ).to.be.revertedWith("Unauthorized");
+        ).to.be.revertedWithCustomError(contract, "Unauthorized");
       });
 
       it("should revert if both parties already signed", async () => {
         const { venue, contract } = await loadFixture(salesActiveContract);
-        await expect(contract.connect(venue).signContract()).to.be.revertedWith(
-          "Contract already finalized"
-        );
+        await expect(contract.connect(venue).signContract()).to.be.revertedWithCustomError(contract, "ContractAlreadyFinalized");
       });
     });
   });
@@ -869,7 +719,7 @@ describe("Event contract", () => {
           contract
             .connect(entertainer)
             .createNft("foo", "FOO", "memo", 70_000, 100_000)
-        ).to.be.revertedWith("Contract not yet finalized");
+        ).to.be.revertedWithCustomError(contract, "ContractNotFinalized");
       });
 
       it("should revert if called by owner", async () => {
@@ -878,7 +728,7 @@ describe("Event contract", () => {
           contract
             .connect(owner)
             .createNft("foo", "FOO", "memo", 70_000, 100_000)
-        ).to.be.revertedWith("Unauthorized");
+        ).to.be.revertedWithCustomError(contract, "Unauthorized");
       });
 
       it("should revert if called by venue", async () => {
@@ -887,7 +737,7 @@ describe("Event contract", () => {
           contract
             .connect(venue)
             .createNft("foo", "FOO", "memo", 70_000, 100_000)
-        ).to.be.revertedWith("Unauthorized");
+        ).to.be.revertedWithCustomError(contract, "Unauthorized");
       });
 
       it("should revert if called by attendee", async () => {
@@ -896,7 +746,7 @@ describe("Event contract", () => {
           contract
             .connect(attendee)
             .createNft("foo", "FOO", "memo", 70_000, 100_000)
-        ).to.be.revertedWith("Unauthorized");
+        ).to.be.revertedWithCustomError(contract, "Unauthorized");
       });
 
       it("should return created token ID", async () => {
@@ -910,8 +760,8 @@ describe("Event contract", () => {
         await expect(
           contract
             .connect(attendee)
-            .purchaseTicket("GA", "", "", [Buffer.from("{}")])
-        ).to.be.revertedWith("Ticket sales have not started");
+            .purchaseTicket("GA", [Buffer.from("{}")])
+        ).to.be.revertedWithCustomError(contract, "SalesNotActive");
       });
 
       it("should revert if sales have ended", async () => {
@@ -919,8 +769,8 @@ describe("Event contract", () => {
         await expect(
           contract
             .connect(attendee)
-            .purchaseTicket("GA", "", "", [Buffer.from("{}")])
-        ).to.be.revertedWith("Ticket sales have ended");
+            .purchaseTicket("GA", [Buffer.from("{}")])
+        ).to.be.revertedWithCustomError(contract, "SalesNotActive");
       });
 
       it("should revert if insufficient payment amount", async () => {
@@ -928,26 +778,17 @@ describe("Event contract", () => {
         await expect(
           contract
             .connect(attendee)
-            .purchaseTicket("GA", "", "", [Buffer.from("{}")])
-        ).to.be.revertedWith("Insufficient payment amount");
+            .purchaseTicket("GA", [Buffer.from("{}")])
+        ).to.be.revertedWithCustomError(contract, "InsufficientPaymentAmount");
       });
 
-      it("should revert if open section is full", async () => {
+      it("should revert if seat is unavailable", async () => {
         const { attendee, contract } = await loadFixture(salesActiveContract);
         await expect(
           contract
             .connect(attendee)
-            .purchaseTicket(testOpenSectionKey, "", "", [Buffer.from("{}")])
-        ).to.be.revertedWith("Section is full");
-      });
-
-      it("should revert if reserved seat is no longer available", async () => {
-        const { attendee, contract } = await loadFixture(salesActiveContract);
-        await expect(
-          contract
-            .connect(attendee)
-            .purchaseTicket(testReservedSectionKey, "", "", [Buffer.from("{}")])
-        ).to.be.revertedWith("Seat no longer available");
+            .purchaseTicket(testSectionKey, [Buffer.from("{}")])
+        ).to.be.revertedWithCustomError(contract, "SeatUnavailable");
       });
 
       it("should mint the NFTicket", async () => {
@@ -984,33 +825,32 @@ describe("Event contract", () => {
     describe("scanTicket function", () => {
       it("should revert if ticket not found", async () => {
         const { venue, contract } = await loadFixture(salesActiveContract);
-        await expect(contract.connect(venue).scanTicket(1)).to.be.revertedWith(
-          "Could not find that ticket"
+        await expect(contract.connect(venue).scanTicket(1)).to.be.revertedWithCustomError(
+          contract,
+          "TicketNotFound"
         );
       });
 
       it("should mark ticket as scanned", async () => {
         const { venue, contract } = await loadFixture(salesActiveContract);
-        await contract.connect(venue).scanTicket(testOpenSectionTicketSerial);
-        const nfTicket = await contract.getNFTicket(
-          testOpenSectionTicketSerial
-        );
-        expect(nfTicket.scanned).to.equal(true);
+        await contract.connect(venue).scanTicket(testSectionTicketSerial);
+        const ticket = await contract.getTicket(testSectionTicketSerial);
+        expect(ticket.scanned).to.equal(true);
       });
 
       it("should revert if ticket already scanned", async () => {
         const { venue, contract } = await loadFixture(salesActiveContract);
-        await contract.connect(venue).scanTicket(testOpenSectionTicketSerial);
+        await contract.connect(venue).scanTicket(testSectionTicketSerial);
         await expect(
-          contract.connect(venue).scanTicket(testOpenSectionTicketSerial)
-        ).to.be.revertedWith("Ticket already scanned");
+          contract.connect(venue).scanTicket(testSectionTicketSerial)
+        ).to.be.revertedWithCustomError(contract, "TicketAlreadyScanned");
       });
 
       it("should revert if called by owner", async () => {
         const { owner, contract } = await loadFixture(salesActiveContract);
         await expect(
-          contract.connect(owner).scanTicket(testOpenSectionTicketSerial)
-        ).to.be.revertedWith("Unauthorized");
+          contract.connect(owner).scanTicket(testSectionTicketSerial)
+        ).to.be.revertedWithCustomError(contract, "Unauthorized");
       });
 
       it("should revert if called by entertainer", async () => {
@@ -1018,15 +858,15 @@ describe("Event contract", () => {
           salesActiveContract
         );
         await expect(
-          contract.connect(entertainer).scanTicket(testOpenSectionTicketSerial)
-        ).to.be.revertedWith("Unauthorized");
+          contract.connect(entertainer).scanTicket(testSectionTicketSerial)
+        ).to.be.revertedWithCustomError(contract, "Unauthorized");
       });
 
       it("should revert if called by attendee", async () => {
         const { attendee, contract } = await loadFixture(salesActiveContract);
         await expect(
-          contract.connect(attendee).scanTicket(testOpenSectionTicketSerial)
-        ).to.be.revertedWith("Unauthorized");
+          contract.connect(attendee).scanTicket(testSectionTicketSerial)
+        ).to.be.revertedWithCustomError(contract, "Unauthorized");
       });
     });
   });
@@ -1078,14 +918,14 @@ describe("Event contract", () => {
           await contract.connect(owner).collectPayout();
           await expect(
             contract.connect(owner).collectPayout()
-          ).to.be.revertedWith("Service payout already collected");
+          ).to.be.revertedWithCustomError(contract, "PayoutAlreadyCollected");
         });
 
-        it("should revert if sales haven't ended", async () => {
+        it("should revert if sales still active", async () => {
           const { owner, contract } = await loadFixture(salesActiveContract);
           await expect(
             contract.connect(owner).collectPayout()
-          ).to.be.revertedWith("Ticket sales are still active");
+          ).to.be.revertedWithCustomError(contract, "SalesStillActive");
         });
       });
 
@@ -1126,14 +966,14 @@ describe("Event contract", () => {
           await contract.connect(venue).collectPayout();
           await expect(
             contract.connect(venue).collectPayout()
-          ).to.be.revertedWith("Venue payout already collected");
+          ).to.be.revertedWithCustomError(contract, "PayoutAlreadyCollected");
         });
 
-        it("should revert if sales haven't ended", async () => {
+        it("should revert if sales still active", async () => {
           const { venue, contract } = await loadFixture(salesActiveContract);
           await expect(
             contract.connect(venue).collectPayout()
-          ).to.be.revertedWith("Ticket sales are still active");
+          ).to.be.revertedWithCustomError(contract, "SalesStillActive");
         });
       });
 
@@ -1174,14 +1014,14 @@ describe("Event contract", () => {
           await contract.connect(entertainer).collectPayout();
           await expect(
             contract.connect(entertainer).collectPayout()
-          ).to.be.revertedWith("Entertainer payout already collected");
+          ).to.be.revertedWithCustomError(contract, "PayoutAlreadyCollected");
         });
 
-        it("should revert if sales haven't ended", async () => {
+        it("should revert if sales still active", async () => {
           const { entertainer, contract } = await loadFixture(salesActiveContract);
           await expect(
             contract.connect(entertainer).collectPayout()
-          ).to.be.revertedWith("Ticket sales are still active");
+          ).to.be.revertedWithCustomError(contract, "SalesStillActive");
         });
       });
 
@@ -1190,7 +1030,7 @@ describe("Event contract", () => {
           const { attendee, contract } = await loadFixture(postSalesContract);
           await expect(
             contract.connect(attendee).collectPayout()
-          ).to.be.revertedWith("Unauthorized");
+          ).to.be.revertedWithCustomError(contract, "Unauthorized");
         });
       });
     });

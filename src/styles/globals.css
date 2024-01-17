@@ -4,9 +4,17 @@
 
 body {
   color: rgb(51, 51, 51);
-  background: rgb(255, 255, 255);
+  background: rgb(225, 225, 225);
 }
 
 .text-hashpack {
   color: #7A7AB8;
+}
+
+.text-primary {
+  color: rgb(46 16 101);
+}
+
+.bg-primary {
+  background-color: rgb(46 16 101);
 }

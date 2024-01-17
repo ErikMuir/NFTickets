@@ -44,10 +44,10 @@ export const Modal = ({
   const modalContent = show ? (
     <div
       className="modal-overlay fixed top-0 left-0 w-full h-full overflow-x-hidden flex justify-center items-center z-10"
-      style={{ backgroundColor: "rgba(0, 0, 0, 0.25)" }}
+      style={{ backgroundColor: "rgba(0, 0, 0, 0.4)" }}
     >
       <div className={`modal-wrapper ${className}`} ref={modalWrapperRef}>
-        <div className="modal relative p-8 pb-12 rounded-xl bg-white z-10">
+        <div className="modal relative p-8 pb-12 rounded-xl bg-white z-10 shadow-md">
           {showClose && (
             <Close
               className="absolute top-0 right-0 m-4 cursor-pointer"

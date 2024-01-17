@@ -1,10 +1,10 @@
 import React from "react";
-import { Inter } from "next/font/google";
+import { Inter, Jost, Salsa } from "next/font/google";
 import "@/styles/globals.css";
 import { TopNavigation } from "@/components/TopNavigation";
 import { Footer } from "@/components/Footer";
 
-const inter = Inter({ subsets: ["latin"] });
+const jost = Jost({ weight: ["400", "700"], subsets: ["latin"] });
 
 export const metadata = {
   title: "NFTickets",
@@ -19,7 +19,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={jost.className}>
         <div className="flex flex-col min-h-screen">
           <TopNavigation />
           <div className="grow shrink-0 basis-auto">

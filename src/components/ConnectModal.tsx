@@ -29,7 +29,7 @@ export const ConnectModal = ({
           <LoadingButton
             onClick={onSubmit}
             variant="contained"
-            className="rounded bg-cyan-700 hover:bg-cyan-600"
+            className="rounded bg-primary hover:bg-violet-700"
             disabled={!extensionAvailable}
             loading={isAuthenticating}
           >
@@ -54,7 +54,7 @@ export const ConnectModal = ({
               }}
               label="Pairing String"
             />
-            <Button size="small" onClick={handleCopy}>
+            <Button size="small" className="text-primary" onClick={handleCopy}>
               Copy
             </Button>
           </div>

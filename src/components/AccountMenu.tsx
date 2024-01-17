@@ -112,7 +112,7 @@ export const AccountMenu = () => {
     return (
       <>
         <Button
-          className="px-4 text-white hover:bg-inherit"
+          className="px-4 text-primary hover:bg-inherit"
           onClick={() => {
             setShowModal(true);
           }}
@@ -153,7 +153,7 @@ export const AccountMenu = () => {
   return (
     <>
       <Button
-        className="text-right inline-flex gap-2 text-white hover:bg-inherit"
+        className="text-right inline-flex gap-2 text-primary hover:bg-inherit"
         size="medium"
         aria-controls="accountMenu"
         aria-haspopup="true"
@@ -192,7 +192,7 @@ export const AccountMenu = () => {
         >
           <MenuList disablePadding={true}>
             <MenuItem
-              className="flex items-center gap-4 hover:bg-zinc-200"
+              className="flex items-center gap-4 hover:bg-violet-300"
               onClick={handleDisconnect}
             >
               <LinkOffIcon fontSize="medium" />

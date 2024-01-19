@@ -6,7 +6,6 @@ import LinkOffIcon from "@mui/icons-material/LinkOff";
 import { Menu, MenuItem, MenuList } from "@mui/material";
 import Button from "@mui/material/Button";
 import { MessageTypes } from "hashconnect";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
@@ -152,14 +151,14 @@ export const AccountMenu = () => {
   return (
     <>
       <Button
-        className="text-right inline-flex gap-2 text-primary hover:bg-inherit"
+        className="text-right inline-flex gap-2 hover:bg-inherit"
         size="medium"
         aria-controls="account-menu"
         aria-haspopup="true"
         onClick={handleOpenMenu}
       >
-        <div className="truncate">{user?.accountId}</div>
-        <div className="flex items-center">
+        <div className="text-primary truncate">{user?.accountId}</div>
+        <div className="text-primary flex items-center">
           <AccountBalanceWalletIcon fontSize="small" />
           <ArrowDropDownIcon fontSize="small" />
         </div>

@@ -112,24 +112,23 @@ export const AccountMenu = () => {
     return (
       <>
         <Button
-          className="px-4 text-primary hover:bg-inherit"
+          className="gap-2 text-primary hover:bg-inherit"
+          size="medium"
+          aria-controls="connect-modal"
+          aria-haspopup="true"
           onClick={() => {
             setShowModal(true);
           }}
-          size="small"
-          startIcon={
-            <Image
-              src="/hashpack-logo.svg"
-              alt="HashPack"
-              width={16}
-              height={16}
-            />
-          }
         >
-          Connect
+          <div>Connect</div>
+          <div className="flex items-center">
+            <AccountBalanceWalletIcon fontSize="small" />
+            <ArrowDropDownIcon fontSize="small" />
+          </div>
         </Button>
         {showModal && (
           <ConnectModal
+            id="connect-modal"
             show={showModal}
             onClose={() => {
               setIsAuthenticating(false);
@@ -155,7 +154,7 @@ export const AccountMenu = () => {
       <Button
         className="text-right inline-flex gap-2 text-primary hover:bg-inherit"
         size="medium"
-        aria-controls="accountMenu"
+        aria-controls="account-menu"
         aria-haspopup="true"
         onClick={handleOpenMenu}
       >
@@ -168,7 +167,7 @@ export const AccountMenu = () => {
 
       {showMenu && (
         <Menu
-          id="accountMenu"
+          id="account-menu"
           anchorEl={anchorEl}
           anchorOrigin={{
             vertical: "bottom",

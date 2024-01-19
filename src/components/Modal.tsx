@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom";
 
 export const Modal = ({
+  id,
   show,
   onClose,
   children,
@@ -10,6 +11,7 @@ export const Modal = ({
   className,
   showClose,
 }: {
+  id?: string;
   show: boolean;
   onClose: () => void;
   children: any;
@@ -43,6 +45,7 @@ export const Modal = ({
 
   const modalContent = show ? (
     <div
+      id={id}
       className="modal-overlay fixed top-0 left-0 w-full h-full overflow-x-hidden flex justify-center items-center z-10"
       style={{ backgroundColor: "rgba(0, 0, 0, 0.4)" }}
     >

@@ -4,6 +4,7 @@ import { LoadingButton } from "@mui/lab";
 import Modal from "./Modal";
 
 export const ConnectModal = ({
+  id,
   show,
   onClose,
   onSubmit,
@@ -11,6 +12,7 @@ export const ConnectModal = ({
   pairingString,
   isAuthenticating,
 }: {
+  id?: string;
   show: boolean;
   onClose: () => void;
   onSubmit: () => void;
@@ -23,7 +25,7 @@ export const ConnectModal = ({
   };
 
   return (
-    <Modal onClose={onClose} show={show} title="Connect your HashPack Wallet">
+    <Modal id={id} onClose={onClose} show={show} title="Connect your HashPack Wallet">
       <div className="flex flex-col items-center" style={{ maxWidth: 400 }}>
         <div className="flex flex-col items-center">
           <LoadingButton

@@ -7,14 +7,26 @@ body {
   background: rgb(225, 225, 225);
 }
 
-.text-hashpack {
-  color: #7A7AB8;
-}
-
 .text-primary {
   color: rgb(46 16 101);
 }
 
 .bg-primary {
   background-color: rgb(46 16 101);
+  opacity: 1;
+  transition-property: opacity;
+  transition-timing-function: ease-in-out;
+  transition-duration: 150ms;
+}
+
+.bg-primary:hover {
+  background-color: rgb(46 16 101);
+  opacity: 0.75;
+  transition-property: opacity;
+  transition-timing-function: ease-in-out;
+  transition-duration: 150ms;
+}
+
+.border-primary {
+  border-color: rgb(46 16 101);
 }

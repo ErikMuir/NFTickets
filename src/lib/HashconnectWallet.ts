@@ -15,8 +15,7 @@ import { hashconnect } from "./hashconnect";
 
 const appMetadata: HashConnectTypes.AppMetadata = {
   name: "NFTicket",
-  description:
-    "A ledger-based ticketing system for live events built on the Hedera Hashgraph network",
+  description: "A ledger-based ticketing system for live events",
   icon: "https://nftickets-beta.vercel.app/logo.png",
 };
 

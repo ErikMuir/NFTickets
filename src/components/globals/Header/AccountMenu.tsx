@@ -185,7 +185,7 @@ export const AccountMenu = () => {
           slotProps={{
             paper: {
               className: "w-80 max-w-full",
-            }
+            },
           }}
         >
           <MenuList disablePadding={true}>

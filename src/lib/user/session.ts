@@ -1,5 +1,5 @@
 import type { IronSessionOptions } from "iron-session";
-import { User } from "@/types";
+import { User } from "@/lib/user/types";
 
 export const ironSessionOptions: IronSessionOptions = {
   password: "2a552d2e-17f9-495c-81a9-daae9d7e6c7c",

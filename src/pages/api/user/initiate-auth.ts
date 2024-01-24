@@ -1,18 +1,18 @@
 import { randomUUID } from "crypto";
-import { getHederaSigningService } from "@/server-utils/hedera-signing-service";
+import { getHederaSigningService } from "@/clients/hedera/signing-service";
 import {
   errorResponse,
   methodNotAllowed,
   StandardPayload,
   success,
 } from "@/server-utils/api-responses";
+import { Network } from "@/clients/hedera/types";
+import { withStandardApi } from "@/server-utils/api-wrappers";
+import { NextApiRequest, NextApiResponse } from "next/types";
 import {
   HashconnectInitiateAuthRequest,
   HashconnectInitiateAuthResult,
-  Network,
-} from "@/types";
-import { withStandardApi } from "@/server-utils/api-wrappers";
-import { NextApiRequest, NextApiResponse } from "next/types";
+} from "@/lib/hashconnect/types";
 
 async function initiateAuthRoute(
   req: NextApiRequest,
@@ -22,7 +22,8 @@ async function initiateAuthRoute(
     return methodNotAllowed(res);
   }
 
-  const { topic, accountId, network } = req.body as HashconnectInitiateAuthRequest;
+  const { topic, accountId, network } =
+    req.body as HashconnectInitiateAuthRequest;
 
   if (!topic || !accountId) {
     return errorResponse(res, 400, "topic and accountId are required.");

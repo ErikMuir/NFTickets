@@ -3,10 +3,11 @@ import { QueryResult, sql } from "@vercel/postgres";
 export const createWalletsTable = (): Promise<QueryResult> => {
   return sql`
     CREATE TABLE IF NOT EXISTS wallets (
-      id        uuid PRIMARY KEY NOT NULL DEFAULT gen_random_uuid(),
-      address   text NOT NULL UNIQUE,
-      name      text,
-      role      text
+      id         uuid PRIMARY KEY NOT NULL DEFAULT gen_random_uuid(),
+      address    text NOT NULL UNIQUE,
+      role       text NULL,
+      created_at text NOT NULL DEFAULT timezone('utc', now()),
+      updated_at text NOT NULL DEFAULT timezone('utc', now())
     );
   `;
 };
@@ -14,8 +15,16 @@ export const createWalletsTable = (): Promise<QueryResult> => {
 export const createVenuesTable = async (): Promise<QueryResult> => {
   return sql`
     CREATE TABLE IF NOT EXISTS venues (
-      id        uuid PRIMARY KEY NOT NULL DEFAULT gen_random_uuid(),
-      walletId  uuid NOT NULL UNIQUE REFERENCES wallets ON DELETE CASCADE
+      id           uuid PRIMARY KEY NOT NULL DEFAULT gen_random_uuid(),
+      wallet_id    uuid NOT NULL UNIQUE REFERENCES wallets ON DELETE CASCADE,
+      name         text NOT NULL,
+      description  text NULL,
+      address      text NULL,
+      city         text NULL,
+      state        text NULL,
+      zip          text NULL,
+      created_at   text NOT NULL DEFAULT timezone('utc', now()),
+      updated_at   text NOT NULL DEFAULT timezone('utc', now())
     );
   `;
 };
@@ -23,8 +32,14 @@ export const createVenuesTable = async (): Promise<QueryResult> => {
 export const createEntertainersTable = async (): Promise<QueryResult> => {
   return sql`
     CREATE TABLE IF NOT EXISTS entertainers (
-      id        uuid PRIMARY KEY NOT NULL DEFAULT gen_random_uuid(),
-      walletId  uuid NOT NULL UNIQUE REFERENCES wallets ON DELETE CASCADE
+      id          uuid PRIMARY KEY NOT NULL DEFAULT gen_random_uuid(),
+      wallet_id   uuid NOT NULL UNIQUE REFERENCES wallets ON DELETE CASCADE,
+      type        text NOT NULL,
+      name        text NOT NULL,
+      description text NULL,
+      iteration   text NULL,
+      created_at  text NOT NULL DEFAULT timezone('utc', now()),
+      updated_at  text NOT NULL DEFAULT timezone('utc', now())
     );
   `;
 };

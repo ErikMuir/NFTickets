@@ -2,11 +2,17 @@ import { useEffect } from "react";
 import Router from "next/router";
 import useSWR from "swr";
 
-import { User } from "@/types";
-import { fetchJson } from "./fetch-json";
+import { User } from "@/lib/user/types";
+import { fetchJson } from "../fetch-json";
 
-export default function useUser({ redirectTo = "", redirectIfFound = false } = {}) {
-  const { data: user, mutate: mutateUser } = useSWR<User>("/api/user", fetchJson);
+export default function useUser({
+  redirectTo = "",
+  redirectIfFound = false,
+} = {}) {
+  const { data: user, mutate: mutateUser } = useSWR<User>(
+    "/api/user",
+    fetchJson
+  );
 
   useEffect(() => {
     if (!redirectTo || !user) return;

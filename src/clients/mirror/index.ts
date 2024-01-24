@@ -1,6 +1,6 @@
-import { getRequired } from "../../common/env";
+import { getRequired } from "../../../common/env";
 import { fetchJson } from "@/lib/fetch-json";
-import { AccountInfo } from "./mirror-types";
+import { AccountInfo } from "@/clients/mirror/types";
 
 export const callMirror = async <T>(path: string): Promise<T> => {
   return fetchJson<T>(`${getRequired("MIRROR_API_URL")}/${path}`, {

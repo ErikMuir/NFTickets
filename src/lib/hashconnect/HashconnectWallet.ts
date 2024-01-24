@@ -1,25 +1,22 @@
 import { AccountId, Transaction, TransactionId } from "@hashgraph/sdk";
 import { HashConnectTypes, MessageTypes } from "hashconnect";
 import invariant from "tiny-invariant";
-
+import { Network } from "@/clients/hedera/types";
+import { fetchStandardJson } from "@/lib/fetch-json";
+import { hashconnect } from "@/lib/hashconnect";
 import {
   AuthenticationResult,
   HashconnectAuthenticationRequest,
+  HashconnectConnectionData,
   HashconnectInitiateAuthResult,
-  LoggedInUser,
-  Network,
-} from "@/types";
-
-import { fetchStandardJson } from "./fetch-json";
-import { hashconnect } from "./hashconnect";
+} from "@/lib/hashconnect/types";
+import { LoggedInUser } from "@/lib/user/types";
 
 const appMetadata: HashConnectTypes.AppMetadata = {
   name: "NFTicket",
   description: "A ledger-based ticketing system for live events",
   icon: "https://nftickets-beta.vercel.app/logo.png",
 };
-
-export type HashconnectConnectionData = HashConnectTypes.InitilizationData;
 
 let hashconnectWallet: HashconnectWallet | undefined;
 export function getHashConnectWallet(): HashconnectWallet {

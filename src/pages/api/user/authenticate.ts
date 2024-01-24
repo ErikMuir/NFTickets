@@ -1,11 +1,9 @@
 import { PublicKey } from "@hashgraph/sdk";
 import { NextApiRequest, NextApiResponse } from "next/types";
 import invariant from "tiny-invariant";
-
-import { getHederaSigningService } from "@/server-utils/hedera-signing-service";
-import { getAccountInfo } from "@/server-utils/mirror-client";
+import { getHederaSigningService } from "@/clients/hedera/signing-service";
+import { getAccountInfo } from "@/clients/mirror";
 import { toUint8Array } from "@/common-utils/arrays";
-
 import {
   errorResponse,
   methodNotAllowed,
@@ -13,7 +11,9 @@ import {
   unauthenticated,
 } from "@/server-utils/api-responses";
 import { withStandardApi } from "@/server-utils/api-wrappers";
-import { HashconnectAuthenticationRequest, LoggedInUser, Network } from "@/types";
+import { Network } from "@/clients/hedera/types";
+import { LoggedInUser } from "@/lib/user/types";
+import { HashconnectAuthenticationRequest } from "@/lib/hashconnect/types";
 
 async function authenticateRoute(
   req: NextApiRequest,
@@ -31,11 +31,16 @@ async function authenticateRoute(
     return unauthenticated(res);
   }
 
-  const { initToken, accountId: account, network, hashconnectTopic } = req.session.user;
-  const { userSignature, signedPayload } = req.body as HashconnectAuthenticationRequest;
+  const { initToken, accountId, network, hashconnectTopic } = req.session.user;
+  const { userSignature, signedPayload } =
+    req.body as HashconnectAuthenticationRequest;
 
   if (!userSignature || !signedPayload) {
-    return errorResponse(res, 400, "userSignature and signedPayload are required.");
+    return errorResponse(
+      res,
+      400,
+      "userSignature and signedPayload are required."
+    );
   }
 
   if (network !== Network.Testnet) {
@@ -61,16 +66,16 @@ async function authenticateRoute(
 
   let publicKey: PublicKey;
   try {
-    invariant(account);
-    const accountResponse = await getAccountInfo(account);
+    invariant(accountId);
+    const accountResponse = await getAccountInfo(accountId);
 
     if (!accountResponse.key?.key) {
-      console.log(`Failed to find public key for account: ${account}`);
+      console.log(`Failed to find public key for account: ${accountId}`);
       return unauthenticated(res);
     }
     publicKey = PublicKey.fromString(accountResponse.key.key);
   } catch (err) {
-    return errorResponse(res, 503, `Could not find account ${account}.`);
+    return errorResponse(res, 503, `Could not find account ${accountId}.`);
   }
 
   const userKeyVerified = hederaSigningService.verifyData(
@@ -83,9 +88,29 @@ async function authenticateRoute(
     return unauthenticated(res);
   }
 
+  // get wallet
+  // if no wallet, create wallet
+
+  // let profile: Profile | undefined;
+  // try {
+  //   profile = await getProfile({ network, account });
+  //   if (!profile) {
+  //     const now = new Date();
+  //     profile = {
+  //       network,
+  //       account,
+  //       lastUpdated: now,
+  //       createdDate: now,
+  //     };
+  //     await putProfile(profile);
+  //   }
+  // } catch (e) {
+  //   logger.error(e, "Error occured trying to get or save profile");
+  // }
+
   const user: LoggedInUser = {
     isLoggedIn: true,
-    accountId: account,
+    accountId,
     network,
     hashconnectTopic,
   };

@@ -6,7 +6,7 @@ import {
   unauthenticated,
 } from "@/server-utils/api-responses";
 import { RequestError } from "@/server-utils/api-errors";
-import { ironSessionOptions } from "@/lib/session";
+import { ironSessionOptions } from "@/lib/user/session";
 
 export function withStandardApi<T = any>(
   handler: NextApiHandler<StandardPayload<T>>,

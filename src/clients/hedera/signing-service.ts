@@ -1,6 +1,6 @@
 import { PublicKey, Transaction, AccountId, TransactionId, PrivateKey } from "@hashgraph/sdk";
 
-import { getOperatorPrivateKey, getOperatorAccountId } from "./hedera-client";
+import { getOperatorPrivateKey, getOperatorAccountId } from "@/clients/hedera";
 
 class HederaSigningService {
   accountId: AccountId;

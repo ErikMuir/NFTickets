@@ -12,8 +12,8 @@ import { useCallback, useEffect, useState } from "react";
 import { ConnectModal } from "./ConnectModal";
 
 import { hashconnect } from "@/lib/hashconnect";
-import { getHashConnectWallet } from "@/lib/HashconnectWallet";
-import useUser from "@/lib/useUser";
+import { getHashConnectWallet } from "@/lib/hashconnect/HashconnectWallet";
+import useUser from "@/lib/user/useUser";
 
 export const AccountMenu = () => {
   const router = useRouter();

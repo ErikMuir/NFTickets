@@ -2,7 +2,7 @@
 
 import ExternalView from "@/components/views/ExternalView";
 import InternalView from "@/components/views/InternalView";
-import useUser from "@/lib/useUser";
+import useUser from "@/lib/user/useUser";
 
 export default function HomeRoute() {
   const { user, mutateUser } = useUser();

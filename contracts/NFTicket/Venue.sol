@@ -4,9 +4,10 @@ pragma solidity >=0.8.0 <0.9.0;
 import {
   Unauthorized,
   DuplicateKey,
-  KeyNotFound
-} from "../Errors.sol";
-import { VenueDisabled } from "./VenueErrors.sol";
+  KeyNotFound,
+  Disabled,
+  NotConfigured
+} from "./Errors.sol";
 import "./EventMap.sol";
 import "./SeatingMap.sol";
 
@@ -22,8 +23,15 @@ contract Venue {
   string public location;
   bool public enabled;
 
+  bytes32 internal constant emptyString = keccak256(bytes(""));
+
   constructor() {
     owner = msg.sender;
+  }
+
+  // internal pure
+  function isEmptyString(string memory val) internal pure returns (bool) {
+    return keccak256(bytes(val)) == emptyString;
   }
 
   // access modifiers
@@ -33,7 +41,12 @@ contract Venue {
   }
 
   modifier isEnabled() {
-    if (!enabled) revert VenueDisabled();
+    if (!enabled) revert Disabled();
+    _;
+  }
+
+  modifier isConfigured() {
+    if (isEmptyString(name) || isEmptyString(location)) revert NotConfigured();
     _;
   }
 
@@ -42,7 +55,7 @@ contract Venue {
     return events.keys;
   }
 
-  function getEventCreation(address _key) public view returns (uint) {
+  function getEvent(address _key) public view returns (uint) {
     return events.get(_key);
   }
 
@@ -93,7 +106,7 @@ contract Venue {
     seating.remove(_key);
   }
 
-  function enable() external onlyOwner {
+  function enable() external onlyOwner isConfigured {
     enabled = true;
   }
 

@@ -16,6 +16,7 @@ import {
   removeVenue,
   removeWallet,
 } from "./scripts";
+import { EntertainerType } from "@/clients/db/types";
 
 export async function up(): Promise<NextResponse> {
   const results: Record<string, QueryResult> = {};
@@ -59,10 +60,10 @@ export async function insert(
       result = await insertWallet(address);
       break;
     case Tables.VENUES:
-      result = await insertVenue(address);
+      result = await insertVenue(address, "");
       break;
     case Tables.ENTERTAINERS:
-      result = await insertEntertainer(address);
+      result = await insertEntertainer(address, "", EntertainerType.UNKNOWN);
       break;
     case Tables.NONE:
       return NextResponse.json({ error: "table not provided" }, { status: 400 });

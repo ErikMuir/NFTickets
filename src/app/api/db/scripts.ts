@@ -1,6 +1,8 @@
 import { EntertainerType } from "@/clients/db/types";
 import { QueryResult, sql } from "@vercel/postgres";
 
+////////////---> create <---////////////
+
 export const createWalletsTable = (): Promise<QueryResult> => {
   return sql`
     CREATE TABLE IF NOT EXISTS wallets (
@@ -35,7 +37,7 @@ export const createEntertainersTable = async (): Promise<QueryResult> => {
 
 export const createEventsTable = async (): Promise<QueryResult> => {
   return sql`
-    CERATE TABLE IF NOT EXISTS events (
+    CREATE TABLE IF NOT EXISTS events (
       address     text PRIMARY KEY NOT NULL,
       venue       text NOT NULL REFERENCES venues,
       entertainer text NOT NULL REFERENCES entertainers
@@ -58,9 +60,7 @@ export const createTicketsTable = async (): Promise<QueryResult> => {
   `;
 };
 
-export const deleteAllWallets = async (): Promise<QueryResult> => {
-  return sql`DELETE FROM wallets;`;
-};
+////////////---> drop <---////////////
 
 export const dropTicketsTable = async (): Promise<QueryResult> => {
   return sql`DROP TABLE IF EXISTS tickets;`;
@@ -81,6 +81,57 @@ export const dropEntertainersTable = async (): Promise<QueryResult> => {
 export const dropWalletsTable = async (): Promise<QueryResult> => {
   return sql`DROP TABLE IF EXISTS wallets;`;
 };
+
+////////////---> delete <---////////////
+
+export const deleteWallet = async (account: string): Promise<QueryResult> => {
+  return sql`DELETE FROM wallets WHERE account = ${account};`;
+};
+
+export const deleteVenue = async (account: string): Promise<QueryResult> => {
+  return sql`DELETE FROM venues WHERE account = ${account};`;
+};
+
+export const deleteEntertainer = async (
+  account: string
+): Promise<QueryResult> => {
+  return sql`DELETE FROM entertainers WHERE account = ${account};`;
+};
+
+export const deleteEvent = async (address: string): Promise<QueryResult> => {
+  return sql`DELETE FROM events WHERE address = ${address}`;
+};
+
+export const deleteTicket = async (
+  token: string,
+  serial: number
+): Promise<QueryResult> => {
+  return sql`DELETE FROM tickets WHERE token = ${token} AND serial = ${serial}`;
+};
+
+////////////---> delete all <---////////////
+
+export const deleteAllWallets = async (): Promise<QueryResult> => {
+  return sql`DELETE FROM wallets;`;
+};
+
+export const deleteAllVenues = async (): Promise<QueryResult> => {
+  return sql`DELETE FROM venues;`;
+};
+
+export const deleteAllEntertainers = async (): Promise<QueryResult> => {
+  return sql`DELETE FROM entertainers;`;
+};
+
+export const deleteAllEvents = async (): Promise<QueryResult> => {
+  return sql`DELETE FROM events;`;
+};
+
+export const deleteAllTickets = async (): Promise<QueryResult> => {
+  return sql`DELETE FROM tickets;`;
+};
+
+////////////---> insert <---////////////
 
 export const insertWallet = async (account: string): Promise<QueryResult> => {
   return sql`INSERT INTO wallets ( account ) VALUES ( ${account} );`;
@@ -107,30 +158,61 @@ export const insertEntertainer = async (
   `;
 };
 
+export const insertEvent = async (
+  address: string,
+  venue: string,
+  entertainer: string
+): Promise<QueryResult> => {
+  return sql`
+    INSERT INTO events ( address, venue, entertainer )
+    SELECT
+      ${address},
+      (
+        SELECT account
+        FROM venues
+        WHERE account = ${venue}
+        LIMIT 1
+      ),
+      (
+        SELECT account
+        FROM entertainers
+        WHERE account = ${entertainer}
+        LIMIT 1
+      );
+  `;
+};
+
 export const insertTicket = async (
   token: string,
-  serial: number
+  serial: number,
+  venue: string,
+  entertainer: string,
+  event: string
 ): Promise<QueryResult> => {
-  return sql`INSERT INTO tickets ( token, serial ) VALUES ( ${token}, ${serial} );`;
-};
-
-export const removeWallet = async (account: string): Promise<QueryResult> => {
-  return sql`DELETE FROM wallets WHERE account = ${account};`;
-};
-
-export const removeVenue = async (account: string): Promise<QueryResult> => {
-  return sql`DELETE FROM venues WHERE account = ${account};`;
-};
-
-export const removeEntertainer = async (
-  account: string
-): Promise<QueryResult> => {
-  return sql`DELETE FROM entertainers WHERE account = ${account};`;
-};
-
-export const removeTicket = async (
-  token: string,
-  serial: number
-): Promise<QueryResult> => {
-  return sql`DELETE FROM tickets WHERE token = ${token} AND serial = ${serial}`;
+  return sql`
+    INSERT INTO tickets ( token, serial, venue, entertainer, event )
+    SELECT
+      ${token},
+      ${serial},
+      (
+        SELECT account
+        FROM venues
+        WHERE account = ${venue}
+        LIMIT 1
+      ),
+      (
+        SELECT account
+        FROM entertainers
+        WHERE account = ${entertainer}
+        LIMIT 1
+      ),
+      (
+        SELECT address
+        FROM events
+        WHERE address = ${event}
+          AND venue = ${venue}
+          AND entertainer = ${entertainer}
+        LIMIT 1
+      );
+  `;
 };

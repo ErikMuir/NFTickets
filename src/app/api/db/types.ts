@@ -3,7 +3,7 @@ export enum Actions {
   UP = "up",
   DOWN = "down",
   INSERT = "insert",
-  REMOVE = "remove",
+  DELETE = "delete",
 }
 
 export enum Tables {
@@ -11,4 +11,6 @@ export enum Tables {
   WALLETS = "wallets",
   VENUES = "venues",
   ENTERTAINERS = "entertainers",
+  EVENTS = "events",
+  TICKETS = "tickets",
 }

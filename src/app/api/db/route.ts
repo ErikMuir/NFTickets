@@ -17,7 +17,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         return await down();
       case Actions.INSERT:
         return await insert(table, address);
-      case Actions.REMOVE:
+      case Actions.DELETE:
         return await remove(table, address);
       case Actions.NONE:
         return NextResponse.json(

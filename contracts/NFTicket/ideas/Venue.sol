@@ -7,7 +7,7 @@ import {
   KeyNotFound,
   Disabled,
   NotConfigured
-} from "./Errors.sol";
+} from "../Errors.sol";
 import "./EventMap.sol";
 import "./SeatingMap.sol";
 
@@ -19,7 +19,6 @@ contract Venue {
   SeatingMap seating;
   address public owner;
   string public name;
-  string public description;
   string public location;
   bool public enabled;
 
@@ -70,10 +69,6 @@ contract Venue {
   // external owner functions
   function setName(string calldata _name) external onlyOwner {
     name = _name;
-  }
-
-  function setDescription(string calldata _description) external onlyOwner {
-    description = _description;
   }
 
   function setLocation(string calldata _location) external onlyOwner {

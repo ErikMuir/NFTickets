@@ -7,7 +7,7 @@ import {
   KeyNotFound,
   Disabled,
   NotConfigured
-} from "./Errors.sol";
+} from "../Errors.sol";
 import "./EventMap.sol";
 
 contract Entertainer {
@@ -16,7 +16,6 @@ contract Entertainer {
   EventMap events;
   address public owner;
   string public name;
-  string public description;
   string public iteration;
   bool public enabled;
 
@@ -59,10 +58,6 @@ contract Entertainer {
   // external owner functions
   function setName(string calldata _name) external onlyOwner {
     name = _name;
-  }
-
-  function setDescription(string calldata _description) external onlyOwner {
-    description = _description;
   }
 
   function setIteration(string calldata _iteration) external onlyOwner {

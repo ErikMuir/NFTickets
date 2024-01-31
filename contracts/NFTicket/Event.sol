@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity >=0.8.0 <0.9.0;
 
-import "../../Hedera/HederaResponseCodes.sol";
-import "../../Hedera/IHederaTokenService.sol";
-import "../../Hedera/HederaTokenService.sol";
-import "../../Hedera/ExpiryHelper.sol";
-import "../../Hedera/KeyHelper.sol";
+import "../Hedera/HederaResponseCodes.sol";
+import "../Hedera/IHederaTokenService.sol";
+import "../Hedera/HederaTokenService.sol";
+import "../Hedera/ExpiryHelper.sol";
+import "../Hedera/KeyHelper.sol";
 import "./Ticket.sol";
 import "./Section.sol";
 import {
@@ -28,7 +28,7 @@ import {
   TicketAlreadyScanned,
   PayoutAlreadyCollected,
   TransferFailed
-} from "./EventErrors.sol";
+} from "./Errors.sol";
 
 contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
   using TicketIterableMapping for TicketMap;

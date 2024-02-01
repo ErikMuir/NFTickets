@@ -23,15 +23,19 @@ import {
   deleteAllEntertainers,
   dropTicketsTable,
   dropEventsTable,
+  createSectionsTable,
+  deleteAllSections,
+  dropSectionsTable,
 } from "./scripts";
-import { EntertainerType } from "@/clients/db/types";
+import { EntertainerType } from "@/models";
 
 export async function up(): Promise<NextResponse> {
   const results: Record<string, QueryResult> = {};
   try {
     results[`create-${Tables.WALLETS}`] = await createWalletsTable();
-    results[`create-${Tables.VENUES}`] = await createVenuesTable();
     results[`create-${Tables.ENTERTAINERS}`] = await createEntertainersTable();
+    results[`create-${Tables.VENUES}`] = await createVenuesTable();
+    results[`create-${Tables.SECTIONS}`] = await createSectionsTable();
     results[`create-${Tables.EVENTS}`] = await createEventsTable();
     results[`create-${Tables.TICKETS}`] = await createTicketsTable();
     return NextResponse.json({ results }, { status: 200 });
@@ -46,11 +50,13 @@ export async function down(): Promise<NextResponse> {
   try {
     results[`delete-${Tables.TICKETS}`] = await deleteAllTickets();
     results[`delete-${Tables.EVENTS}`] = await deleteAllEvents();
+    results[`delete-${Tables.SECTIONS}`] = await deleteAllSections();
     results[`delete-${Tables.VENUES}`] = await deleteAllVenues();
     results[`delete-${Tables.ENTERTAINERS}`] = await deleteAllEntertainers();
     results[`delete-${Tables.WALLETS}`] = await deleteAllWallets();
     results[`drop-${Tables.TICKETS}`] = await dropTicketsTable();
     results[`drop-${Tables.EVENTS}`] = await dropEventsTable();
+    results[`drop-${Tables.SECTIONS}`] = await dropSectionsTable();
     results[`drop-${Tables.VENUES}`] = await dropVenuesTable();
     results[`drop-${Tables.ENTERTAINERS}`] = await dropEntertainersTable();
     results[`drop-${Tables.WALLETS}`] = await dropWalletsTable();
@@ -78,12 +84,19 @@ export async function insert(
     case Tables.WALLETS:
       result = await insertWallet(address);
       break;
-    case Tables.VENUES:
-      result = await insertVenue(address, "");
-      break;
     case Tables.ENTERTAINERS:
       result = await insertEntertainer(address, "", EntertainerType.UNKNOWN);
       break;
+    case Tables.VENUES:
+      result = await insertVenue(address, "");
+      break;
+    case Tables.SECTIONS:
+    case Tables.EVENTS:
+    case Tables.TICKETS:
+      return NextResponse.json(
+        { error: `table not supported: '${table}'` },
+        { status: 400 }
+      );
     case Tables.NONE:
       return NextResponse.json(
         { error: "table not provided" },
@@ -116,12 +129,19 @@ export async function remove(
     case Tables.WALLETS:
       result = await deleteWallet(address);
       break;
-    case Tables.VENUES:
-      result = await deleteVenue(address);
-      break;
     case Tables.ENTERTAINERS:
       result = await deleteEntertainer(address);
       break;
+    case Tables.VENUES:
+      result = await deleteVenue(address);
+      break;
+    case Tables.SECTIONS:
+    case Tables.EVENTS:
+    case Tables.TICKETS:
+      return NextResponse.json(
+        { error: `table not supported: '${table}'` },
+        { status: 400 }
+      );
     case Tables.NONE:
       return NextResponse.json(
         { error: "table not provided" },

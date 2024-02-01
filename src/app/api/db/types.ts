@@ -9,8 +9,9 @@ export enum Actions {
 export enum Tables {
   NONE = "",
   WALLETS = "wallets",
-  VENUES = "venues",
   ENTERTAINERS = "entertainers",
+  VENUES = "venues",
+  SECTIONS = "sections",
   EVENTS = "events",
   TICKETS = "tickets",
 }

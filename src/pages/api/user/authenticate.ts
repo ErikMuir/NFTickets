@@ -14,6 +14,8 @@ import { withStandardApi } from "@/server-utils/api-wrappers";
 import { Network } from "@/clients/hedera/types";
 import { LoggedInUser } from "@/lib/user/types";
 import { HashconnectAuthenticationRequest } from "@/lib/hashconnect/types";
+import { getWallet, insertWallet } from "@/clients/db";
+import { Role } from "@/models";
 
 async function authenticateRoute(
   req: NextApiRequest,
@@ -88,31 +90,26 @@ async function authenticateRoute(
     return unauthenticated(res);
   }
 
-  // get wallet
-  // if no wallet, create wallet
+  const wallet = await getWallet(accountId);
+  const role = wallet?.role ?? Role.ATTENDEE;
 
-  // let profile: Profile | undefined;
-  // try {
-  //   profile = await getProfile({ network, account });
-  //   if (!profile) {
-  //     const now = new Date();
-  //     profile = {
-  //       network,
-  //       account,
-  //       lastUpdated: now,
-  //       createdDate: now,
-  //     };
-  //     await putProfile(profile);
-  //   }
-  // } catch (e) {
-  //   logger.error(e, "Error occured trying to get or save profile");
-  // }
+  if (!wallet) {
+    try {
+      await insertWallet({
+        account: accountId,
+        role,
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
   const user: LoggedInUser = {
     isLoggedIn: true,
     accountId,
     network,
     hashconnectTopic,
+    role,
   };
 
   req.session.user = user;

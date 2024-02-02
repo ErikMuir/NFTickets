@@ -9,7 +9,7 @@ export default function useUser({
   redirectTo = "",
   redirectIfFound = false,
 } = {}) {
-  const { data: user, mutate: mutateUser } = useSWR<User>(
+  const { data: user, mutate: mutateUser, isLoading: isUserLoading } = useSWR<User>(
     "/api/user",
     fetchJson
   );
@@ -27,5 +27,5 @@ export default function useUser({
     }
   }, [user, redirectIfFound, redirectTo]);
 
-  return { user, mutateUser };
+  return { user, mutateUser, isUserLoading };
 }

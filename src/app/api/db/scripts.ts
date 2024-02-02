@@ -7,7 +7,7 @@ export const createWalletsTable = (): Promise<QueryResult> => {
   return sql`
     CREATE TABLE IF NOT EXISTS wallets (
       account text PRIMARY KEY NOT NULL,
-      role    text NULL
+      role    text NOT NULL DEFAULT('attendee')
     );
   `;
 };
@@ -38,9 +38,9 @@ export const createVenuesTable = async (): Promise<QueryResult> => {
 export const createSectionsTable = async (): Promise<QueryResult> => {
   return sql`
     CREATE TABLE IF NOT EXISTS sections (
-      venue       text NOT NULL REFERENCES venues,
-      section     text NOT NULL,
-      capacity    integer NOT NULL DEFAULT 0,
+      venue    text NOT NULL REFERENCES venues,
+      section  text NOT NULL,
+      capacity integer NOT NULL DEFAULT 0,
       PRIMARY KEY(venue, section)
     );
   `;

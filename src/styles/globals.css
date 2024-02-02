@@ -4,22 +4,19 @@
 
 body {
   color: rgb(51, 51, 51);
-  background: rgb(225, 225, 225);
+  background: rgb(255, 255, 255);
 }
 
 .text-primary {
-  color: rgb(46 16 101);
+  color: rgb(76 29 149);
+  /* color: rgb(51, 51, 51); */
 }
 
 .bg-primary {
-  background-color: rgb(46 16 101);
-  opacity: 1;
-  transition-property: opacity;
-  transition-timing-function: ease-in-out;
-  transition-duration: 150ms;
+  background-color: rgb(76 29 149);
 }
 
-.bg-primary:hover {
+/* .bg-primary {
   background-color: rgb(46 16 101);
   opacity: 0.75;
   transition-property: opacity;
@@ -27,6 +24,10 @@ body {
   transition-duration: 150ms;
 }
 
-.border-primary {
-  border-color: rgb(46 16 101);
-}
+.bg-primary:hover {
+  background-color: rgb(46 16 101);
+  opacity: 0.9;
+  transition-property: opacity;
+  transition-timing-function: ease-in-out;
+  transition-duration: 150ms;
+} */

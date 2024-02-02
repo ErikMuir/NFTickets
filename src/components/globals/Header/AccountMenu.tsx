@@ -1,5 +1,3 @@
-"use client";
-
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import LinkOffIcon from "@mui/icons-material/LinkOff";
@@ -14,6 +12,7 @@ import { ConnectModal } from "./ConnectModal";
 import { hashconnect } from "@/lib/hashconnect";
 import { getHashConnectWallet } from "@/lib/hashconnect/HashconnectWallet";
 import useUser from "@/lib/user/useUser";
+import { Person } from "@mui/icons-material";
 
 export const AccountMenu = () => {
   const router = useRouter();
@@ -43,6 +42,11 @@ export const AccountMenu = () => {
       router.push("/");
     }
   }
+
+  const handleProfile = () => {
+    setShowMenu(false);
+    router.push("/profile");
+  };
 
   const handleDisconnect = () => {
     getHashConnectWallet()
@@ -189,6 +193,13 @@ export const AccountMenu = () => {
           }}
         >
           <MenuList disablePadding={true}>
+            <MenuItem
+              className="flex items-center gap-4 hover:bg-violet-300"
+              onClick={handleProfile}
+            >
+              <Person fontSize="medium" />
+              Profile
+            </MenuItem>
             <MenuItem
               className="flex items-center gap-4 hover:bg-violet-300"
               onClick={handleDisconnect}

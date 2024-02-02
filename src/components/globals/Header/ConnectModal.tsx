@@ -36,6 +36,7 @@ export const ConnectModal = ({
           <LoadingButton
             onClick={onSubmit}
             variant="contained"
+            color="primary"
             className="rounded bg-primary"
             disabled={!extensionAvailable}
             loading={isAuthenticating}
@@ -54,9 +55,9 @@ export const ConnectModal = ({
             </p>
           )}
         </div>
-        <div className="flex flex-col items-center mt-12">
-          <div className="text-md font-light">- OR -</div>
-          <div className="flex flex-wrap gap-2 justify-center mt-12">
+        <div className="flex flex-col items-center">
+          <div className="text-md font-light my-8">- OR -</div>
+          <div className="flex flex-wrap gap-2 justify-center">
             <TextField
               value={pairingString || ""}
               InputProps={{

@@ -3,7 +3,7 @@ export type Venue = {
   name: string;
   description?: string;
   location?: string;
-  sections?: Record<string, number>;
+  sections?: Record<string, number>; // TODO : do we need this?
 };
 
 export const mapVenue = ({

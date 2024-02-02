@@ -1,8 +1,12 @@
+"use client";
+
 import React from "react";
 import { Jost } from "next/font/google";
-import "@/styles/globals.css";
+import { ThemeProvider } from "@mui/material/styles";
 import { Footer } from "@/components/globals/Footer";
 import { Header } from "@/components/globals/Header/Header";
+import { theme } from "@/styles/theme";
+import "@/styles/globals.css";
 
 const jost = Jost({ weight: ["400", "700"], subsets: ["latin"] });
 
@@ -15,9 +19,11 @@ export default function RootLayout({
     <html lang="en">
       <body className={jost.className}>
         <div className="flex flex-col min-h-screen">
-          <Header />
-          <main className="grow shrink-0 basis-auto">{children}</main>
-          <Footer />
+          <ThemeProvider theme={theme}>
+            <Header />
+            <main className="grow shrink-0 basis-auto">{children}</main>
+            <Footer />
+          </ThemeProvider>
         </div>
         <div id="modal-root"></div>
       </body>

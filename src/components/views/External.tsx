@@ -1,7 +1,4 @@
 import Image from "next/image";
-import { Salsa } from "next/font/google";
-
-const salsa = Salsa({ weight: "400", subsets: ["latin"] });
 
 export default function External() {
   return (

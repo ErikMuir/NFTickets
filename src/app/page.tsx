@@ -13,7 +13,11 @@ export default function HomeRoute() {
     return <Loading />;
   }
 
-  switch (user?.role) {
+  if (!user?.isLoggedIn) {
+    return <External />;
+  }
+
+  switch (user.role) {
     case Role.ATTENDEE:
       return <Internal />;
     case Role.ENTERTAINER:

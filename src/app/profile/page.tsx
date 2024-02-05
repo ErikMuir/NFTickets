@@ -1,7 +1,7 @@
 "use client";
 
-import ProfileView from "@/components/views/ProfileView";
+import Profile from "@/components/views/Profile";
 
 export default function ProfileRoute() {
-  return <ProfileView />;
+  return <Profile />;
 }

@@ -1,8 +1,8 @@
 "use client";
 
-import ExternalView from "@/components/views/ExternalView";
-import InternalView from "@/components/views/InternalView";
-import LoadingView from "@/components/views/LoadingView";
+import External from "@/components/views/External";
+import Internal from "@/components/views/Internal";
+import Loading from "@/components/views/Loading";
 import useUser from "@/lib/user/useUser";
 import { Role } from "@/models";
 
@@ -10,17 +10,17 @@ export default function HomeRoute() {
   const { user, isUserLoading } = useUser();
 
   if (isUserLoading) {
-    return <LoadingView />;
+    return <Loading />;
   }
 
   switch (user?.role) {
     case Role.ATTENDEE:
-      return <InternalView />;
+      return <Internal />;
     case Role.ENTERTAINER:
-      return <InternalView />;
+      return <Internal />;
     case Role.VENUE:
-      return <InternalView />;
+      return <Internal />;
     default:
-      return <ExternalView />;
+      return <External />;
   }
 }

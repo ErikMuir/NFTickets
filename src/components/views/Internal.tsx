@@ -4,7 +4,7 @@ import { twMerge } from "tailwind-merge";
 
 const salsa = Salsa({ weight: "400", subsets: ["latin"] });
 
-export default function InternalView() {
+export default function Internal() {
   const { user } = useUser();
   return (
     <div className="flex flex-col w-2/3 mt-8 mx-auto items-center">

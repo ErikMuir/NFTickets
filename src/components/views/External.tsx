@@ -3,7 +3,7 @@ import { Salsa } from "next/font/google";
 
 const salsa = Salsa({ weight: "400", subsets: ["latin"] });
 
-export default function ExternalView() {
+export default function External() {
   return (
     <div className="flex flex-col w-2/3 mt-8 mx-auto items-center">
       <Image src="/logo.png" alt="logo" width={300} height={300} priority />

@@ -17,6 +17,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <title>NFTickets</title>
+        <meta name="description" content="NFTickets" />
+        <link rel="icon" href="/favicon.ico" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" />
+      </head>
       <body className={jost.className}>
         <div className="flex flex-col min-h-screen">
           <ThemeProvider theme={theme}>

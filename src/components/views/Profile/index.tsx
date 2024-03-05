@@ -9,7 +9,7 @@ import Attendee from "./Attendee";
 
 export default function Profile() {
   const { user, isUserLoading } = useUser();
-  const [role, setRole] = useState<Role>(Role.ATTENDEE);
+  const [role, _setRole] = useState<Role>(Role.ATTENDEE);
 
   if (isUserLoading) return <Loading />;
 
@@ -17,7 +17,7 @@ export default function Profile() {
 
   return (
     <div className="flex flex-col max-w-[960px] mx-auto p-8 items-center">
-      <div className="text-6xl pb-12">Profile</div>
+      <div className="text-6xl pt-12 pb-24">Profile</div>
       {role === Role.ATTENDEE && <Attendee />}
       {role === Role.ENTERTAINER && <Entertainer />}
       {role === Role.VENUE && <Venue />}

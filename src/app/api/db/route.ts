@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { down, insert, remove, up } from "./actions";
+import { up, down, reset, seed, insert, remove } from "./actions";
 import { Actions } from "./types";
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
@@ -15,6 +15,10 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         return await up();
       case Actions.DOWN:
         return await down();
+      case Actions.RESET:
+        return await reset();
+      case Actions.SEED:
+        return await seed();
       case Actions.INSERT:
         return await insert(table, address);
       case Actions.DELETE:

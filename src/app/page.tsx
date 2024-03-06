@@ -1,8 +1,10 @@
 "use client";
 
-import External from "@/components/views/External";
-import Internal from "@/components/views/Internal";
+import Attendee from "@/components/views/Attendee";
+import Entertainer from "@/components/views/Entertainer";
+import LoggedOut from "@/components/views/LoggedOut";
 import Loading from "@/components/views/Loading";
+import Venue from "@/components/views/Venue";
 import useUser from "@/lib/user/useUser";
 import { Role } from "@/models";
 
@@ -14,17 +16,17 @@ export default function HomeRoute() {
   }
 
   if (!user?.isLoggedIn) {
-    return <External />;
+    return <LoggedOut />;
   }
 
   switch (user.role) {
     case Role.ATTENDEE:
-      return <Internal />;
+      return <Attendee />;
     case Role.ENTERTAINER:
-      return <Internal />;
+      return <Entertainer />;
     case Role.VENUE:
-      return <Internal />;
+      return <Venue />;
     default:
-      return <External />;
+      return <LoggedOut />;
   }
 }

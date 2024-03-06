@@ -34,7 +34,7 @@ const reservedSections = {
 };
 
 export const venues: Record<string, Venue> = {
-  "0.0.444": {
+  msg: {
     account: "0.0.444",
     name: "Madison Square Garden",
     location: "4 Pennsylvania Plaza, New York, NY 10001",
@@ -46,13 +46,13 @@ export const venues: Record<string, Venue> = {
       ...reservedSections,
     },
   },
-  "0.0.555": {
+  arrowhead: {
     account: "0.0.555",
     name: "Arrowhead Stadium",
     location: "1 Arrowhead Dr, Kansas City, MO 64129",
     sections: { ...reservedSections },
   },
-  "0.0.666": {
+  moroccan: {
     account: "0.0.666",
     name: "The Moroccan Lounge",
     location: "901 East 1st Street, Los Angeles, CA 90012",

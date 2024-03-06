@@ -16,6 +16,20 @@ export const getEvent = async (address: string): Promise<Event | null> => {
   return result.rowCount === 0 ? null : mapEvent(result.rows[0]);
 };
 
+export const getAllEvents = async (): Promise<Event[]> => {
+  const result = await sql`
+    SELECT
+      address,
+      venue,
+      entertainer,
+      date_time,
+      sales_begin,
+      sales_end
+    FROM events;
+  `;
+  return result.rows.map(mapEvent);
+};
+
 export const getEventsByVenue = async (venue: string): Promise<Event[]> => {
   const result = await sql`
     SELECT

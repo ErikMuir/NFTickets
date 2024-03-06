@@ -1,24 +1,23 @@
-import type { Entertainer } from "@/models";
-import { EntertainerType } from "@/models";
+import { type Entertainer, EntertainerType } from "@/models";
 
 export const entertainers: Record<string, Entertainer> = {
-  "0.0.111": {
+  phish: {
     account: "0.0.111",
     name: "Phish",
     type: EntertainerType.MUSIC,
     description:
-      "Phish will embark on a 23-date Summer Tour beginning July 11 and culminating with their traditional Labor Day Weekend run at Dick's Sporting Goods Park in Commerce City, CO, where they'll return for four nights. The tour includes a seven-night run at New York City's Madison Square Garden.",
-    iteration: "Summer Tour 2023",
+      "Phish will embark on a 26-date Summer Tour (including their 4-day Mondegreen Festival) this July, August, and September.",
+    iteration: "Summer Tour 2024",
   },
-  "0.0.222": {
+  chiefs: {
     account: "0.0.222",
     name: "Kansas City Chiefs",
     type: EntertainerType.SPORTS,
     description:
-      "Head Coach Andy Reid leads the returning Super Bowl champion Kansas City Chiefs into the 2023 season captained by the top quarterback in the NFL, Patrick Mahomes.",
-    iteration: "2023 NFL Season",
+      "Head Coach Andy Reid leads the returning Super Bowl champion Kansas City Chiefs into the 2024 season captained by the top quarterback in the NFL, Patrick Mahomes.",
+    iteration: "2024 NFL Season",
   },
-  "0.0.333": {
+  heidecker: {
     account: "0.0.333",
     name: "Tim Heidecker",
     type: EntertainerType.COMEDY,

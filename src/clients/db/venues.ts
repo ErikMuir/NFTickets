@@ -14,6 +14,18 @@ export const getVenue = async (account: string): Promise<Venue | null> => {
   return result.rowCount === 0 ? null : mapVenue(result.rows[0]);
 };
 
+export const getAllVenues = async (): Promise<Venue[]> => {
+  const result = await sql`
+    SELECT
+      account,
+      name,
+      description,
+      location
+    FROM venues;
+  `;
+  return result.rows.map(mapVenue);
+};
+
 export const insertVenue = async (venue: Venue): Promise<void> => {
   const { rowCount } = await sql`
     INSERT INTO venues

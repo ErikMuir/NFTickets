@@ -1,9 +1,17 @@
-import { EntertainerType } from "@/models";
-import { QueryResult, sql } from "@vercel/postgres";
+import { QueryResult, QueryResultRow, sql } from "@vercel/postgres";
+import {
+  Entertainer,
+  Event,
+  Role,
+  Section,
+  Ticket,
+  Venue,
+  Wallet,
+} from "@/models";
 
 ////////////---> create <---////////////
 
-export const createWalletsTable = (): Promise<QueryResult> => {
+export const createWalletsTable = (): Promise<QueryResult<QueryResultRow>> => {
   return sql`
     CREATE TABLE IF NOT EXISTS wallets (
       account text PRIMARY KEY NOT NULL,
@@ -12,7 +20,9 @@ export const createWalletsTable = (): Promise<QueryResult> => {
   `;
 };
 
-export const createEntertainersTable = async (): Promise<QueryResult> => {
+export const createEntertainersTable = async (): Promise<
+  QueryResult<QueryResultRow>
+> => {
   return sql`
     CREATE TABLE IF NOT EXISTS entertainers (
       account     text PRIMARY KEY NOT NULL REFERENCES wallets,
@@ -24,7 +34,9 @@ export const createEntertainersTable = async (): Promise<QueryResult> => {
   `;
 };
 
-export const createVenuesTable = async (): Promise<QueryResult> => {
+export const createVenuesTable = async (): Promise<
+  QueryResult<QueryResultRow>
+> => {
   return sql`
     CREATE TABLE IF NOT EXISTS venues (
       account     text PRIMARY KEY NOT NULL REFERENCES wallets,
@@ -35,7 +47,9 @@ export const createVenuesTable = async (): Promise<QueryResult> => {
   `;
 };
 
-export const createSectionsTable = async (): Promise<QueryResult> => {
+export const createSectionsTable = async (): Promise<
+  QueryResult<QueryResultRow>
+> => {
   return sql`
     CREATE TABLE IF NOT EXISTS sections (
       venue    text NOT NULL REFERENCES venues,
@@ -46,7 +60,9 @@ export const createSectionsTable = async (): Promise<QueryResult> => {
   `;
 };
 
-export const createEventsTable = async (): Promise<QueryResult> => {
+export const createEventsTable = async (): Promise<
+  QueryResult<QueryResultRow>
+> => {
   return sql`
     CREATE TABLE IF NOT EXISTS events (
       address     text PRIMARY KEY NOT NULL,
@@ -59,7 +75,9 @@ export const createEventsTable = async (): Promise<QueryResult> => {
   `;
 };
 
-export const createTicketsTable = async (): Promise<QueryResult> => {
+export const createTicketsTable = async (): Promise<
+  QueryResult<QueryResultRow>
+> => {
   return sql`
     CREATE TABLE IF NOT EXISTS tickets (
       token       text NOT NULL,
@@ -77,131 +95,180 @@ export const createTicketsTable = async (): Promise<QueryResult> => {
 
 ////////////---> drop <---////////////
 
-export const dropWalletsTable = async (): Promise<QueryResult> => {
+export const dropWalletsTable = async (): Promise<
+  QueryResult<QueryResultRow>
+> => {
   return sql`DROP TABLE IF EXISTS wallets;`;
 };
 
-export const dropEntertainersTable = async (): Promise<QueryResult> => {
+export const dropEntertainersTable = async (): Promise<
+  QueryResult<QueryResultRow>
+> => {
   return sql`DROP TABLE IF EXISTS entertainers;`;
 };
 
-export const dropVenuesTable = async (): Promise<QueryResult> => {
+export const dropVenuesTable = async (): Promise<
+  QueryResult<QueryResultRow>
+> => {
   return sql`DROP TABLE IF EXISTS venues;`;
 };
 
-export const dropSectionsTable = async (): Promise<QueryResult> => {
+export const dropSectionsTable = async (): Promise<
+  QueryResult<QueryResultRow>
+> => {
   return sql`DROP TABLE IF EXISTS sections;`;
 };
 
-export const dropEventsTable = async (): Promise<QueryResult> => {
+export const dropEventsTable = async (): Promise<
+  QueryResult<QueryResultRow>
+> => {
   return sql`DROP TABLE IF EXISTS events;`;
 };
 
-export const dropTicketsTable = async (): Promise<QueryResult> => {
+export const dropTicketsTable = async (): Promise<
+  QueryResult<QueryResultRow>
+> => {
   return sql`DROP TABLE IF EXISTS tickets;`;
 };
 
 ////////////---> delete <---////////////
 
-export const deleteWallet = async (account: string): Promise<QueryResult> => {
+export const deleteWallet = async (
+  account: string
+): Promise<QueryResult<QueryResultRow>> => {
   return sql`DELETE FROM wallets WHERE account = ${account};`;
 };
 
 export const deleteEntertainer = async (
   account: string
-): Promise<QueryResult> => {
+): Promise<QueryResult<QueryResultRow>> => {
   return sql`DELETE FROM entertainers WHERE account = ${account};`;
 };
 
-export const deleteVenue = async (account: string): Promise<QueryResult> => {
+export const deleteVenue = async (
+  account: string
+): Promise<QueryResult<QueryResultRow>> => {
   return sql`DELETE FROM venues WHERE account = ${account};`;
 };
 
-export const deleteSection = async (venue: string, section: string): Promise<QueryResult> => {
+export const deleteSection = async (
+  venue: string,
+  section: string
+): Promise<QueryResult<QueryResultRow>> => {
   return sql`DELETE FROM sections WHERE venue = ${venue} AND section = ${section};`;
 };
 
-export const deleteEvent = async (address: string): Promise<QueryResult> => {
+export const deleteEvent = async (
+  address: string
+): Promise<QueryResult<QueryResultRow>> => {
   return sql`DELETE FROM events WHERE address = ${address};`;
 };
 
 export const deleteTicket = async (
   token: string,
   serial: number
-): Promise<QueryResult> => {
+): Promise<QueryResult<QueryResultRow>> => {
   return sql`DELETE FROM tickets WHERE token = ${token} AND serial = ${serial};`;
 };
 
 ////////////---> delete all <---////////////
 
-export const deleteAllWallets = async (): Promise<QueryResult> => {
+export const deleteAllWallets = async (): Promise<
+  QueryResult<QueryResultRow>
+> => {
   return sql`DELETE FROM wallets;`;
 };
 
-export const deleteAllEntertainers = async (): Promise<QueryResult> => {
+export const deleteAllEntertainers = async (): Promise<
+  QueryResult<QueryResultRow>
+> => {
   return sql`DELETE FROM entertainers;`;
 };
 
-export const deleteAllVenues = async (): Promise<QueryResult> => {
+export const deleteAllVenues = async (): Promise<
+  QueryResult<QueryResultRow>
+> => {
   return sql`DELETE FROM venues;`;
 };
 
-export const deleteAllSections = async (): Promise<QueryResult> => {
+export const deleteAllSections = async (): Promise<
+  QueryResult<QueryResultRow>
+> => {
   return sql`DELETE FROM sections;`;
 };
 
-export const deleteAllEvents = async (): Promise<QueryResult> => {
+export const deleteAllEvents = async (): Promise<
+  QueryResult<QueryResultRow>
+> => {
   return sql`DELETE FROM events;`;
 };
 
-export const deleteAllTickets = async (): Promise<QueryResult> => {
+export const deleteAllTickets = async (): Promise<
+  QueryResult<QueryResultRow>
+> => {
   return sql`DELETE FROM tickets;`;
 };
 
 ////////////---> insert <---////////////
 
-export const insertWallet = async (account: string): Promise<QueryResult> => {
-  return sql`INSERT INTO wallets ( account ) VALUES ( ${account} );`;
+export const insertWallet = async ({
+  account,
+  role,
+}: Wallet): Promise<QueryResult<QueryResultRow>> => {
+  return sql`INSERT INTO wallets ( account, role ) VALUES ( ${account}, ${role} );`;
 };
 
-export const insertEntertainer = async (
-  account: string,
-  name: string,
-  type: EntertainerType
-): Promise<QueryResult> => {
+export const insertEntertainer = async ({
+  account,
+  name,
+  type,
+  description,
+  iteration,
+}: Entertainer): Promise<QueryResult<QueryResultRow>> => {
   return sql`
-    INSERT INTO entertainers ( account, name, type )
-    SELECT account, ${name}, ${type} FROM wallets WHERE account = ${account};
+    INSERT INTO entertainers ( account, name, type, description, iteration )
+    SELECT account, ${name}, ${type}, ${description}, ${iteration}
+    FROM wallets
+    WHERE account = ${account} AND role = ${Role.ENTERTAINER};
   `;
 };
 
-export const insertVenue = async (
-  account: string,
-  name: string
-): Promise<QueryResult> => {
+export const insertVenue = async ({
+  account,
+  name,
+  location,
+}: Venue): Promise<QueryResult<QueryResultRow>> => {
   return sql`
-    INSERT INTO venues ( account, name )
-    SELECT account, ${name} FROM wallets WHERE account = ${account};
+    INSERT INTO venues ( account, name, location )
+    SELECT account, ${name}, ${location}
+    FROM wallets
+    WHERE account = ${account} AND role = ${Role.VENUE};
   `;
 };
 
-export const insertSection = async (
-  venue: string,
-  section: string
-): Promise<QueryResult> => {
+export const insertSection = async ({
+  venue,
+  section,
+  capacity,
+}: Section): Promise<QueryResult<QueryResultRow>> => {
   return sql`
-    INSERT INTO sections ( venue, section )
-    SELECT account, ${section} FROM venues WHERE account = ${venue};
+    INSERT INTO sections ( venue, section, capacity )
+    SELECT account, ${section}, ${
+    capacity || 1
+  } FROM venues WHERE account = ${venue};
   `;
 };
 
-export const insertEvent = async (
-  address: string,
-  venue: string,
-  entertainer: string
-): Promise<QueryResult> => {
+export const insertEvent = async ({
+  address,
+  venue,
+  entertainer,
+  dateTime,
+  ticketSalesBegin,
+  ticketSalesEnd,
+}: Event): Promise<QueryResult<QueryResultRow>> => {
   return sql`
-    INSERT INTO events ( address, venue, entertainer )
+    INSERT INTO events ( address, venue, entertainer, date_time, sales_begin, sales_end )
     SELECT
       ${address},
       (
@@ -215,18 +282,21 @@ export const insertEvent = async (
         FROM entertainers
         WHERE account = ${entertainer}
         LIMIT 1
-      );
+      ),
+      ${dateTime?.toISOString()},
+      ${ticketSalesBegin?.toISOString()},
+      ${ticketSalesEnd?.toISOString()};
   `;
 };
 
-export const insertTicket = async (
-  token: string,
-  serial: number,
-  venue: string,
-  entertainer: string,
-  event: string,
-  section: string,
-): Promise<QueryResult> => {
+export const insertTicket = async ({
+  token,
+  serial,
+  venue,
+  entertainer,
+  event,
+  section,
+}: Ticket): Promise<QueryResult<QueryResultRow>> => {
   return sql`
     INSERT INTO tickets ( token, serial, venue, entertainer, event, section )
     SELECT

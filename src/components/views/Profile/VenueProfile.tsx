@@ -1,4 +1,4 @@
-export default function Entertainer() {
+export default function VenueProfile() {
   const submit = async () => {
     // TODO
   };

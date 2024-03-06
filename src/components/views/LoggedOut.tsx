@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-export default function External() {
+export default function LoggedOut() {
   return (
     <div className="flex flex-col w-2/3 mt-8 mx-auto items-center">
       <Image src="/logo.png" alt="logo" width={300} height={300} priority />

@@ -2,6 +2,8 @@ export enum Actions {
   NONE = "",
   UP = "up",
   DOWN = "down",
+  RESET = "reset",
+  SEED = "seed",
   INSERT = "insert",
   DELETE = "delete",
 }

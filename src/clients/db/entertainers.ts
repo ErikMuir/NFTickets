@@ -17,6 +17,19 @@ export const getEntertainer = async (
   return result.rowCount === 0 ? null : mapEntertainer(result.rows[0]);
 };
 
+export const getAllEntertainers = async (): Promise<Entertainer[]> => {
+  const result = await sql`
+  SELECT
+    account,
+    type,
+    name,
+    description,
+    iteration
+  FROM entertainers;
+`;
+  return result.rows.map(mapEntertainer);
+};
+
 export const getEntertainersByType = async (
   type: EntertainerType
 ): Promise<Entertainer[]> => {

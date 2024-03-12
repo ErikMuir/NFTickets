@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { up, down, reset, seed, insert, remove } from "./actions";
 import { Actions } from "./types";
+import { authorize } from "@/server-utils/authorize";
+import { ForbiddenError } from "@/server-utils/api-errors";
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   const { searchParams } = request.nextUrl;
@@ -10,6 +12,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   const address = searchParams.get("address") || "";
 
   try {
+    authorize(request);
     switch (action) {
       case Actions.UP:
         return await up();
@@ -36,6 +39,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     }
   } catch (error) {
     console.log(error);
+    if (error instanceof ForbiddenError) {
+      return NextResponse.json({ error }, { status: 403 });
+    }
     return NextResponse.json({ error }, { status: 500 });
   }
 }

@@ -4,8 +4,7 @@ export enum Actions {
   DOWN = "down",
   RESET = "reset",
   SEED = "seed",
-  INSERT = "insert",
-  DELETE = "delete",
+  AD_HOC = "ad-hoc",
 }
 
 export enum Tables {

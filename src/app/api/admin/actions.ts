@@ -1,6 +1,6 @@
 import { QueryResult } from "@vercel/postgres";
 import { NextResponse } from "next/server";
-import { EntertainerType, Role } from "@/models";
+import { Role } from "@/models";
 import { Tables } from "./types";
 import {
   createEntertainersTable,
@@ -13,9 +13,6 @@ import {
   insertEntertainer,
   insertVenue,
   insertWallet,
-  deleteEntertainer,
-  deleteVenue,
-  deleteWallet,
   createEventsTable,
   createTicketsTable,
   deleteAllEvents,
@@ -189,96 +186,7 @@ export async function seed(): Promise<NextResponse> {
   }
 }
 
-export async function insert(
-  table: string,
-  address: string
-): Promise<NextResponse> {
-  let result: QueryResult;
-
-  if (!address) {
-    return NextResponse.json(
-      { error: "address not provided" },
-      { status: 400 }
-    );
-  }
-
-  switch (table) {
-    case Tables.WALLETS:
-      result = await insertWallet({ account: address, role: Role.ATTENDEE });
-      break;
-    case Tables.ENTERTAINERS:
-      result = await insertEntertainer({
-        account: address,
-        name: "",
-        type: EntertainerType.UNKNOWN,
-      });
-      break;
-    case Tables.VENUES:
-      result = await insertVenue({ account: address, name: "" });
-      break;
-    case Tables.SECTIONS:
-    case Tables.EVENTS:
-    case Tables.TICKETS:
-      return NextResponse.json(
-        { error: `table not supported: '${table}'` },
-        { status: 400 }
-      );
-    case Tables.NONE:
-      return NextResponse.json(
-        { error: "table not provided" },
-        { status: 400 }
-      );
-    default:
-      return NextResponse.json(
-        { error: `unknown table: '${table}'` },
-        { status: 400 }
-      );
-  }
-
-  return NextResponse.json({ result }, { status: 200 });
-}
-
-export async function remove(
-  table: string,
-  address: string
-): Promise<NextResponse> {
-  let result: QueryResult;
-
-  if (!address) {
-    return NextResponse.json(
-      { error: "address not provided" },
-      { status: 400 }
-    );
-  }
-
-  switch (table) {
-    case Tables.WALLETS:
-      result = await deleteWallet(address);
-      break;
-    case Tables.ENTERTAINERS:
-      result = await deleteEntertainer(address);
-      break;
-    case Tables.VENUES:
-      result = await deleteVenue(address);
-      break;
-    case Tables.SECTIONS:
-    case Tables.EVENTS:
-    case Tables.TICKETS:
-      return NextResponse.json(
-        { error: `table not supported: '${table}'` },
-        { status: 400 }
-      );
-    case Tables.NONE:
-      return NextResponse.json(
-        { error: "table not provided" },
-        { status: 400 }
-      );
-    default:
-      return NextResponse.json(
-        { error: `unknown table: '${table}'` },
-        { status: 400 }
-      );
-  }
-
+export async function adHoc() {
+  const result = {}; // <---- change this to whatever you need to do on the fly
   return NextResponse.json({ result }, { status: 200 });
 }

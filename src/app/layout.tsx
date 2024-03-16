@@ -28,7 +28,7 @@ export default function RootLayout({
         <div className="flex flex-col min-h-screen">
           <ThemeProvider theme={theme}>
             <Header />
-            <main className="grow shrink-0 basis-auto">{children}</main>
+            <main className="grow shrink-0 basis-auto m-4">{children}</main>
             <Footer />
           </ThemeProvider>
         </div>

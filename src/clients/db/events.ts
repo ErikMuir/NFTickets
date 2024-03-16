@@ -1,45 +1,60 @@
 import { sql } from "@vercel/postgres";
-import { type Event, mapEvent } from "@/models";
+import { type Event, type EventDto, mapEvent } from "@/models";
 
-export const getEvent = async (address: string): Promise<Event | null> => {
+export const getEvent = async (address: string): Promise<EventDto | null> => {
   const result = await sql`
     SELECT
-      address,
-      venue,
-      entertainer,
-      date_time,
-      sales_begin,
-      sales_end
-    FROM events
+      ev.address,
+      v.name AS venue_name,
+      v.account AS venue_account,
+      en.name AS entertainer_name,
+      en.account AS entertainer_account,
+      ev.date_time,
+      ev.sales_begin,
+      ev.sales_end,
+      en.image_url
+    FROM events AS ev
+    INNER JOIN entertainers AS en ON en.account = ev.entertainer
+    INNER JOIN venues AS v ON v.account = ev.venue
     WHERE address = ${address};
   `;
   return result.rowCount === 0 ? null : mapEvent(result.rows[0]);
 };
 
-export const getAllEvents = async (): Promise<Event[]> => {
+export const getAllEvents = async (): Promise<EventDto[]> => {
   const result = await sql`
     SELECT
-      address,
-      venue,
-      entertainer,
+      ev.address,
+      v.name AS venue_name,
+      v.account AS venue_account,
+      en.name AS entertainer_name,
+      en.account AS entertainer_account,
       date_time,
       sales_begin,
-      sales_end
-    FROM events;
+      sales_end,
+      en.image_url
+    FROM events AS ev
+    INNER JOIN entertainers AS en ON en.account = ev.entertainer
+    INNER JOIN venues AS v ON v.account = ev.venue;
   `;
   return result.rows.map(mapEvent);
 };
 
-export const getEventsByVenue = async (venue: string): Promise<Event[]> => {
+export const getEventsByVenue = async (venue: string): Promise<EventDto[]> => {
   const result = await sql`
     SELECT
-      address,
-      venue,
-      entertainer,
+      ev.address,
+      v.name AS venue_name,
+      v.account AS venue_account,
+      en.name AS entertainer_name,
+      en.account AS entertainer_account,
       date_time,
       sales_begin,
-      sales_end
-    FROM events
+      sales_end,
+      en.image_url
+    FROM events AS ev
+    INNER JOIN entertainers AS en ON en.account = ev.entertainer
+    INNER JOIN venues AS v ON v.account = ev.venue
     WHERE venue = ${venue};
   `;
   return result.rows.map(mapEvent);
@@ -47,16 +62,21 @@ export const getEventsByVenue = async (venue: string): Promise<Event[]> => {
 
 export const getEventsByEntertainer = async (
   entertainer: string
-): Promise<Event[]> => {
+): Promise<EventDto[]> => {
   const result = await sql`
     SELECT
-      address,
-      venue,
-      entertainer,
+      ev.address,
+      v.name AS venue_name,
+      v.account AS venue_account,
+      en.name AS entertainer_name,
+      en.account AS entertainer_account,
       date_time,
       sales_begin,
-      sales_end
-    FROM events
+      sales_end,
+      en.image_url
+    FROM events AS ev
+    INNER JOIN entertainers AS en ON en.account = ev.entertainer
+    INNER JOIN venues AS v ON v.account = ev.venue
     WHERE entertainer = ${entertainer};
   `;
   return result.rows.map(mapEvent);

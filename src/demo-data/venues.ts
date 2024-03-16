@@ -38,6 +38,7 @@ export const venues: Record<string, Venue> = {
     account: "0.0.444",
     name: "Madison Square Garden",
     location: "4 Pennsylvania Plaza, New York, NY 10001",
+    imageUrl: "/msg-press.png",
     sections: {
       "FLOOR-A": 400,
       "FLOOR-B": 400,
@@ -50,12 +51,14 @@ export const venues: Record<string, Venue> = {
     account: "0.0.555",
     name: "Arrowhead Stadium",
     location: "1 Arrowhead Dr, Kansas City, MO 64129",
+    imageUrl: "/arrowhead-press.jpg",
     sections: { ...reservedSections },
   },
   moroccan: {
     account: "0.0.666",
     name: "The Moroccan Lounge",
     location: "901 East 1st Street, Los Angeles, CA 90012",
+    imageUrl: "/moroccan-press.jpg",
     sections: { GA: 250 },
   },
 };

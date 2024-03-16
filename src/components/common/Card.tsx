@@ -1,25 +1,37 @@
+import Image from "next/image";
 import { ReactElement } from "react";
+import { twMerge } from "tailwind-merge";
 
 export type CardProps = {
-  image?: ReactElement;
   title?: string;
   subtitle?: string;
   description?: string;
+  imageUrl?: string;
+  className?: string;
 };
 
 export const Card = ({
-  image,
   title,
   subtitle,
   description,
+  imageUrl,
+  className,
 }: CardProps): ReactElement => {
-  // TODO : fix the width issues
+  const styles = twMerge(
+    "w-full md:w-80 box-border border shadow-md rounded-md overflow-hidden bg-slate-50",
+    className
+  );
+  const hasText = title || subtitle || description;
   return (
-    <div className="!w-sm !md:max-w-md border p-4 rounded-md bg-slate-50">
-      {image && <div className="">{image}</div>}
-      {title?.length && <div className="text-xl text-center">{title}</div>}
-      {subtitle?.length && <div className="text-md text-center">{subtitle}</div>}
-      {description?.length && <div className="text-sm">{description}</div>}
+    <div className={styles}>
+      {imageUrl && <Image src={imageUrl} className="w-full" width={1092} height={614} alt={imageUrl} />}
+      {hasText && (
+        <div className="p-2 bg-neutral-100">
+          {title && <div className="text-xl text-center">{title}</div>}
+          {subtitle && <div className="text-md text-center">{subtitle}</div>}
+          {description && <div className="text-sm text-center">{description}</div>}
+        </div>
+      )}
     </div>
   );
 };

@@ -29,7 +29,8 @@ export const createEntertainersTable = async (): Promise<
       type        text NOT NULL,
       name        text NOT NULL,
       description text NULL,
-      iteration   text NULL
+      iteration   text NULL,
+      image_url   text NULL
     );
   `;
 };
@@ -42,7 +43,8 @@ export const createVenuesTable = async (): Promise<
       account     text PRIMARY KEY NOT NULL REFERENCES wallets,
       name        text NOT NULL,
       description text NULL,
-      location    text NULL
+      location    text NULL,
+      image_url   text NULL
     );
   `;
 };
@@ -224,10 +226,11 @@ export const insertEntertainer = async ({
   type,
   description,
   iteration,
+  imageUrl,
 }: Entertainer): Promise<QueryResult<QueryResultRow>> => {
   return sql`
-    INSERT INTO entertainers ( account, name, type, description, iteration )
-    SELECT account, ${name}, ${type}, ${description}, ${iteration}
+    INSERT INTO entertainers ( account, name, type, description, iteration, image_url )
+    SELECT account, ${name}, ${type}, ${description}, ${iteration}, ${imageUrl}
     FROM wallets
     WHERE account = ${account} AND role = ${Role.ENTERTAINER};
   `;
@@ -237,10 +240,11 @@ export const insertVenue = async ({
   account,
   name,
   location,
+  imageUrl,
 }: Venue): Promise<QueryResult<QueryResultRow>> => {
   return sql`
-    INSERT INTO venues ( account, name, location )
-    SELECT account, ${name}, ${location}
+    INSERT INTO venues ( account, name, location, image_url )
+    SELECT account, ${name}, ${location}, ${imageUrl}
     FROM wallets
     WHERE account = ${account} AND role = ${Role.VENUE};
   `;
@@ -253,9 +257,9 @@ export const insertSection = async ({
 }: Section): Promise<QueryResult<QueryResultRow>> => {
   return sql`
     INSERT INTO sections ( venue, section, capacity )
-    SELECT account, ${section}, ${
-    capacity || 1
-  } FROM venues WHERE account = ${venue};
+    SELECT account, ${section}, ${capacity}
+    FROM venues
+    WHERE account = ${venue};
   `;
 };
 

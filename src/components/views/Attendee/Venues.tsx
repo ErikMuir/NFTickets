@@ -14,12 +14,12 @@ export const Venues = (): ReactElement => {
 
     return (
       <div className="flex flex-wrap items-start gap-8">
-        {venues.map((venue) => (
+        {venues.map(({ account, name, location, imageUrl }) => (
           <Card
-            key={venue.account}
-            title={venue.name}
-            subtitle={venue.location}
-            description={venue.description}
+            key={account}
+            title={name}
+            description={location}
+            imageUrl={imageUrl}
           />
         ))}
       </div>

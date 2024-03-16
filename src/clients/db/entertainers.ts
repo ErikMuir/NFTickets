@@ -10,7 +10,8 @@ export const getEntertainer = async (
       type,
       name,
       description,
-      iteration
+      iteration,
+      image_url
     FROM entertainers
     WHERE account = ${account};
   `;
@@ -24,7 +25,8 @@ export const getAllEntertainers = async (): Promise<Entertainer[]> => {
     type,
     name,
     description,
-    iteration
+    iteration,
+    image_url
   FROM entertainers;
 `;
   return result.rows.map(mapEntertainer);
@@ -39,7 +41,8 @@ export const getEntertainersByType = async (
       type,
       name,
       description,
-      iteration
+      iteration,
+      image_url
     FROM entertainers
     WHERE type = ${type};
   `;
@@ -56,14 +59,16 @@ export const insertEntertainer = async (
       type,
       name,
       description,
-      iteration
+      iteration,
+      image_url
     )
     SELECT
       account,
       ${entertainer.type},
       ${entertainer.name},
       ${entertainer.description},
-      ${entertainer.iteration}
+      ${entertainer.iteration},
+      ${entertainer.imageUrl}
     FROM wallets
     WHERE account = ${entertainer.account};
   `;
@@ -83,7 +88,8 @@ export const updateEntertainer = async (
       type = ${entertainer.type},
       name = ${entertainer.name},
       description = ${entertainer.description},
-      iteration = ${entertainer.iteration}
+      iteration = ${entertainer.iteration},
+      image_url = ${entertainer.imageUrl}
     WHERE account = ${entertainer.account};
   `;
   if (rowCount === 0) {

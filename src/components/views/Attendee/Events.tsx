@@ -2,6 +2,7 @@ import { ReactElement } from "react";
 import { CircularProgress } from "@mui/material";
 import useEvents from "@/lib/useEvents";
 import { Card } from "@/components/common/Card";
+import { toFriendlyDateTime } from "../../../../common/date-helpers";
 
 export const Events = (): ReactElement => {
   const { data: events, isLoading } = useEvents();
@@ -14,12 +15,13 @@ export const Events = (): ReactElement => {
 
     return (
       <div className="flex flex-wrap items-start gap-8">
-        {events.map((event) => (
+        {events.map(({ address, entertainerName, venueName, dateTime, imageUrl }) => (
           <Card
-            key={event.address}
-            title={event.entertainer}
-            subtitle={event.venue}
-            description={new Date(event.dateTime ?? 0)?.toLocaleString()}
+            key={address}
+            title={entertainerName}
+            subtitle={`at ${venueName}`}
+            description={toFriendlyDateTime(dateTime)}
+            imageUrl={imageUrl}
           />
         ))}
       </div>

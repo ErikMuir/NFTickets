@@ -1,7 +1,7 @@
-import type { IronSessionOptions } from "iron-session";
+import type { SessionOptions } from "iron-session";
 import { User } from "@/lib/user/types";
 
-export const ironSessionOptions: IronSessionOptions = {
+export const sessionOptions: SessionOptions = {
   password: "2a552d2e-17f9-495c-81a9-daae9d7e6c7c",
   cookieName: `nftickets/session`,
   cookieOptions: {

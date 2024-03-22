@@ -4,9 +4,10 @@ import { Role } from "@/models";
 export type LoggedOutUser = {
   isLoggedIn: false;
   initToken?: string;
-  network?: Network;
   accountId?: string;
+  network?: Network;
   hashconnectTopic?: string;
+  role?: Role;
 };
 
 export type LoggedInUser = {

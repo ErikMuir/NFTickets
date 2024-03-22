@@ -1,6 +1,4 @@
-import { NextApiResponse } from "next";
-
-import { errorResponse, StandardPayload } from "./api-responses";
+import { errorResponse } from "@/server-utils/api-responses";
 
 export class RequestError extends Error {
   status: number;
@@ -10,8 +8,8 @@ export class RequestError extends Error {
     this.status = status;
   }
 
-  toErrorResponse<T = unknown>(res: NextApiResponse<StandardPayload<T>>) {
-    return errorResponse(res, this.status, this.message);
+  toErrorResponse() {
+    return errorResponse(this.message, this.status);
   }
 
   toErrorRedirect() {

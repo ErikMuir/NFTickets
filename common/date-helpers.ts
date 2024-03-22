@@ -3,7 +3,7 @@ export type Date_ish = Date | string | number | undefined | null;
 const toFriendlyDate = (val: Date_ish): string => {
   const datetime = new Date(val || 0);
   const [day, month, date, year] = new Date(datetime).toString().split(" ");
-  return `${day}, ${month} ${parseInt(date, 10)}, ${year}`;
+  return `${day} | ${month} ${parseInt(date, 10)}, ${year}`;
 };
 
 const toFriendlyTime = (val: Date_ish): string => {

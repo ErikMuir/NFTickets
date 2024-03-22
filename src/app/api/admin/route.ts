@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { up, down, reset, seed, adHoc } from "./actions";
 import { Actions } from "./types";
-import { authorize } from "@/server-utils/authorize";
+import { authorizeAdmin } from "@/server-utils/authorize-admin";
 import { ForbiddenError } from "@/server-utils/api-errors";
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
@@ -10,7 +10,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   const action = searchParams.get("action") || "";
 
   try {
-    authorize(request);
+    authorizeAdmin(request);
     switch (action) {
       case Actions.UP:
         return await up();

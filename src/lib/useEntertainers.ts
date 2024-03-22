@@ -2,9 +2,9 @@
 
 import useSWR from "swr";
 
-import { fetchJson } from "./fetch-json";
+import { fetchStandardJson } from "./fetch-json";
 import { Entertainer } from "@/models";
 
 export default function useEntertainers() {
-  return useSWR<Entertainer[]>("/api/entertainers", fetchJson);
+  return useSWR<Entertainer[]>("/api/entertainers", fetchStandardJson);
 }

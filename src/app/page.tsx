@@ -9,7 +9,7 @@ import useUser from "@/lib/user/useUser";
 import { Role } from "@/models";
 
 export default function HomeRoute() {
-  const { user, isUserLoading } = useUser();
+  const { data: user, isLoading: isUserLoading } = useUser();
 
   if (isUserLoading) {
     return <Loading />;

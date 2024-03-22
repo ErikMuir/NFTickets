@@ -14,11 +14,10 @@ export const Venues = (): ReactElement => {
 
     return (
       <div className="flex flex-wrap items-start gap-8">
-        {venues.map(({ account, name, location, imageUrl }) => (
+        {venues.map(({ account, name, imageUrl }) => (
           <Card
             key={account}
             title={name}
-            description={location}
             imageUrl={imageUrl}
           />
         ))}

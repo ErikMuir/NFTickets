@@ -1,4 +1,4 @@
-import { NextApiResponse } from "next";
+import { NextResponse } from "next/server";
 
 export type SuccessPayload<T> = {
   ok: true;
@@ -12,48 +12,49 @@ export type ErrorPayload = {
 
 export type StandardPayload<T> = SuccessPayload<T> | ErrorPayload;
 
-export function success<T = unknown>(
-  res: NextApiResponse<StandardPayload<T>>,
+export function nextResponse<T>(data: T, status = 200) {
+  const ok = status < 400;
+  const payload: StandardPayload<T> = ok ? { ok, data } : { ok, error: `${data}` };
+  return NextResponse.json(payload, { status });
+}
+
+export function success<T>(
   data: T,
   statusCode = 200
 ) {
-  return res.status(statusCode).json({ ok: true, data });
+  if (statusCode >= 400) statusCode = 200;
+  return nextResponse(data, statusCode);
 }
 
-export function errorResponse<T = unknown>(
-  res: NextApiResponse<StandardPayload<T>>,
-  statusCode: number,
-  error: string
+export function errorResponse(
+  error: string,
+  statusCode = 500,
 ) {
-  return res.status(statusCode).json({ ok: false, error });
+  if (statusCode < 400) statusCode = 500;
+  return nextResponse(error, statusCode);
 }
 
-export function methodNotAllowed<T = unknown>(res: NextApiResponse<StandardPayload<T>>) {
-  return errorResponse(res, 405, "Method not allowed");
+export function methodNotAllowed(message = "Method not allowed") {
+  return errorResponse(message, 405);
 }
 
-export function notFound<T = unknown>(res: NextApiResponse<StandardPayload<T>>) {
-  return errorResponse(res, 404, "Not Found");
+export function notFound(message = "Not Found") {
+  return errorResponse(message, 404);
 }
 
-export function badRequest<T = unknown>(
-  res: NextApiResponse<StandardPayload<T>>,
-  message = "Bad Request"
-) {
-  return errorResponse(res, 400, message);
+export function badRequest(message = "Bad Request") {
+  return errorResponse(message, 400);
 }
 
-export function unauthenticated<T = unknown>(res: NextApiResponse<StandardPayload<T>>) {
-  return errorResponse(res, 401, "Unauthenticated");
+export function unauthenticated(message = "Unauthenticated") {
+  return errorResponse(message, 401);
 }
 
-export function forbidden<T = unknown>(res: NextApiResponse<StandardPayload<T>>) {
-  return errorResponse(res, 403, "Forbidden");
+export function forbidden(message = "Forbidden") {
+  return errorResponse(message, 403);
 }
 
-export function serverError<T = unknown>(
-  res: NextApiResponse<StandardPayload<T>>,
-  message = "Unknown server error"
-) {
-  return errorResponse(res, 500, message);
+export function serverError(message = "Unknown server error") {
+  return errorResponse(message);
 }
+

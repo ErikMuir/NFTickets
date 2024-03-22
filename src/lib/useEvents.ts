@@ -2,9 +2,9 @@
 
 import useSWR from "swr";
 
-import { fetchJson } from "./fetch-json";
+import { fetchStandardJson } from "./fetch-json";
 import { EventDto } from "@/models";
 
 export default function useEvents() {
-  return useSWR<EventDto[]>("/api/events", fetchJson);
+  return useSWR<EventDto[]>("/api/events", fetchStandardJson);
 }

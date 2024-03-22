@@ -1,56 +1,53 @@
+import { NextRequest } from "next/server";
+import { cookies } from "next/headers";
 import { PublicKey } from "@hashgraph/sdk";
-import { NextApiRequest, NextApiResponse } from "next/types";
+import { getIronSession } from "iron-session";
 import invariant from "tiny-invariant";
 import { getHederaSigningService } from "@/clients/hedera/signing-service";
 import { getAccountInfo } from "@/clients/mirror";
 import { toUint8Array } from "@/common-utils/arrays";
+import { badRequest, forbidden, success } from "@/server-utils/api-responses";
 import {
   errorResponse,
   methodNotAllowed,
-  StandardPayload,
   unauthenticated,
 } from "@/server-utils/api-responses";
-import { withStandardApi } from "@/server-utils/api-wrappers";
 import { Network } from "@/clients/hedera/types";
-import { LoggedInUser } from "@/lib/user/types";
+import { sessionOptions } from "@/lib/user/session";
 import { HashconnectAuthenticationRequest } from "@/lib/hashconnect/types";
 import { getWallet, insertWallet } from "@/clients/db";
 import { Role } from "@/models";
+import { User } from "@/lib/user/types";
 
-async function authenticateRoute(
-  req: NextApiRequest,
-  res: NextApiResponse<StandardPayload<{ user: LoggedInUser }>>
-) {
+export async function POST(req: NextRequest) {
+  const user = await getIronSession<User>(cookies(), sessionOptions);
+
   if (req.method !== "POST") {
-    return methodNotAllowed(res);
+    return methodNotAllowed();
   }
-  if (!req.session.user?.hashconnectTopic) {
+  if (!user?.hashconnectTopic) {
     console.log("No hashconnect session found.");
-    return unauthenticated(res);
+    return unauthenticated();
   }
-  if (!req.session.user.initToken) {
+  if (!user.initToken) {
     console.log("No token found on session.");
-    return unauthenticated(res);
+    return unauthenticated();
   }
 
-  const { initToken, accountId, network, hashconnectTopic } = req.session.user;
+  const { initToken, accountId, network } = user;
   const { userSignature, signedPayload } =
-    req.body as HashconnectAuthenticationRequest;
+    (await req.json()) as HashconnectAuthenticationRequest;
 
   if (!userSignature || !signedPayload) {
-    return errorResponse(
-      res,
-      400,
-      "userSignature and signedPayload are required."
-    );
+    return badRequest("userSignature and signedPayload are required.");
   }
 
   if (network !== Network.Testnet) {
-    return errorResponse(res, 400, "network should be testnet");
+    return badRequest("network should be testnet");
   }
 
   if (signedPayload.originalPayload.data.token !== initToken) {
-    return errorResponse(res, 403, "signedPayload does not match session");
+    return forbidden("signedPayload does not match session");
   }
 
   const hederaSigningService = await getHederaSigningService();
@@ -63,7 +60,7 @@ async function authenticateRoute(
 
   if (!serverKeyVerified) {
     console.log("Could not verify server signature");
-    return unauthenticated(res);
+    return unauthenticated();
   }
 
   let publicKey: PublicKey;
@@ -73,11 +70,11 @@ async function authenticateRoute(
 
     if (!accountResponse.key?.key) {
       console.log(`Failed to find public key for account: ${accountId}`);
-      return unauthenticated(res);
+      return unauthenticated();
     }
     publicKey = PublicKey.fromString(accountResponse.key.key);
   } catch (err) {
-    return errorResponse(res, 503, `Could not find account ${accountId}.`);
+    return errorResponse(`Could not find account ${accountId}.`, 503);
   }
 
   const userKeyVerified = hederaSigningService.verifyData(
@@ -87,7 +84,7 @@ async function authenticateRoute(
   );
 
   if (!userKeyVerified) {
-    return unauthenticated(res);
+    return unauthenticated();
   }
 
   const wallet = await getWallet(accountId);
@@ -104,21 +101,9 @@ async function authenticateRoute(
     }
   }
 
-  const user: LoggedInUser = {
-    isLoggedIn: true,
-    accountId,
-    network,
-    hashconnectTopic,
-    role,
-  };
+  user.isLoggedIn = true;
+  user.role = role;
+  await user.save();
 
-  req.session.user = user;
-  await req.session.save();
-
-  return res.status(200).json({
-    ok: true,
-    data: { user },
-  });
+  return success(user);
 }
-
-export default withStandardApi(authenticateRoute, { public: true });

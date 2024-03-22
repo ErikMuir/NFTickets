@@ -8,7 +8,7 @@ import EntertainerProfile from "./EntertainerProfile";
 import VenueProfile from "./VenueProfile";
 
 export default function Profile() {
-  const { user, isUserLoading } = useUser();
+  const { data: user, isLoading: isUserLoading } = useUser();
   const [role, _setRole] = useState<Role>(Role.ATTENDEE);
 
   if (isUserLoading) return <Loading />;

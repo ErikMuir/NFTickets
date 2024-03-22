@@ -16,7 +16,7 @@ import { Person } from "@mui/icons-material";
 
 export const AccountMenu = () => {
   const router = useRouter();
-  const { user, mutateUser } = useUser();
+  const { data: user, mutate: mutateUser } = useUser();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [showMenu, setShowMenu] = useState(false);
   const [showModal, setShowModal] = useState(false);

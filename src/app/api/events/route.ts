@@ -1,12 +1,7 @@
-import { NextResponse } from "next/server";
 import { getAllEvents } from "@/clients/db/events";
+import { success } from "@/server-utils/api-responses";
 
 export async function GET(_: Request) {
-  try {
-    const events = await getAllEvents();
-    return NextResponse.json(events, { status: 200 });
-  } catch (error) {
-    console.log(error);
-    return NextResponse.json({ error }, { status: 500 });
-  }
+  const events = await getAllEvents();
+  return success(events);
 }

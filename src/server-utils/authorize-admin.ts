@@ -1,4 +1,4 @@
-import { getRequired } from "../../common/env";
+import { getRequired } from "../common-utils/env";
 import { ForbiddenError } from "./api-errors";
 
 export const authorizeAdmin = ({ headers }: Request): void => {

@@ -2,7 +2,6 @@ import { ReactElement } from "react";
 import { CircularProgress } from "@mui/material";
 import useEntertainers from "@/lib/useEntertainers";
 import { Card } from "@/components/common/Card";
-import Image from "next/image";
 
 export const Entertainers = (): ReactElement => {
   const { data: entertainers, isLoading } = useEntertainers();

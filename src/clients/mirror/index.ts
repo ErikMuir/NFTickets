@@ -1,4 +1,4 @@
-import { getRequired } from "../../../common/env";
+import { getRequired } from "../../common-utils/env";
 import { fetchJson } from "@/lib/fetch-json";
 import { AccountInfo } from "@/clients/mirror/types";
 
@@ -11,6 +11,8 @@ export const callMirror = async <T>(path: string): Promise<T> => {
   });
 };
 
-export const getAccountInfo = async (accountId: string): Promise<AccountInfo> => {
+export const getAccountInfo = async (
+  accountId: string
+): Promise<AccountInfo> => {
   return callMirror<AccountInfo>(`/accounts/${accountId}`);
 };

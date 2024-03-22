@@ -2,7 +2,7 @@ import { ReactElement } from "react";
 import { CircularProgress } from "@mui/material";
 import useEvents from "@/lib/useEvents";
 import { Card } from "@/components/common/Card";
-import { toFriendlyDateTime } from "../../../../common/date-helpers";
+import { toFriendlyDateTime } from "@/common-utils/dates";
 
 export const Events = (): ReactElement => {
   const { data: events, isLoading } = useEvents();
@@ -19,7 +19,7 @@ export const Events = (): ReactElement => {
           <Card
             key={address}
             title={entertainerName}
-            subtitle={`at ${venueName}`}
+            subtitle={venueName}
             description={toFriendlyDateTime(dateTime)}
             imageUrl={imageUrl}
           />

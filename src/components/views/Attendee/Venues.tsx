@@ -27,7 +27,7 @@ export const Venues = (): ReactElement => {
 
   return (
     <div>
-      <div className="text-sm uppercase mb-2">Venues</div>
+      {/* <div className="text-sm uppercase mb-2">Venues</div> */}
       {getContent()}
     </div>
   );

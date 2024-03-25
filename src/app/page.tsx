@@ -1,15 +1,14 @@
 "use client";
 
-import Attendee from "@/components/views/Attendee";
-import Entertainer from "@/components/views/Entertainer";
+import { useRouter } from "next/navigation";
 import LoggedOut from "@/components/views/LoggedOut";
 import Loading from "@/components/views/Loading";
-import Venue from "@/components/views/Venue";
 import useUser from "@/lib/user/useUser";
 import { Role } from "@/models";
 
 export default function HomeRoute() {
   const { data: user, isLoading: isUserLoading } = useUser();
+  const router = useRouter();
 
   if (isUserLoading) {
     return <Loading />;
@@ -21,11 +20,11 @@ export default function HomeRoute() {
 
   switch (user.role) {
     case Role.ATTENDEE:
-      return <Attendee />;
+      return router.push("/attendee");
     case Role.ENTERTAINER:
-      return <Entertainer />;
+      return router.push("/entertainer");
     case Role.VENUE:
-      return <Venue />;
+      return router.push("/venue");
     default:
       return <LoggedOut />;
   }

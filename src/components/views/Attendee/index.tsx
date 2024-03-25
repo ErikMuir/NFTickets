@@ -1,4 +1,4 @@
-import { ReactElement, useState } from "react";
+import { ReactElement, useState, useCallback } from "react";
 import { Entertainers } from "./Entertainers";
 import { Venues } from "./Venues";
 import { Events } from "./Events";
@@ -8,14 +8,15 @@ const attendeeTabs = ["Events", "Entertainers", "Venues"];
 
 export default function Attendee(): ReactElement {
   const [currentTab, setCurrentTab] = useState(attendeeTabs[0]);
-  const handleTabChange = (tab: string): void => {
+  const handleTabChange = useCallback((tab: string): void => {
+    console.log(`${tab} was clicked`);
     setCurrentTab(tab);
-  };
+  }, []);
   return (
     <div className="flex flex-col gap-12 w-[320px] md:w-[672px] xl:w-[1024px] mx-auto">
       <Tabs
         tabs={attendeeTabs}
-        currentTab={attendeeTabs[0]}
+        currentTab={currentTab}
         onTabClick={handleTabChange}
       />
       {currentTab === "Events" && <Events />}

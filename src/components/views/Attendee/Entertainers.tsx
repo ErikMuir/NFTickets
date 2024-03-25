@@ -29,7 +29,7 @@ export const Entertainers = (): ReactElement => {
 
   return (
     <div>
-      <div className="text-sm uppercase mb-2">Entertainers</div>
+      {/* <div className="text-sm uppercase mb-2">Entertainers</div> */}
       {getContent()}
     </div>
   );

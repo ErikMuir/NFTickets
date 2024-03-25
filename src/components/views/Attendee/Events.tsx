@@ -30,7 +30,7 @@ export const Events = (): ReactElement => {
 
   return (
     <div>
-      <div className="text-sm uppercase mb-1">Events</div>
+      {/* <div className="text-sm uppercase mb-1">Events</div> */}
       {getContent()}
     </div>
   );

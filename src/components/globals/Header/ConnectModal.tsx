@@ -1,7 +1,8 @@
-import { Button, TextField } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
+import { IconButton, TextField } from "@mui/material";
+import { CopyAllOutlined } from "@mui/icons-material";
 
-import Modal from "../Modal";
+import Modal from "@/components/globals/Modal";
 
 export const ConnectModal = ({
   id,
@@ -57,17 +58,22 @@ export const ConnectModal = ({
         </div>
         <div className="flex flex-col items-center">
           <div className="text-md font-light my-8">- OR -</div>
-          <div className="flex flex-wrap gap-2 justify-center">
+          <div className="flex items-center gap-2 w-full">
             <TextField
+            className="grow"
               value={pairingString || ""}
               InputProps={{
                 readOnly: true,
               }}
               label="Pairing String"
             />
-            <Button size="small" className="text-primary" onClick={handleCopy}>
-              Copy
-            </Button>
+            <IconButton
+              size="small"
+              color="primary"
+              onClick={handleCopy}
+            >
+              <CopyAllOutlined />
+            </IconButton>
           </div>
           <ol className="text-left text-xs px-4 mt-4 list-decimal w-3/4">
             <li>Copy pairing string</li>

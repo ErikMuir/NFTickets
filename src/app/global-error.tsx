@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@mui/material";
+import { Button } from "@/components/common/Button";
 
 export default function GlobalError({
   error,
@@ -11,10 +11,11 @@ export default function GlobalError({
 }) {
   return (
     <html>
-      <body className="p-12 flex flex-col items-center justify-start">
-        <h2 className="text-2xl">Something went wrong!</h2>
-        <Button variant="contained">Try again</Button>
-        <button type="button" className="" onClick={reset}>Try again</button>
+      <body>
+        <div className="flex flex-col gap-4 items-center mt-16">
+          <div className="text-xl">Something went wrong!</div>
+          <Button onClick={reset}>Try again</Button>
+        </div>
       </body>
     </html>
   );

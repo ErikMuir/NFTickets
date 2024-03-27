@@ -5,7 +5,7 @@ import { getIronSession } from "iron-session";
 import { success } from "@/server-utils/api-responses";
 import { sessionOptions } from "@/lib/user/session";
 
-export async function GET(req: NextRequest) {
+export async function POST(req: NextRequest) {
   const session = await getIronSession(cookies(), sessionOptions);
   session.destroy();
   return success(void 0);

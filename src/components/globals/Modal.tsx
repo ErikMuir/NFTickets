@@ -1,6 +1,7 @@
 import { Close } from "@mui/icons-material";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom";
+import { twMerge } from "tailwind-merge";
 
 export const Modal = ({
   id,
@@ -46,10 +47,15 @@ export const Modal = ({
   const modalContent = show ? (
     <div
       id={id}
-      className="modal-overlay fixed top-0 left-0 w-full h-full overflow-x-hidden flex justify-center items-center z-10"
-      style={{ backgroundColor: "rgba(0, 0, 0, 0.4)" }}
+      className={twMerge(
+        "modal-overlay",
+        "fixed top-0 left-0 z-10",
+        "w-full h-full overflow-x-hidden",
+        "flex justify-center items-center",
+        "bg-black/60",
+      )}
     >
-      <div className={`modal-wrapper ${className}`} ref={modalWrapperRef}>
+      <div className={twMerge("modal-wrapper", className)} ref={modalWrapperRef}>
         <div className="modal relative p-8 pb-12 rounded-xl bg-white z-10 shadow-md">
           {showClose && (
             <Close

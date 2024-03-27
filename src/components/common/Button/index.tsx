@@ -1,40 +1,35 @@
 import { PropsWithChildren, ReactElement } from "react";
 import { Button as MuiButton } from "@mui/material";
 import { twMerge } from "tailwind-merge";
-
-export type Size = "small" | "medium" | "large";
-export type Color = "inherit" | "primary" | "secondary" | "success" | "error" | "info" | "warning";
-
-export type ButtonProps = {
-  className?: string;
-  classes?: object;
-  color?: Color;
-  disabled?: boolean;
-  fullWidth?: boolean;
-  size?: Size;
-  onClick?: () => void;
-};
+import { ButtonProps } from "./buttonTypes";
 
 export const Button = ({
-  className,
-  classes,
-  disabled,
-  fullWidth,
+  className = "",
+  color = "primary",
   size = "medium",
+  variant = "contained",
+  startIcon,
+  endIcon,
+  disabled = false,
+  fullWidth = false,
   onClick,
   children,
 }: PropsWithChildren<ButtonProps>): ReactElement => {
   const styles = twMerge(
-    // "px-4 py-2",
+    "self-center",
+    variant === "contained" && color === "secondary" && "text-white",
     className,
   );
   return (
     <MuiButton
-      className={className}
-      classes={classes}
+      className={styles}
+      color={color}
+      size={size}
+      variant={variant}
+      startIcon={startIcon}
+      endIcon={endIcon}
       disabled={disabled}
       fullWidth={fullWidth}
-      size={size}
       onClick={onClick}
     >
       {children}

@@ -1,7 +1,8 @@
-import { Button, TextField } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
+import { TextField } from "@mui/material";
 
-import Modal from "../Modal";
+import { Button } from "@/components/common/Button";
+import Modal from "@/components/globals/Modal";
 
 export const ConnectModal = ({
   id,
@@ -65,7 +66,7 @@ export const ConnectModal = ({
               }}
               label="Pairing String"
             />
-            <Button size="small" className="text-primary" onClick={handleCopy}>
+            <Button size="small" onClick={handleCopy}>
               Copy
             </Button>
           </div>

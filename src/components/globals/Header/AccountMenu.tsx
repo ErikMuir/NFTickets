@@ -1,18 +1,14 @@
-import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import LinkOffIcon from "@mui/icons-material/LinkOff";
+import { AccountBalanceWallet, ArrowDropDown, LinkOff, Person } from "@mui/icons-material";
 import { Menu, MenuItem, MenuList } from "@mui/material";
-import Button from "@mui/material/Button";
 import { MessageTypes } from "hashconnect";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
-import { ConnectModal } from "./ConnectModal";
-
+import { Button } from "@/components/common/Button";
+import { ConnectModal } from "@/components/globals/Header/ConnectModal";
 import { hashconnect } from "@/lib/hashconnect";
 import { getHashConnectWallet } from "@/lib/hashconnect/HashconnectWallet";
 import useUser from "@/lib/user/useUser";
-import { Person } from "@mui/icons-material";
 
 export const AccountMenu = () => {
   const router = useRouter();
@@ -115,8 +111,8 @@ export const AccountMenu = () => {
     return (
       <>
         <Button
-          className="gap-2 text-primary hover:bg-inherit"
-          size="medium"
+          className="gap-2"
+          variant="text"
           aria-controls="connect-modal"
           aria-haspopup="true"
           onClick={() => {
@@ -125,8 +121,8 @@ export const AccountMenu = () => {
         >
           <div>Connect</div>
           <div className="flex items-center">
-            <AccountBalanceWalletIcon fontSize="small" />
-            <ArrowDropDownIcon fontSize="small" />
+            <AccountBalanceWallet fontSize="small" />
+            <ArrowDropDown fontSize="small" />
           </div>
         </Button>
         {showModal && (
@@ -156,15 +152,15 @@ export const AccountMenu = () => {
     <>
       <Button
         className="text-right inline-flex gap-2 hover:bg-inherit"
-        size="medium"
+        variant="text"
         aria-controls="account-menu"
         aria-haspopup="true"
         onClick={handleOpenMenu}
       >
         <div className="text-primary truncate">{user?.accountId}</div>
         <div className="text-primary flex items-center">
-          <AccountBalanceWalletIcon fontSize="small" />
-          <ArrowDropDownIcon fontSize="small" />
+          <AccountBalanceWallet fontSize="small" />
+          <ArrowDropDown fontSize="small" />
         </div>
       </Button>
 
@@ -204,7 +200,7 @@ export const AccountMenu = () => {
               className="flex items-center gap-4 hover:bg-violet-300"
               onClick={handleDisconnect}
             >
-              <LinkOffIcon fontSize="medium" />
+              <LinkOff fontSize="medium" />
               Disconnect
             </MenuItem>
           </MenuList>

@@ -5,7 +5,7 @@ import { Jost } from "next/font/google";
 import { ThemeProvider } from "@mui/material/styles";
 import { Footer } from "@/components/globals/Footer";
 import { Header } from "@/components/globals/Header/Header";
-import { theme } from "@/styles/theme";
+import { muiTheme } from "@/styles/mui-theme";
 import "@/styles/globals.css";
 
 const jost = Jost({ weight: ["400", "700"], subsets: ["latin"] });
@@ -26,7 +26,7 @@ export default function RootLayout({
       </head>
       <body className={jost.className}>
         <div className="flex flex-col min-h-screen">
-          <ThemeProvider theme={theme}>
+          <ThemeProvider theme={muiTheme}>
             <Header />
             <main className="grow shrink-0 basis-auto m-4">{children}</main>
             <Footer />

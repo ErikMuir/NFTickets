@@ -9,7 +9,6 @@ const attendeeTabs = ["Events", "Entertainers", "Venues"];
 export default function Attendee(): ReactElement {
   const [currentTab, setCurrentTab] = useState(attendeeTabs[0]);
   const handleTabChange = useCallback((tab: string): void => {
-    console.log(`${tab} was clicked`);
     setCurrentTab(tab);
   }, []);
   return (

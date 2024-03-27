@@ -43,7 +43,10 @@ export const createVenuesTable = async (): Promise<
       account     text PRIMARY KEY NOT NULL REFERENCES wallets,
       name        text NOT NULL,
       description text NULL,
-      location    text NULL,
+      address     text NULL,
+      city        text NULL,
+      state       text NULL,
+      zip         text NULL,
       image_url   text NULL
     );
   `;
@@ -239,12 +242,15 @@ export const insertEntertainer = async ({
 export const insertVenue = async ({
   account,
   name,
-  location,
+  address,
+  city,
+  state,
+  zip,
   imageUrl,
 }: Venue): Promise<QueryResult<QueryResultRow>> => {
   return sql`
-    INSERT INTO venues ( account, name, location, image_url )
-    SELECT account, ${name}, ${location}, ${imageUrl}
+    INSERT INTO venues ( account, name, address, city, state, zip, image_url )
+    SELECT account, ${name}, ${address}, ${city}, ${state}, ${zip}, ${imageUrl}
     FROM wallets
     WHERE account = ${account} AND role = ${Role.VENUE};
   `;

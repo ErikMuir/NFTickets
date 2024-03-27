@@ -5,14 +5,18 @@ export const getEvent = async (address: string): Promise<EventDto | null> => {
   const result = await sql`
     SELECT
       ev.address,
-      v.name AS venue_name,
-      v.account AS venue_account,
-      en.name AS entertainer_name,
-      en.account AS entertainer_account,
       ev.date_time,
       ev.sales_begin,
       ev.sales_end,
-      en.image_url
+      v.account AS venue_account,
+      v.name AS venue_name,
+      v.address AS venue_address,
+      v.city AS venue_city,
+      v.state AS venue_state,
+      v.zip AS venue_zip,
+      en.account AS entertainer_account,
+      en.name AS entertainer_name,
+      en.image_url AS entertainer_image_url
     FROM events AS ev
     INNER JOIN entertainers AS en ON en.account = ev.entertainer
     INNER JOIN venues AS v ON v.account = ev.venue
@@ -25,14 +29,18 @@ export const getAllEvents = async (): Promise<EventDto[]> => {
   const result = await sql`
     SELECT
       ev.address,
-      v.name AS venue_name,
+      ev.date_time,
+      ev.sales_begin,
+      ev.sales_end,
       v.account AS venue_account,
-      en.name AS entertainer_name,
+      v.name AS venue_name,
+      v.address AS venue_address,
+      v.city AS venue_city,
+      v.state AS venue_state,
+      v.zip AS venue_zip,
       en.account AS entertainer_account,
-      date_time,
-      sales_begin,
-      sales_end,
-      en.image_url
+      en.name AS entertainer_name,
+      en.image_url AS entertainer_image_url
     FROM events AS ev
     INNER JOIN entertainers AS en ON en.account = ev.entertainer
     INNER JOIN venues AS v ON v.account = ev.venue;
@@ -44,14 +52,18 @@ export const getEventsByVenue = async (venue: string): Promise<EventDto[]> => {
   const result = await sql`
     SELECT
       ev.address,
-      v.name AS venue_name,
+      ev.date_time,
+      ev.sales_begin,
+      ev.sales_end,
       v.account AS venue_account,
-      en.name AS entertainer_name,
+      v.name AS venue_name,
+      v.address AS venue_address,
+      v.city AS venue_city,
+      v.state AS venue_state,
+      v.zip AS venue_zip,
       en.account AS entertainer_account,
-      date_time,
-      sales_begin,
-      sales_end,
-      en.image_url
+      en.name AS entertainer_name,
+      en.image_url AS entertainer_image_url
     FROM events AS ev
     INNER JOIN entertainers AS en ON en.account = ev.entertainer
     INNER JOIN venues AS v ON v.account = ev.venue
@@ -66,14 +78,18 @@ export const getEventsByEntertainer = async (
   const result = await sql`
     SELECT
       ev.address,
-      v.name AS venue_name,
+      ev.date_time,
+      ev.sales_begin,
+      ev.sales_end,
       v.account AS venue_account,
-      en.name AS entertainer_name,
+      v.name AS venue_name,
+      v.address AS venue_address,
+      v.city AS venue_city,
+      v.state AS venue_state,
+      v.zip AS venue_zip,
       en.account AS entertainer_account,
-      date_time,
-      sales_begin,
-      sales_end,
-      en.image_url
+      en.name AS entertainer_name,
+      en.image_url AS entertainer_image_url
     FROM events AS ev
     INNER JOIN entertainers AS en ON en.account = ev.entertainer
     INNER JOIN venues AS v ON v.account = ev.venue

@@ -7,7 +7,10 @@ export const getVenue = async (account: string): Promise<Venue | null> => {
       account,
       name,
       description,
-      location,
+      address,
+      city,
+      state,
+      zip,
       image_url
     FROM venues
     WHERE account = ${account};
@@ -21,7 +24,10 @@ export const getAllVenues = async (): Promise<Venue[]> => {
       account,
       name,
       description,
-      location,
+      address,
+      city,
+      state,
+      zip,
       image_url
     FROM venues;
   `;
@@ -35,14 +41,20 @@ export const insertVenue = async (venue: Venue): Promise<void> => {
       account,
       name,
       description,
-      location,
+      address,
+      city,
+      state,
+      zip,
       image_url
     )
     SELECT
       account,
       ${venue.name},
       ${venue.description},
-      ${venue.location},
+      ${venue.address},
+      ${venue.city},
+      ${venue.state},
+      ${venue.zip},
       ${venue.imageUrl}
     FROM wallets
     WHERE account = ${venue.account};
@@ -58,7 +70,10 @@ export const updateVenue = async (venue: Venue): Promise<void> => {
     SET
       name = ${venue.name},
       description = ${venue.description},
-      location = ${venue.location},
+      address = ${venue.address},
+      city = ${venue.city},
+      state = ${venue.state},
+      zip = ${venue.zip},
       image_url = ${venue.imageUrl}
     WHERE account = ${venue.account};
   `;

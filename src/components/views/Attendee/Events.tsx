@@ -1,37 +1,31 @@
 import { ReactElement } from "react";
-import { CircularProgress } from "@mui/material";
-import useEvents from "@/lib/useEvents";
-import { Card } from "@/components/common/Card";
 import { toFriendlyDateTime } from "@/common-utils/dates";
+import { Card } from "@/components/common/Card";
+import Loading from "@/components/views/Loading";
+import useEvents from "@/lib/useEvents";
 
 export const Events = (): ReactElement => {
   const { data: events, isLoading } = useEvents();
 
   const getContent = (): ReactElement => {
-    if (isLoading) return <CircularProgress size="1.5rem" />;
+    if (isLoading) return <Loading />;
 
-    if (!events?.length)
-      return <div className="text-md italic">No entertainers</div>;
+    if (!events?.length) return <div className="text-md italic">No events</div>;
 
     return (
       <div className="flex flex-wrap items-start gap-8">
-        {events.map(({ address, entertainerName, venueName, dateTime, imageUrl }) => (
+        {events.map(({ address, venue, entertainer, dateTime }) => (
           <Card
             key={address}
-            title={entertainerName}
-            subtitle={venueName}
+            title={entertainer.name}
+            subtitle={`${venue.name} | ${venue.city}, ${venue.state}`}
             description={toFriendlyDateTime(dateTime)}
-            imageUrl={imageUrl}
+            imageUrl={entertainer.imageUrl}
           />
         ))}
       </div>
     );
   };
 
-  return (
-    <div>
-      {/* <div className="text-sm uppercase mb-1">Events</div> */}
-      {getContent()}
-    </div>
-  );
+  return <div>{getContent()}</div>;
 };

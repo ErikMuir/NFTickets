@@ -18,7 +18,7 @@ export const Card = ({
   className,
 }: CardProps): ReactElement => {
   const styles = twMerge(
-    "w-full md:w-80 box-border border shadow-md rounded-md overflow-hidden bg-slate-50",
+    "w-full md:w-80 shadow-md rounded-md overflow-hidden bg-slate-50",
     className
   );
   const hasText = title || subtitle || description;

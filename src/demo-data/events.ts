@@ -6,7 +6,7 @@ export const events: Record<string, Event> = {
     venue: "0.0.444",
     entertainer: "0.0.111",
     dateTime: new Date("2024-07-28T23:30:00Z"),
-    salesBegin: new Date("2024-06-01T13:00:00Z"),
+    salesBegin: new Date("2024-03-01T13:00:00Z"),
     salesEnd: new Date("2024-07-29T00:30:00Z"),
     finalized: true,
   },

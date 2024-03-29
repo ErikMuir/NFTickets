@@ -5,6 +5,28 @@ import { Card } from "@/components/common/Card";
 import Loading from "@/components/views/Loading";
 import useEvents from "@/lib/useEvents";
 import { Hidable } from "@/components/componentTypes";
+import { EventDto } from "@/models";
+
+export const sortEvents = (events: EventDto[] = []): EventDto[] => {
+  const preSalesEvents: EventDto[] = [];
+  const activeSalesEvents: EventDto[] = [];
+  const postSalesEvents: EventDto[] = [];
+  const pastEvents: EventDto[] = [];
+
+  events.forEach((e: EventDto) => {
+    if (e.preSales) preSalesEvents.push({ ...e });
+    else if (e.pastEvent) pastEvents.push({ ...e });
+    else if (e.postSales) postSalesEvents.push({ ...e });
+    else activeSalesEvents.push({ ...e });
+  });
+
+  return [
+    ...activeSalesEvents,
+    ...postSalesEvents,
+    ...preSalesEvents,
+    ...pastEvents,
+  ];
+};
 
 export const Events = ({ isHidden }: Hidable): ReactElement => {
   const { data: events, isLoading } = useEvents();
@@ -14,28 +36,24 @@ export const Events = ({ isHidden }: Hidable): ReactElement => {
 
     if (!events?.length) return <div className="text-md italic">No events</div>;
 
-    const now = new Date().toISOString();
-
     return (
       <div className="flex flex-wrap items-start gap-8">
-        {events.map(
+        {sortEvents(events).map(
           ({
             address,
             venue,
             entertainer,
             dateTime,
-            salesBegin,
-            salesEnd,
+            preSales,
+            postSales,
+            pastEvent,
           }) => {
-            const pastEvent = dateTime!.toISOString() <= now;
-            const preSales = salesBegin!.toISOString() > now;
-            const salesEnded = salesEnd!.toISOString() <= now;
             let overlayText: string | undefined;
             if (pastEvent) {
               overlayText = "Past Event";
             } else if (preSales) {
               overlayText = "Pre Sales";
-            } else if (salesEnded) {
+            } else if (postSales) {
               overlayText = "Sales Ended";
             }
             return (

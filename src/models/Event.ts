@@ -19,6 +19,9 @@ export type EventDto = {
   salesBegin?: Date;
   salesEnd?: Date;
   finalized: boolean;
+  preSales: boolean;
+  postSales: boolean;
+  pastEvent: boolean;
 };
 
 export const mapEventFromDb = ({
@@ -36,26 +39,35 @@ export const mapEventFromDb = ({
   entertainer_account,
   entertainer_name,
   entertainer_image_url,
-}: any): EventDto => ({
-  address,
-  venue: {
-    account: venue_account,
-    name: venue_name,
-    address: venue_address,
-    city: venue_city,
-    state: venue_state,
-    zip: venue_zip,
-  },
-  entertainer: {
-    account: entertainer_account,
-    name: entertainer_name,
-    imageUrl: entertainer_image_url,
-  },
-  dateTime: date_time ? new Date(date_time) : undefined,
-  salesBegin: sales_begin ? new Date(sales_begin) : undefined,
-  salesEnd: sales_end ? new Date(sales_end) : undefined,
-  finalized,
-});
+}: any): EventDto => {
+  const now = new Date().toISOString();
+  const preSales = sales_begin && sales_begin > now;
+  const postSales = sales_end && sales_end <= now;
+  const pastEvent = date_time && date_time <= now;
+  return {
+    address,
+    venue: {
+      account: venue_account,
+      name: venue_name,
+      address: venue_address,
+      city: venue_city,
+      state: venue_state,
+      zip: venue_zip,
+    },
+    entertainer: {
+      account: entertainer_account,
+      name: entertainer_name,
+      imageUrl: entertainer_image_url,
+    },
+    dateTime: date_time ? new Date(date_time) : undefined,
+    salesBegin: sales_begin ? new Date(sales_begin) : undefined,
+    salesEnd: sales_end ? new Date(sales_end) : undefined,
+    finalized,
+    preSales,
+    postSales,
+    pastEvent,
+  };
+};
 
 export const mapEventFromApi = ({
   address,
@@ -65,23 +77,29 @@ export const mapEventFromApi = ({
   salesBegin,
   salesEnd,
   finalized,
-}: any): EventDto => ({
-  address,
-  venue: {
-    account: venue.account,
-    name: venue.name,
-    address: venue.address,
-    city: venue.city,
-    state: venue.state,
-    zip: venue.zip,
-  },
-  entertainer: {
-    account: entertainer.account,
-    name: entertainer.name,
-    imageUrl: entertainer.imageUrl,
-  },
-  dateTime: dateTime ? new Date(dateTime) : undefined,
-  salesBegin: salesBegin ? new Date(salesBegin) : undefined,
-  salesEnd: salesEnd ? new Date(salesEnd) : undefined,
-  finalized,
-});
+}: any): EventDto => {
+  const now = new Date().toISOString();
+  return {
+    address,
+    venue: {
+      account: venue.account,
+      name: venue.name,
+      address: venue.address,
+      city: venue.city,
+      state: venue.state,
+      zip: venue.zip,
+    },
+    entertainer: {
+      account: entertainer.account,
+      name: entertainer.name,
+      imageUrl: entertainer.imageUrl,
+    },
+    dateTime: dateTime ? new Date(dateTime) : undefined,
+    salesBegin: salesBegin ? new Date(salesBegin) : undefined,
+    salesEnd: salesEnd ? new Date(salesEnd) : undefined,
+    finalized,
+    preSales: salesBegin && salesBegin > now,
+    postSales: salesEnd && salesEnd <= now,
+    pastEvent: dateTime && dateTime <= now,
+  };
+};

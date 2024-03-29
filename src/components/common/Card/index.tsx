@@ -1,15 +1,7 @@
-import Image from "next/image";
 import { ReactElement } from "react";
 import { twMerge } from "tailwind-merge";
-
-export type CardProps = {
-  title?: string;
-  subtitle?: string;
-  description?: string;
-  imageUrl?: string;
-  overlayText?: string;
-  className?: string;
-};
+import { CardProps } from "./cardTypes";
+import { CardImage } from "./CardImage";
 
 export const Card = ({
   title,
@@ -19,7 +11,6 @@ export const Card = ({
   overlayText,
   className,
 }: CardProps): ReactElement => {
-  // TODO : implement overlay text
   const styles = twMerge(
     "w-full md:w-80 shadow-md rounded-md overflow-hidden bg-slate-50",
     className
@@ -27,7 +18,7 @@ export const Card = ({
   const hasText = title || subtitle || description;
   return (
     <div className={styles}>
-      {imageUrl && <Image src={imageUrl} className="w-full" width={1092} height={614} alt={imageUrl} />}
+      {imageUrl && <CardImage imageUrl={imageUrl} overlayText={overlayText}  />}
       {hasText && (
         <div className="p-2 bg-neutral-100">
           {title && <div className="text-xl text-center">{title}</div>}

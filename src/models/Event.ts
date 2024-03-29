@@ -6,8 +6,9 @@ export type Event = {
   venue: string;
   entertainer: string;
   dateTime?: Date;
-  ticketSalesBegin?: Date;
-  ticketSalesEnd?: Date;
+  salesBegin?: Date;
+  salesEnd?: Date;
+  finalized: boolean;
 };
 
 export type EventDto = {
@@ -15,15 +16,17 @@ export type EventDto = {
   venue: Partial<Venue>;
   entertainer: Partial<Entertainer>;
   dateTime?: Date;
-  ticketSalesBegin?: Date;
-  ticketSalesEnd?: Date;
+  salesBegin?: Date;
+  salesEnd?: Date;
+  finalized: boolean;
 };
 
-export const mapEvent = ({
+export const mapEventFromDb = ({
   address,
   date_time,
   sales_begin,
   sales_end,
+  finalized,
   venue_account,
   venue_name,
   venue_address,
@@ -49,6 +52,36 @@ export const mapEvent = ({
     imageUrl: entertainer_image_url,
   },
   dateTime: date_time ? new Date(date_time) : undefined,
-  ticketSalesBegin: sales_begin ? new Date(sales_begin) : undefined,
-  ticketSalesEnd: sales_end ? new Date(sales_end) : undefined,
+  salesBegin: sales_begin ? new Date(sales_begin) : undefined,
+  salesEnd: sales_end ? new Date(sales_end) : undefined,
+  finalized,
+});
+
+export const mapEventFromApi = ({
+  address,
+  venue,
+  entertainer,
+  dateTime,
+  salesBegin,
+  salesEnd,
+  finalized,
+}: any): EventDto => ({
+  address,
+  venue: {
+    account: venue.account,
+    name: venue.name,
+    address: venue.address,
+    city: venue.city,
+    state: venue.state,
+    zip: venue.zip,
+  },
+  entertainer: {
+    account: entertainer.account,
+    name: entertainer.name,
+    imageUrl: entertainer.imageUrl,
+  },
+  dateTime: dateTime ? new Date(dateTime) : undefined,
+  salesBegin: salesBegin ? new Date(salesBegin) : undefined,
+  salesEnd: salesEnd ? new Date(salesEnd) : undefined,
+  finalized,
 });

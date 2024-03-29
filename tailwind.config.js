@@ -10,13 +10,15 @@ module.exports = {
   },
   theme: {
     colors: {
-      primary: "#7e57c2",
-      secondary: '#e1a026',
-      default: "#333333",
-      white: "#ffffff",
-      black: "#000000",
-      darkGray: "",
-      lightGrey: "",
+      'primary': "#7e57c2",
+      'secondary': '#e1a026',
+      'default': "#333333",
+      'black': "#000000",
+      'gray-dark': "#333333",
+      'gray-medium': "#888888",
+      'gray-light': "#cccccc",
+      'off-white': '#faf9f6',
+      'white': "#ffffff",
     },
     fontFamily: {
       'sans': ['Oswald', 'serif'],

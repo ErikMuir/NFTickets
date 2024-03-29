@@ -7,6 +7,7 @@ export type CardProps = {
   subtitle?: string;
   description?: string;
   imageUrl?: string;
+  overlayText?: string;
   className?: string;
 };
 
@@ -15,8 +16,10 @@ export const Card = ({
   subtitle,
   description,
   imageUrl,
+  overlayText,
   className,
 }: CardProps): ReactElement => {
+  // TODO : implement overlay text
   const styles = twMerge(
     "w-full md:w-80 shadow-md rounded-md overflow-hidden bg-slate-50",
     className

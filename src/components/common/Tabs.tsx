@@ -23,10 +23,8 @@ export const TabItem = ({
     <div
       onClick={() => onClick(tab)}
       className={twMerge(
-        "text-md text-center h-[44px] w-28 px-4 py-2 cursor-pointer",
-        isCurrentTab ? "font-bold" : "font-normal",
-        isCurrentTab ? "text-primary" : "text-red-400 hover:text-gray-500",
-        isCurrentTab ? "border-primary border-b-2" : "",
+        "text-md text-center h-[44px] px-4 py-2 cursor-pointer tracking-wide",
+        isCurrentTab ? "text-primary border-primary border-b-2" : "text-gray-light hover:text-gray-medium",
       )}
     >
       {tab}

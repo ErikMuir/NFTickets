@@ -25,7 +25,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" />
       </head>
-      <body className={twMerge(jost.className, "text-black bg-white")}>
+      <body className={twMerge(jost.className, "text-gray-dark bg-off-white")}>
         <div className="flex flex-col min-h-screen">
           <ThemeProvider theme={muiTheme}>
             <Header />

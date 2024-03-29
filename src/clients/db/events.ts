@@ -1,5 +1,5 @@
 import { sql } from "@vercel/postgres";
-import { type Event, type EventDto, mapEvent } from "@/models";
+import { type Event, type EventDto, mapEventFromDb } from "@/models";
 
 export const getEvent = async (address: string): Promise<EventDto | null> => {
   const result = await sql`
@@ -8,6 +8,7 @@ export const getEvent = async (address: string): Promise<EventDto | null> => {
       ev.date_time,
       ev.sales_begin,
       ev.sales_end,
+      ev.finalized,
       v.account AS venue_account,
       v.name AS venue_name,
       v.address AS venue_address,
@@ -22,7 +23,7 @@ export const getEvent = async (address: string): Promise<EventDto | null> => {
     INNER JOIN venues AS v ON v.account = ev.venue
     WHERE address = ${address};
   `;
-  return result.rowCount === 0 ? null : mapEvent(result.rows[0]);
+  return result.rowCount === 0 ? null : mapEventFromDb(result.rows[0]);
 };
 
 export const getAllEvents = async (): Promise<EventDto[]> => {
@@ -32,6 +33,7 @@ export const getAllEvents = async (): Promise<EventDto[]> => {
       ev.date_time,
       ev.sales_begin,
       ev.sales_end,
+      ev.finalized,
       v.account AS venue_account,
       v.name AS venue_name,
       v.address AS venue_address,
@@ -45,7 +47,7 @@ export const getAllEvents = async (): Promise<EventDto[]> => {
     INNER JOIN entertainers AS en ON en.account = ev.entertainer
     INNER JOIN venues AS v ON v.account = ev.venue;
   `;
-  return result.rows.map(mapEvent);
+  return result.rows.map(mapEventFromDb);
 };
 
 export const getEventsByVenue = async (venue: string): Promise<EventDto[]> => {
@@ -55,6 +57,7 @@ export const getEventsByVenue = async (venue: string): Promise<EventDto[]> => {
       ev.date_time,
       ev.sales_begin,
       ev.sales_end,
+      ev.finalized,
       v.account AS venue_account,
       v.name AS venue_name,
       v.address AS venue_address,
@@ -69,7 +72,7 @@ export const getEventsByVenue = async (venue: string): Promise<EventDto[]> => {
     INNER JOIN venues AS v ON v.account = ev.venue
     WHERE venue = ${venue};
   `;
-  return result.rows.map(mapEvent);
+  return result.rows.map(mapEventFromDb);
 };
 
 export const getEventsByEntertainer = async (
@@ -81,6 +84,7 @@ export const getEventsByEntertainer = async (
       ev.date_time,
       ev.sales_begin,
       ev.sales_end,
+      ev.finalized,
       v.account AS venue_account,
       v.name AS venue_name,
       v.address AS venue_address,
@@ -95,7 +99,7 @@ export const getEventsByEntertainer = async (
     INNER JOIN venues AS v ON v.account = ev.venue
     WHERE entertainer = ${entertainer};
   `;
-  return result.rows.map(mapEvent);
+  return result.rows.map(mapEventFromDb);
 };
 
 export const insertEvent = async (event: Event): Promise<void> => {
@@ -107,7 +111,8 @@ export const insertEvent = async (event: Event): Promise<void> => {
       entertainer,
       date_time,
       sales_begin,
-      sales_end
+      sales_end,
+      finalized
     )
     SELECT
       ${event.address}
@@ -124,8 +129,9 @@ export const insertEvent = async (event: Event): Promise<void> => {
         LIMIT 1
       ),
       ${event.dateTime?.toISOString()},
-      ${event.ticketSalesBegin?.toISOString()},
-      ${event.ticketSalesEnd?.toISOString()};
+      ${event.salesBegin?.toISOString()},
+      ${event.salesEnd?.toISOString()},
+      ${event.finalized};
   `;
   if (rowCount === 0) {
     throw new Error(`Failed to insert event ${event.address}`);
@@ -137,8 +143,9 @@ export const updateEvent = async (event: Event): Promise<void> => {
     UPDATE events
     SET
       date_time = ${event.dateTime?.toISOString()},
-      sales_begin = ${event.ticketSalesBegin?.toISOString()},
-      sales_end = ${event.ticketSalesEnd?.toISOString()}
+      sales_begin = ${event.salesBegin?.toISOString()},
+      sales_end = ${event.salesEnd?.toISOString()},
+      finalized = ${event.finalized}
     WHERE address = ${event.address}
   `;
   if (rowCount === 0) {

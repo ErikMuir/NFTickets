@@ -18,9 +18,9 @@ export default function Attendee(): ReactElement {
         currentTab={currentTab}
         onTabClick={handleTabChange}
       />
-      {currentTab === "Events" && <Events />}
-      {currentTab === "Entertainers" && <Entertainers />}
-      {currentTab === "Venues" && <Venues />}
+      <Events isHidden={currentTab !== "Events"} />
+      <Entertainers isHidden={currentTab !== "Entertainers"} />
+      <Venues isHidden={currentTab !== "Venues"} />
     </div>
   );
 }

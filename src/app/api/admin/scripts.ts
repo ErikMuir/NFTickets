@@ -57,8 +57,8 @@ export const createSectionsTable = async (): Promise<
 > => {
   return sql`
     CREATE TABLE IF NOT EXISTS sections (
-      venue    text NOT NULL REFERENCES venues,
-      section  text NOT NULL,
+      venue    text    NOT NULL REFERENCES venues,
+      section  text    NOT NULL,
       capacity integer NOT NULL DEFAULT 0,
       PRIMARY KEY(venue, section)
     );
@@ -70,12 +70,13 @@ export const createEventsTable = async (): Promise<
 > => {
   return sql`
     CREATE TABLE IF NOT EXISTS events (
-      address     text PRIMARY KEY NOT NULL,
-      venue       text NOT NULL REFERENCES venues,
-      entertainer text NOT NULL REFERENCES entertainers,
-      date_time   text NULL,
-      sales_begin text NULL,
-      sales_end   text NULL
+      address     text    PRIMARY KEY NOT NULL,
+      venue       text    NOT NULL REFERENCES venues,
+      entertainer text    NOT NULL REFERENCES entertainers,
+      date_time   text    NULL,
+      sales_begin text    NULL,
+      sales_end   text    NULL,
+      finalized   boolean NOT NULL DEFAULT FALSE
     );
   `;
 };
@@ -85,14 +86,14 @@ export const createTicketsTable = async (): Promise<
 > => {
   return sql`
     CREATE TABLE IF NOT EXISTS tickets (
-      token       text NOT NULL,
+      token       text    NOT NULL,
       serial      integer NOT NULL,
-      venue       text NOT NULL REFERENCES venues,
-      entertainer text NOT NULL REFERENCES entertainers,
-      event       text NOT NULL REFERENCES events,
-      section     text NOT NULL,
-      scanned_at  text NULL,
-      scanned_by  text NULL,
+      venue       text    NOT NULL REFERENCES venues,
+      entertainer text    NOT NULL REFERENCES entertainers,
+      event       text    NOT NULL REFERENCES events,
+      section     text    NOT NULL,
+      scanned_at  text    NULL,
+      scanned_by  text    NULL,
       PRIMARY KEY(token, serial)
     );
   `;
@@ -274,11 +275,12 @@ export const insertEvent = async ({
   venue,
   entertainer,
   dateTime,
-  ticketSalesBegin,
-  ticketSalesEnd,
+  salesBegin: ticketSalesBegin,
+  salesEnd: ticketSalesEnd,
+  finalized,
 }: Event): Promise<QueryResult<QueryResultRow>> => {
   return sql`
-    INSERT INTO events ( address, venue, entertainer, date_time, sales_begin, sales_end )
+    INSERT INTO events ( address, venue, entertainer, date_time, sales_begin, sales_end, finalized )
     SELECT
       ${address},
       (
@@ -295,7 +297,8 @@ export const insertEvent = async ({
       ),
       ${dateTime?.toISOString()},
       ${ticketSalesBegin?.toISOString()},
-      ${ticketSalesEnd?.toISOString()};
+      ${ticketSalesEnd?.toISOString()},
+      ${finalized ?? false};
   `;
 };
 

@@ -1,9 +1,11 @@
 import { ReactElement } from "react";
+import { twMerge } from "tailwind-merge";
 import useEntertainers from "@/lib/useEntertainers";
 import { Card } from "@/components/common/Card";
 import Loading from "@/components/views/Loading";
+import { Hidable } from "@/components/componentTypes";
 
-export const Entertainers = (): ReactElement => {
+export const Entertainers = ({ isHidden }: Hidable): ReactElement => {
   const { data: entertainers, isLoading } = useEntertainers();
 
   const getContent = (): ReactElement => {
@@ -21,5 +23,5 @@ export const Entertainers = (): ReactElement => {
     );
   };
 
-  return <div>{getContent()}</div>;
+  return <div className={twMerge(isHidden && "hidden")}>{getContent()}</div>;
 };

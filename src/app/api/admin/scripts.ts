@@ -295,9 +295,9 @@ export const insertEvent = async ({
         WHERE account = ${entertainer}
         LIMIT 1
       ),
-      ${dateTime?.toISOString()},
-      ${ticketSalesBegin?.toISOString()},
-      ${ticketSalesEnd?.toISOString()},
+      ${dateTime},
+      ${ticketSalesBegin},
+      ${ticketSalesEnd},
       ${finalized ?? false};
   `;
 };

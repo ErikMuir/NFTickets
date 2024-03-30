@@ -128,9 +128,9 @@ export const insertEvent = async (event: Event): Promise<void> => {
         WHERE account = ${event.entertainer}
         LIMIT 1
       ),
-      ${event.dateTime?.toISOString()},
-      ${event.salesBegin?.toISOString()},
-      ${event.salesEnd?.toISOString()},
+      ${event.dateTime},
+      ${event.salesBegin},
+      ${event.salesEnd},
       ${event.finalized};
   `;
   if (rowCount === 0) {
@@ -142,9 +142,9 @@ export const updateEvent = async (event: Event): Promise<void> => {
   const { rowCount } = await sql`
     UPDATE events
     SET
-      date_time = ${event.dateTime?.toISOString()},
-      sales_begin = ${event.salesBegin?.toISOString()},
-      sales_end = ${event.salesEnd?.toISOString()},
+      date_time = ${event.dateTime},
+      sales_begin = ${event.salesBegin},
+      sales_end = ${event.salesEnd},
       finalized = ${event.finalized}
     WHERE address = ${event.address}
   `;

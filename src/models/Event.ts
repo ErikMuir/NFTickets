@@ -5,9 +5,9 @@ export type Event = {
   address: string;
   venue: string;
   entertainer: string;
-  dateTime?: Date;
-  salesBegin?: Date;
-  salesEnd?: Date;
+  dateTime?: string;
+  salesBegin?: string;
+  salesEnd?: string;
   finalized: boolean;
 };
 
@@ -15,9 +15,9 @@ export type EventDto = {
   address: string;
   venue: Partial<Venue>;
   entertainer: Partial<Entertainer>;
-  dateTime?: Date;
-  salesBegin?: Date;
-  salesEnd?: Date;
+  dateTime?: string;
+  salesBegin?: string;
+  salesEnd?: string;
   finalized: boolean;
   preSales: boolean;
   postSales: boolean;
@@ -59,9 +59,9 @@ export const mapEventFromDb = ({
       name: entertainer_name,
       imageUrl: entertainer_image_url,
     },
-    dateTime: date_time ? new Date(date_time) : undefined,
-    salesBegin: sales_begin ? new Date(sales_begin) : undefined,
-    salesEnd: sales_end ? new Date(sales_end) : undefined,
+    dateTime: date_time,
+    salesBegin: sales_begin,
+    salesEnd: sales_end,
     finalized,
     preSales,
     postSales,
@@ -94,9 +94,9 @@ export const mapEventFromApi = ({
       name: entertainer.name,
       imageUrl: entertainer.imageUrl,
     },
-    dateTime: dateTime ? new Date(dateTime) : undefined,
-    salesBegin: salesBegin ? new Date(salesBegin) : undefined,
-    salesEnd: salesEnd ? new Date(salesEnd) : undefined,
+    dateTime,
+    salesBegin,
+    salesEnd,
     finalized,
     preSales: salesBegin && salesBegin > now,
     postSales: salesEnd && salesEnd <= now,

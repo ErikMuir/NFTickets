@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import LoggedOut from "@/components/views/LoggedOut";
-import Loading from "@/components/views/Loading";
+import { Loading } from "@/components/views/Loading";
 import useUser from "@/lib/user/useUser";
 import { Role } from "@/models";
 

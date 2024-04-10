@@ -14,6 +14,9 @@ export const muiTheme = createTheme({
     info: {
       main: "#3b719f",
     },
+    warning: {
+      main: "#ed6c02",
+    },
     error: {
       main: "#ef5350",
     },

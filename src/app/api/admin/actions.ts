@@ -1,33 +1,34 @@
-import { QueryResult } from "@vercel/postgres";
 import { NextResponse } from "next/server";
+import { QueryResult, sql } from "@vercel/postgres";
 import { Role } from "@/models";
+import { entertainers, events, venues } from "@/demo-data";
 import { Tables } from "./types";
 import {
   createEntertainersTable,
+  createEventsTable,
+  createSectionsTable,
+  createTicketsTable,
   createVenuesTable,
   createWalletsTable,
+  deleteAllEntertainers,
+  deleteAllEvents,
+  deleteAllSections,
+  deleteAllTickets,
+  deleteAllVenues,
   deleteAllWallets,
   dropEntertainersTable,
+  dropEventsTable,
+  dropSectionsTable,
+  dropTicketsTable,
   dropVenuesTable,
   dropWalletsTable,
   insertEntertainer,
-  insertVenue,
-  insertWallet,
-  createEventsTable,
-  createTicketsTable,
-  deleteAllEvents,
-  deleteAllTickets,
-  deleteAllVenues,
-  deleteAllEntertainers,
-  dropTicketsTable,
-  dropEventsTable,
-  createSectionsTable,
-  deleteAllSections,
-  dropSectionsTable,
   insertEvent,
   insertSection,
+  insertVenue,
+  insertWallet,
 } from "./scripts";
-import { entertainers, events, venues } from "@/demo-data";
+import { getWallet, updateWallet } from "@/clients/db";
 
 export async function up(): Promise<NextResponse> {
   const results: Record<string, QueryResult> = {};
@@ -187,6 +188,10 @@ export async function seed(): Promise<NextResponse> {
 }
 
 export async function adHoc() {
-  const result = {}; // <---- change this to whatever you need to do on the fly
+  // const result = {}; // <---- change this to whatever you need to do on the fly
+  const wallet = await getWallet("0.0.2935");
+  if (!wallet) return NextResponse.json({}, { status: 404 });
+  wallet.role = Role.ATTENDEE;
+  const result = await updateWallet(wallet);
   return NextResponse.json({ result }, { status: 200 });
 }

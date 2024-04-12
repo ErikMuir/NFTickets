@@ -4,7 +4,7 @@ import React from "react";
 import { Jost } from "next/font/google";
 import { ThemeProvider } from "@mui/material/styles";
 import { Footer } from "@/components/globals/Footer";
-import { Header } from "@/components/globals/Header/Header";
+import { Header } from "@/components/globals/Header";
 import { muiTheme } from "@/styles/mui-theme";
 import "@/styles/globals.css";
 import { twMerge } from "tailwind-merge";

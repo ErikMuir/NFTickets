@@ -1,8 +1,8 @@
 import { ReactElement, useState, useCallback } from "react";
-import { Entertainers } from "./Entertainers";
-import { Venues } from "./Venues";
-import { Events } from "./Events";
 import { Tabs } from "@/components/common/Tabs";
+import { Entertainers } from "./Attendee/Entertainers";
+import { Venues } from "./Attendee/Venues";
+import { Events } from "./Attendee/Events";
 
 const attendeeTabs = ["Events", "Entertainers", "Venues"];
 

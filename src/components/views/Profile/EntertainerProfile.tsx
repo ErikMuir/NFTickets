@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import useEntertainer from "@/lib/useEntertainer";
-import { Entertainer, EntertainerType } from "@/models";
-import { Button } from "@/components/common/Button";
-import { Loading } from "@/components/views/Loading";
-import { AccountProp, SelectValue } from "@/components/componentTypes";
-import { Select } from "../../common/Select";
-import { TextArea } from "../../common/TextArea";
-import { TextField } from "../../common/TextField";
-import { ErrorMessage } from "@/components/common/ErrorMessage";
 import { fetchStandardJson } from "@/lib/fetch-json";
+import { Entertainer, EntertainerType } from "@/models";
+import { AccountProp, SelectValue } from "@/components/componentTypes";
+import { Button } from "@/components/common/Button";
+import { ErrorMessage } from "@/components/common/ErrorMessage";
+import { Select } from "@/components/common/Select";
+import { TextArea } from "@/components/common/TextArea";
+import { TextField } from "@/components/common/TextField";
+import { Loading } from "@/components/common/Loading";
 
 export const entertainerTypeOptions: Record<string, SelectValue> = {
   Music: EntertainerType.MUSIC,

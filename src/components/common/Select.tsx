@@ -4,7 +4,10 @@ import {
   MenuItem,
   Select as MuiSelect,
 } from "@mui/material";
-import { SelectFormControlProps, SelectValue } from "../componentTypes";
+import {
+  SelectFormControlProps,
+  SelectValue,
+} from "@/components/componentTypes";
 
 const coerceSelectValue = (value: SelectValue): string | undefined =>
   value === undefined ? undefined : `${value}`;

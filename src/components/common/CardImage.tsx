@@ -1,7 +1,12 @@
 import Image from "next/image";
 import { ReactElement } from "react";
 import { twMerge } from "tailwind-merge";
-import { CardImageProps } from "./cardTypes";
+
+export type CardImageProps = {
+  imageUrl: string;
+  overlayText?: string;
+  className?: string;
+};
 
 export const CardImage = ({
   imageUrl,
@@ -19,13 +24,13 @@ export const CardImage = ({
   return (
     <div className={containerClassName}>
       <Image
-          src={imageUrl}
-          className={imageClassName}
-          width={1092}
-          height={614}
-          alt={imageUrl}
-        />
-        {overlayText && <div className={overlayClassName}>{overlayText}</div>}
+        src={imageUrl}
+        className={imageClassName}
+        width={1092}
+        height={614}
+        alt={imageUrl}
+      />
+      {overlayText && <div className={overlayClassName}>{overlayText}</div>}
     </div>
   );
 };

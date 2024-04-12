@@ -1,10 +1,10 @@
 import useUser from "@/lib/user/useUser";
 import { Role } from "@/models";
-import { Loading } from "../Loading";
-import Unauthorized from "../Unauthorized";
-import AttendeeProfile from "./AttendeeProfile";
-import EntertainerProfile from "./EntertainerProfile";
-import VenueProfile from "./VenueProfile";
+import { Loading } from "@/components/common/Loading";
+import Unauthorized from "@/components/views/Unauthorized";
+import AttendeeProfile from "./Profile/AttendeeProfile";
+import EntertainerProfile from "./Profile/EntertainerProfile";
+import VenueProfile from "./Profile/VenueProfile";
 
 export default function Profile() {
   const { data: user, isLoading: isUserLoading } = useUser();

@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { up, down, reset, seed, adHoc } from "./actions";
+import { up, down, reset, seed, adHoc, setRole } from "./actions";
 import { Actions } from "./types";
 import { authorizeAdmin } from "@/server-utils/authorize-admin";
 import { ForbiddenError } from "@/server-utils/api-errors";
+import { knownLookup, lookup } from "@/common-utils/enums";
+import { Role } from "@/models";
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   const { searchParams } = request.nextUrl;
@@ -20,6 +22,10 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         return await reset();
       case Actions.SEED:
         return await seed();
+      case Actions.SET_ROLE:
+        const account = searchParams.get("account") || "";
+        const role = knownLookup(Role, searchParams.get("role") || "");
+        return await setRole(account, role);
       case Actions.AD_HOC:
         return await adHoc();
       case Actions.NONE:

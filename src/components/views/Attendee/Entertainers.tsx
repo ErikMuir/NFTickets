@@ -2,7 +2,7 @@ import { ReactElement } from "react";
 import { twMerge } from "tailwind-merge";
 import useEntertainers from "@/lib/useEntertainers";
 import { Card } from "@/components/common/Card";
-import { Loading } from "@/components/views/Loading";
+import { Loading } from "@/components/common/Loading";
 import { Hidable } from "@/components/componentTypes";
 
 export const Entertainers = ({ isHidden }: Hidable): ReactElement => {

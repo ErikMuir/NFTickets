@@ -4,6 +4,7 @@ export enum Actions {
   DOWN = "down",
   RESET = "reset",
   SEED = "seed",
+  SET_ROLE = "set-role",
   AD_HOC = "ad-hoc",
 }
 

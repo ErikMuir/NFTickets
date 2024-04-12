@@ -28,7 +28,13 @@ import {
   insertVenue,
   insertWallet,
 } from "./scripts";
-import { getEntertainer, getWallet, updateEntertainer, updateWallet } from "@/clients/db";
+import {
+  getEntertainer,
+  getVenue,
+  getWallet,
+  updateEntertainer,
+  updateWallet,
+} from "@/clients/db";
 
 export async function up(): Promise<NextResponse> {
   const results: Record<string, QueryResult> = {};
@@ -187,7 +193,38 @@ export async function seed(): Promise<NextResponse> {
   }
 }
 
-export async function adHoc() {
+export async function setRole(
+  account: string,
+  role: Role
+): Promise<NextResponse> {
+  try {
+    const wallet = await getWallet(account);
+    if (!wallet) return NextResponse.json({}, { status: 404 });
+    await updateWallet({ ...wallet, role });
+
+    if (role === Role.ENTERTAINER) {
+      const entertainer = await getEntertainer(account);
+      if (!entertainer)
+        await insertEntertainer({
+          account,
+          name: "",
+          type: EntertainerType.UNKNOWN,
+        });
+    }
+
+    if (role === Role.VENUE) {
+      const venue = await getVenue(account);
+      if (!venue) await insertVenue({ account, name: "" });
+    }
+
+    return NextResponse.json({}, { status: 200 });
+  } catch (error) {
+    console.log(error);
+    return NextResponse.json({ error }, { status: 500 });
+  }
+}
+
+export async function adHoc(): Promise<NextResponse> {
   //---------------------------------------------------
   // change this to whatever you need to do on the fly
   //---------------------------------------------------

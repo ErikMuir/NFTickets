@@ -1,5 +1,5 @@
-import { SelectChangeEvent } from "@mui/material";
 import { ChangeEvent } from "react";
+import { SelectChangeEvent } from "@mui/material";
 
 export type Hidable = {
   isHidden?: boolean;
@@ -28,4 +28,3 @@ export type SelectFormControlProps = BaseFormControlProps & {
   value: SelectValue;
   onChange: (e: SelectChangeEvent) => void;
 };
-

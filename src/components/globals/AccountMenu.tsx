@@ -1,11 +1,16 @@
-import { AccountBalanceWallet, ArrowDropDown, LinkOff, Person } from "@mui/icons-material";
+import {
+  AccountBalanceWallet,
+  ArrowDropDown,
+  LinkOff,
+  Person,
+} from "@mui/icons-material";
 import { Menu, MenuItem, MenuList } from "@mui/material";
 import { MessageTypes } from "hashconnect";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 import { Button } from "@/components/common/Button";
-import { ConnectModal } from "@/components/globals/Header/ConnectModal";
+import { ConnectModal } from "@/components/globals/ConnectModal";
 import { hashconnect } from "@/lib/hashconnect";
 import { getHashConnectWallet } from "@/lib/hashconnect/HashconnectWallet";
 import useUser from "@/lib/user/useUser";

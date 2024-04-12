@@ -2,7 +2,7 @@ import { ReactElement } from "react";
 import { twMerge } from "tailwind-merge";
 import { toFriendlyDateTime } from "@/common-utils/dates";
 import { Card } from "@/components/common/Card";
-import { Loading } from "@/components/views/Loading";
+import { Loading } from "@/components/common/Loading";
 import { Hidable } from "@/components/componentTypes";
 import useEvents from "@/lib/useEvents";
 import { sortEvents } from "./attendeeHelpers";

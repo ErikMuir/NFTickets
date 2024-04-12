@@ -1,7 +1,15 @@
 import { ReactElement } from "react";
 import { twMerge } from "tailwind-merge";
-import { CardProps } from "./cardTypes";
 import { CardImage } from "./CardImage";
+
+export type CardProps = {
+  title?: string;
+  subtitle?: string;
+  description?: string;
+  imageUrl?: string;
+  overlayText?: string;
+  className?: string;
+};
 
 export const Card = ({
   title,
@@ -18,12 +26,14 @@ export const Card = ({
   const hasText = title || subtitle || description;
   return (
     <div className={styles}>
-      {imageUrl && <CardImage imageUrl={imageUrl} overlayText={overlayText}  />}
+      {imageUrl && <CardImage imageUrl={imageUrl} overlayText={overlayText} />}
       {hasText && (
         <div className="p-2 bg-neutral-100">
           {title && <div className="text-xl text-center">{title}</div>}
           {subtitle && <div className="text-md text-center">{subtitle}</div>}
-          {description && <div className="text-sm text-center">{description}</div>}
+          {description && (
+            <div className="text-sm text-center">{description}</div>
+          )}
         </div>
       )}
     </div>

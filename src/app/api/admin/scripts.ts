@@ -137,46 +137,6 @@ export const dropTicketsTable = async (): Promise<
   return sql`DROP TABLE IF EXISTS tickets;`;
 };
 
-////////////---> delete <---////////////
-
-export const deleteWallet = async (
-  account: string
-): Promise<QueryResult<QueryResultRow>> => {
-  return sql`DELETE FROM wallets WHERE account = ${account};`;
-};
-
-export const deleteEntertainer = async (
-  account: string
-): Promise<QueryResult<QueryResultRow>> => {
-  return sql`DELETE FROM entertainers WHERE account = ${account};`;
-};
-
-export const deleteVenue = async (
-  account: string
-): Promise<QueryResult<QueryResultRow>> => {
-  return sql`DELETE FROM venues WHERE account = ${account};`;
-};
-
-export const deleteSection = async (
-  venue: string,
-  section: string
-): Promise<QueryResult<QueryResultRow>> => {
-  return sql`DELETE FROM sections WHERE venue = ${venue} AND section = ${section};`;
-};
-
-export const deleteEvent = async (
-  address: string
-): Promise<QueryResult<QueryResultRow>> => {
-  return sql`DELETE FROM events WHERE address = ${address};`;
-};
-
-export const deleteTicket = async (
-  token: string,
-  serial: number
-): Promise<QueryResult<QueryResultRow>> => {
-  return sql`DELETE FROM tickets WHERE token = ${token} AND serial = ${serial};`;
-};
-
 ////////////---> delete all <---////////////
 
 export const deleteAllWallets = async (): Promise<

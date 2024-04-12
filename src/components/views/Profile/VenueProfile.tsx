@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import useVenue from "@/lib/useVenue";
-import { Venue } from "@/models";
-import { Button } from "@/components/common/Button";
-import { Loading } from "@/components/views/Loading";
-import { AccountProp } from "@/components/componentTypes";
-import { TextField } from "../../common/TextField";
-import { TextArea } from "../../common/TextArea";
-import { ErrorMessage } from "@/components/common/ErrorMessage";
 import { fetchStandardJson } from "@/lib/fetch-json";
+import { Venue } from "@/models";
+import { AccountProp } from "@/components/componentTypes";
+import { Button } from "@/components/common/Button";
+import { ErrorMessage } from "@/components/common/ErrorMessage";
+import { TextField } from "@/components/common/TextField";
+import { TextArea } from "@/components/common/TextArea";
+import { Loading } from "@/components/common/Loading";
 
 export default function VenueProfile({ account }: AccountProp) {
   const [name, setName] = useState<string>("");

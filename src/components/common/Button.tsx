@@ -1,7 +1,34 @@
-import { PropsWithChildren, ReactElement } from "react";
+import {
+  MouseEventHandler,
+  PropsWithChildren,
+  ReactElement,
+  ReactNode,
+} from "react";
 import { Button as MuiButton } from "@mui/material";
 import { twMerge } from "tailwind-merge";
-import { ButtonProps } from "./buttonTypes";
+
+export type ButtonSize = "small" | "medium" | "large";
+export type ButtonVariant = "contained" | "outlined" | "text";
+export type ButtonColor =
+  | "inherit"
+  | "primary"
+  | "secondary"
+  | "success"
+  | "error"
+  | "info"
+  | "warning";
+
+export type ButtonProps = {
+  className?: string;
+  color?: ButtonColor;
+  size?: ButtonSize;
+  variant?: ButtonVariant;
+  startIcon?: ReactNode;
+  endIcon?: ReactNode;
+  disabled?: boolean;
+  fullWidth?: boolean;
+  onClick?: MouseEventHandler<HTMLButtonElement>;
+};
 
 export const Button = ({
   className = "",
@@ -18,7 +45,7 @@ export const Button = ({
   const styles = twMerge(
     "self-center",
     variant === "contained" && color === "secondary" && "text-white",
-    className,
+    className
   );
   return (
     <MuiButton

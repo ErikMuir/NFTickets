@@ -22,11 +22,10 @@ export const mapVenue = ({
 }: any): Venue => ({
   account,
   name,
-  description,
-  address,
-  city,
-  state,
-  zip,
-  imageUrl: image_url,
-  sections: {},
+  description: description || undefined,
+  address: address || undefined,
+  city: city || undefined,
+  state: state || undefined,
+  zip: zip || undefined,
+  imageUrl: image_url || undefined,
 });

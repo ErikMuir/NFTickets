@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { QueryResult, sql } from "@vercel/postgres";
-import { Role } from "@/models";
+import { EntertainerType, Role } from "@/models";
 import { entertainers, events, venues } from "@/demo-data";
 import { Tables } from "./types";
 import {
@@ -28,7 +28,7 @@ import {
   insertVenue,
   insertWallet,
 } from "./scripts";
-import { getWallet, updateWallet } from "@/clients/db";
+import { getEntertainer, getWallet, updateEntertainer, updateWallet } from "@/clients/db";
 
 export async function up(): Promise<NextResponse> {
   const results: Record<string, QueryResult> = {};
@@ -188,10 +188,16 @@ export async function seed(): Promise<NextResponse> {
 }
 
 export async function adHoc() {
-  // const result = {}; // <---- change this to whatever you need to do on the fly
-  const wallet = await getWallet("0.0.2935");
+  //---------------------------------------------------
+  // change this to whatever you need to do on the fly
+  //---------------------------------------------------
+  const account = "0.0.2935";
+  const wallet = await getWallet(account);
   if (!wallet) return NextResponse.json({}, { status: 404 });
-  wallet.role = Role.ATTENDEE;
-  const result = await updateWallet(wallet);
+  wallet.role = Role.VENUE;
+  await updateWallet(wallet);
+  const result = await insertVenue({ account, name: "" });
+  //---------------------------------------------------
+
   return NextResponse.json({ result }, { status: 200 });
 }

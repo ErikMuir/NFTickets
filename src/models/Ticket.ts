@@ -26,5 +26,5 @@ export const mapTicket = ({
   event,
   section,
   scannedAt: scanned_at ? new Date(scanned_at) : undefined,
-  scannedBy: scanned_by,
+  scannedBy: scanned_by || undefined,
 });

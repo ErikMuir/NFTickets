@@ -20,7 +20,7 @@ export default function Profile() {
       <div className="text-6xl pt-4 pb-12">Profile</div>
       {role === Role.ATTENDEE && <AttendeeProfile />}
       {role === Role.ENTERTAINER && <EntertainerProfile account={accountId} />}
-      {role === Role.VENUE && <VenueProfile />}
+      {role === Role.VENUE && <VenueProfile account={accountId} />}
     </div>
   );
 }

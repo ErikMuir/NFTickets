@@ -5,6 +5,6 @@ import useSWR from "swr";
 import { fetchStandardJson } from "./fetch-json";
 import { Entertainer } from "@/models";
 
-export default function useEntertainer(accountId: string) {
-  return useSWR<Entertainer>(`/api/entertainers/${accountId}`, fetchStandardJson);
+export default function useEntertainer(account: string) {
+  return useSWR<Entertainer>(`/api/entertainers/${account}`, fetchStandardJson);
 }

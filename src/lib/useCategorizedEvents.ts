@@ -4,13 +4,10 @@ import useSWR from "swr";
 
 import { fetchStandardJson } from "./fetch-json";
 import { EventDto, mapEventFromApi } from "@/models";
+import { CategorizedEvents } from "@/models/Event";
+import { EventFilterProps } from "./useEvents";
 
-export type EventFilterProps = {
-  venue?: string;
-  entertainer?: string;
-};
-
-export default function useEvents({
+export default function useCategorizedEvents({
   venue,
   entertainer,
 }: EventFilterProps = {}) {
@@ -28,10 +25,22 @@ export default function useEvents({
     fetchStandardJson
   );
 
+  const categorizedEvents: CategorizedEvents = {
+    unfinalized: [],
+    upcoming: [],
+    past: [],
+  };
+
+  swrResponse.data?.forEach((event) => {
+    const mappedEvent = mapEventFromApi(event);
+    if (!mappedEvent.finalized) categorizedEvents.unfinalized.push(mappedEvent);
+    else if (!mappedEvent.pastEvent)
+      categorizedEvents.upcoming.push(mappedEvent);
+    else categorizedEvents.past.push(mappedEvent);
+  });
+
   return {
     ...swrResponse,
-    data: swrResponse.data
-      ?.filter((ev) => ev.finalized)
-      .map(mapEventFromApi),
+    data: categorizedEvents,
   };
 }

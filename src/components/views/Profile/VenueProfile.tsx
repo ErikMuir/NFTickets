@@ -63,6 +63,14 @@ export default function VenueProfile({ account }: AccountProp) {
   return (
     <form onSubmit={submit} className="flex flex-col w-full items-center gap-4">
       <TextField
+        id="role"
+        label="Role"
+        fullWidth
+        value="Venue"
+        onChange={() => {}}
+        disabled
+      />
+      <TextField
         id="name"
         label="Name"
         fullWidth

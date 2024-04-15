@@ -17,6 +17,7 @@ export const Select = ({
   label,
   className,
   fullWidth,
+  disabled,
   value,
   onChange,
   options,
@@ -32,6 +33,7 @@ export const Select = ({
         className={className}
         value={coerceSelectValue(value)}
         onChange={onChange}
+        disabled={disabled}
       >
         {options &&
           Object.entries(options).map(([key, value]) => (

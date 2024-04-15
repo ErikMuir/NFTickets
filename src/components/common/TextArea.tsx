@@ -6,6 +6,7 @@ export const TextArea = ({
   label,
   className,
   fullWidth,
+  disabled,
   value,
   onChange,
 }: TextFormControlProps) => {
@@ -20,6 +21,7 @@ export const TextArea = ({
         rows={4}
         value={value}
         onChange={onChange}
+        disabled={disabled}
       />
     </FormControl>
   );

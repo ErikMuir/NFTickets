@@ -24,6 +24,24 @@ export type EventDto = {
   pastEvent: boolean;
 };
 
+export enum EventCategory {
+  UNFINALIZED_EVENTS = "Unfinalized Events",
+  UPCOMING_EVENTS = "Upcoming Events",
+  PAST_EVENTS = "Past Events",
+}
+
+export const eventTabs = [
+  EventCategory.UNFINALIZED_EVENTS,
+  EventCategory.UPCOMING_EVENTS,
+  EventCategory.PAST_EVENTS,
+];
+
+export type CategorizedEvents = {
+  unfinalized: EventDto[];
+  upcoming: EventDto[];
+  past: EventDto[];
+};
+
 export const mapEventFromDb = ({
   address,
   date_time,

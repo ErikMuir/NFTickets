@@ -6,6 +6,7 @@ export const TextField = ({
   label,
   className,
   fullWidth,
+  disabled,
   value,
   onChange,
 }: TextFormControlProps) => {
@@ -18,6 +19,7 @@ export const TextField = ({
         variant="outlined"
         value={value}
         onChange={onChange}
+        disabled={disabled}
       />
     </FormControl>
   );

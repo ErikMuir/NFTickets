@@ -21,7 +21,7 @@ export const getEvent = async (address: string): Promise<EventDto | null> => {
     FROM events AS ev
     INNER JOIN entertainers AS en ON en.account = ev.entertainer
     INNER JOIN venues AS v ON v.account = ev.venue
-    WHERE address = ${address};
+    WHERE ev.address = ${address};
   `;
   return result.rowCount === 0 ? null : mapEventFromDb(result.rows[0]);
 };
@@ -70,7 +70,7 @@ export const getEventsByVenue = async (venue: string): Promise<EventDto[]> => {
     FROM events AS ev
     INNER JOIN entertainers AS en ON en.account = ev.entertainer
     INNER JOIN venues AS v ON v.account = ev.venue
-    WHERE venue = ${venue};
+    WHERE ev.venue = ${venue};
   `;
   return result.rows.map(mapEventFromDb);
 };
@@ -97,7 +97,7 @@ export const getEventsByEntertainer = async (
     FROM events AS ev
     INNER JOIN entertainers AS en ON en.account = ev.entertainer
     INNER JOIN venues AS v ON v.account = ev.venue
-    WHERE entertainer = ${entertainer};
+    WHERE ev.entertainer = ${entertainer};
   `;
   return result.rows.map(mapEventFromDb);
 };

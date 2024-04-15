@@ -14,17 +14,18 @@ export type BaseFormControlProps = {
   label?: string;
   className?: string;
   fullWidth?: boolean;
+  disabled?: boolean;
 };
 
 export type TextFormControlProps = BaseFormControlProps & {
-  value: string | undefined;
-  onChange: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  value?: string;
+  onChange?: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
 };
 
 export type SelectValue = string | number | readonly string[] | undefined;
 
 export type SelectFormControlProps = BaseFormControlProps & {
   options: Record<string, SelectValue>;
-  value: SelectValue;
-  onChange: (e: SelectChangeEvent) => void;
+  value?: SelectValue;
+  onChange?: (e: SelectChangeEvent) => void;
 };

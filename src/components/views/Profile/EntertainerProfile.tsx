@@ -67,6 +67,14 @@ export default function EntertainerProfile({ account }: AccountProp) {
   return (
     <form onSubmit={submit} className="flex flex-col w-full items-center gap-4">
       <TextField
+        id="role"
+        label="Role"
+        fullWidth
+        value="Entertainer"
+        onChange={() => {}}
+        disabled
+      />
+      <TextField
         id="name"
         label="Name"
         fullWidth

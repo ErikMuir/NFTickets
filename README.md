@@ -4,8 +4,6 @@
 
 This project aims to create a standard for a ledger-based ticketing system for live events built in the Hedera ecosystem using Hedera's Token, Consensus, and Smart Contract services.
 
-> This project is team **solar-garlic**'s submission for the [Beyond Blockchain: Hashgraph Hackathon](https://go.beyondblockchain.dev/pg-homepage) in 2023.
-
 ## Problem Statement
 
 Live event promotors and ticket marketplaces (e.g. Live Nation, TicketMaster, StubHub) are regularly accused of unfair and opaque business practices due to their monopolization and centralization of the live event industry.

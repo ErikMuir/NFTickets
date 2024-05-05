@@ -7,7 +7,7 @@ import {
 import {
   SelectFormControlProps,
   SelectValue,
-} from "@/components/componentTypes";
+} from "@/components/component-types";
 
 const coerceSelectValue = (value: SelectValue): string | undefined =>
   value === undefined ? undefined : `${value}`;

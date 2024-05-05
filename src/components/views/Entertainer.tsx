@@ -1,26 +1,27 @@
-import { ReactElement, useState, useCallback, useEffect } from "react";
+import { ReactElement, useState, useCallback } from "react";
 import { Tabs } from "@/components/common/Tabs";
 import EntertainerEvents from "./Entertainer/Events";
-import useCategorizedEvents from "@/lib/useCategorizedEvents";
-import useUser from "@/lib/user/useUser";
-import { EventCategory, eventTabs } from "@/models/Event";
+import useEvents from "@/lib/useEvents";
+import { EventCategory } from "@/lib/events/event-helpers";
 import { lookup } from "@/common-utils/enums";
+import { Role } from "@/models";
+import { AccountProp } from "../component-types";
 
-export default function Entertainer(): ReactElement {
+export const eventTabs = [
+  EventCategory.UPCOMING_EVENTS,
+  EventCategory.UNFINALIZED_EVENTS,
+  EventCategory.PAST_EVENTS,
+];
+
+export default function Entertainer({ account }: AccountProp): ReactElement {
   const [currentTab, setCurrentTab] = useState(eventTabs[0]);
-  const [account, setAccount] = useState<string>();
-
-  const { data: user } = useUser();
   const {
-    data: { unfinalized, upcoming, past },
+    data: { past, unfinalized, upcoming },
     isLoading,
-  } = useCategorizedEvents({
-    entertainer: account,
+  } = useEvents({
+    role: Role.VENUE,
+    account,
   });
-
-  useEffect(() => {
-    setAccount(user?.accountId);
-  }, [user]);
 
   const handleTabChange = useCallback((tab: string): void => {
     const newTab = lookup(EventCategory, tab);

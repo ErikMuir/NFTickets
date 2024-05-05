@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import useEntertainer from "@/lib/useEntertainer";
 import { fetchStandardJson } from "@/lib/fetch-json";
 import { Entertainer, EntertainerType } from "@/models";
-import { AccountProp, SelectValue } from "@/components/componentTypes";
+import { AccountProp, SelectValue } from "@/components/component-types";
 import { Button } from "@/components/common/Button";
 import { ErrorMessage } from "@/components/common/ErrorMessage";
 import { Select } from "@/components/common/Select";

@@ -1,5 +1,5 @@
 import { FormControl, TextField as MuiTextField } from "@mui/material";
-import { TextFormControlProps } from "@/components/componentTypes";
+import { TextFormControlProps } from "@/components/component-types";
 
 export const TextField = ({
   id,

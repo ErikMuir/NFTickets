@@ -195,7 +195,8 @@ export async function seed(): Promise<NextResponse> {
 
 export async function setRole(
   account: string,
-  role: Role
+  role: Role,
+  name: string,
 ): Promise<NextResponse> {
   try {
     const wallet = await getWallet(account);
@@ -207,14 +208,14 @@ export async function setRole(
       if (!entertainer)
         await insertEntertainer({
           account,
-          name: "",
+          name,
           type: EntertainerType.UNKNOWN,
         });
     }
 
     if (role === Role.VENUE) {
       const venue = await getVenue(account);
-      if (!venue) await insertVenue({ account, name: "" });
+      if (!venue) await insertVenue({ account, name });
     }
 
     return NextResponse.json({}, { status: 200 });

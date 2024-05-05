@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import useVenue from "@/lib/useVenue";
 import { fetchStandardJson } from "@/lib/fetch-json";
 import { Venue } from "@/models";
-import { AccountProp } from "@/components/componentTypes";
+import { AccountProp } from "@/components/component-types";
 import { Button } from "@/components/common/Button";
 import { ErrorMessage } from "@/components/common/ErrorMessage";
 import { TextField } from "@/components/common/TextField";

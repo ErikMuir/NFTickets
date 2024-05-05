@@ -3,35 +3,21 @@
 import useSWR from "swr";
 
 import { fetchStandardJson } from "./fetch-json";
-import { EventDto, mapEventFromApi } from "@/models";
+import { EventDto } from "@/models";
+import {
+  RoleAccountFilter,
+  queryStringFromRoleAccountFilter,
+} from "./role-account-filter";
+import { CategorizedEvents } from "./events/event-helpers";
 
-export type EventFilterProps = {
-  venue?: string;
-  entertainer?: string;
-};
-
-export default function useEvents({
-  venue,
-  entertainer,
-}: EventFilterProps = {}) {
-  const params: Record<string, string> = {};
-  if (venue) params["venue"] = venue;
-  if (entertainer) params["entertainer"] = entertainer;
-
-  const queryString = Object.entries(params)
-    .filter(([key, value]) => key.length && value.length)
-    .map(([key, value]) => `${key}=${value}`)
-    .join("&");
-
+export default function useEvents(filter: RoleAccountFilter = {}) {
   const swrResponse = useSWR<EventDto[]>(
-    `/api/events?${queryString}`,
+    `/api/events?${queryStringFromRoleAccountFilter(filter)}`,
     fetchStandardJson
   );
-
   return {
-    ...swrResponse,
-    data: swrResponse.data
-      ?.filter((ev) => ev.finalized)
-      .map(mapEventFromApi),
+    data: new CategorizedEvents(swrResponse.data, filter.role).value,
+    isLoading: swrResponse.isLoading,
+    error: swrResponse.error,
   };
 }

@@ -3,7 +3,7 @@ import { twMerge } from "tailwind-merge";
 import useEntertainers from "@/lib/useEntertainers";
 import { Card } from "@/components/common/Card";
 import { Loading } from "@/components/common/Loading";
-import { Hidable } from "@/components/componentTypes";
+import { Hidable } from "@/components/component-types";
 
 export const Entertainers = ({ isHidden }: Hidable): ReactElement => {
   const { data: entertainers, isLoading } = useEntertainers();

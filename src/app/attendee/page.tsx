@@ -16,5 +16,5 @@ export default function AttendeeRoute() {
     redirect("/");
   }
 
-  return <Attendee />;
+  return <Attendee account={user.accountId} />;
 }

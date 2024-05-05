@@ -16,5 +16,5 @@ export default function EntertainerRoute() {
     redirect("/");
   }
 
-  return <Entertainer />;
+  return <Entertainer account={user.accountId} />;
 }

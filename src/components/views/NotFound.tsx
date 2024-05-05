@@ -1,7 +1,7 @@
-export default function Unauthorized() {
+export default function NotFound() {
   return (
     <div className="text-center mt-8">
-      404 Not Found
+      404 | Not Found
     </div>
   );
 }

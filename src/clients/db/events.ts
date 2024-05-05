@@ -102,6 +102,33 @@ export const getEventsByEntertainer = async (
   return result.rows.map(mapEventFromDb);
 };
 
+export const getEventByAddress = async (
+  address: string
+): Promise<EventDto[]> => {
+  const result = await sql`
+    SELECT
+      ev.address,
+      ev.date_time,
+      ev.sales_begin,
+      ev.sales_end,
+      ev.finalized,
+      v.account AS venue_account,
+      v.name AS venue_name,
+      v.address AS venue_address,
+      v.city AS venue_city,
+      v.state AS venue_state,
+      v.zip AS venue_zip,
+      en.account AS entertainer_account,
+      en.name AS entertainer_name,
+      en.image_url AS entertainer_image_url
+    FROM events AS ev
+    INNER JOIN entertainers AS en ON en.account = t.entertainer
+    INNER JOIN venues AS v ON v.account = t.venue
+    WHERE ev.address = ${address};
+  `;
+  return result.rows.map(mapEventFromDb);
+};
+
 export const insertEvent = async (event: Event): Promise<void> => {
   const { rowCount } = await sql`
     INSERT INTO events

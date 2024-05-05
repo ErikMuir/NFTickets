@@ -16,5 +16,5 @@ export default function VenueRoute() {
     redirect("/");
   }
 
-  return <Venue />;
+  return <Venue account={user.accountId} />;
 }

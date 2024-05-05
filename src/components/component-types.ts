@@ -1,5 +1,7 @@
 import { ChangeEvent } from "react";
 import { SelectChangeEvent } from "@mui/material";
+import { EventCategory } from "@/lib/events/event-helpers";
+import { EventDto } from "@/models";
 
 export type Hidable = {
   isHidden?: boolean;
@@ -28,4 +30,11 @@ export type SelectFormControlProps = BaseFormControlProps & {
   options: Record<string, SelectValue>;
   value?: SelectValue;
   onChange?: (e: SelectChangeEvent) => void;
+};
+
+export type EventsTabProps = {
+  tab: EventCategory;
+  currentTab: string;
+  isLoading?: boolean;
+  events: EventDto[];
 };

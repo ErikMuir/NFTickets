@@ -5,13 +5,13 @@ import { getIronSession } from "iron-session";
 import invariant from "tiny-invariant";
 import { getHederaSigningService } from "@/clients/hedera/signing-service";
 import { getAccountInfo } from "@/clients/mirror";
-import { toUint8Array } from "@/common-utils/arrays";
-import { badRequest, forbidden, success } from "@/server-utils/api-responses";
+import { toUint8Array } from "@/utils/common/arrays";
+import { badRequest, forbidden, success } from "@/utils/server/api-responses";
 import {
   errorResponse,
   methodNotAllowed,
   unauthenticated,
-} from "@/server-utils/api-responses";
+} from "@/utils/server/api-responses";
 import { Network } from "@/clients/hedera/types";
 import { sessionOptions } from "@/lib/user/session";
 import { HashconnectAuthenticationRequest } from "@/lib/hashconnect/types";

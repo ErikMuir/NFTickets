@@ -1,31 +1,34 @@
-import { Close } from "@mui/icons-material";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  PropsWithChildren,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import ReactDOM from "react-dom";
+import { Close } from "@mui/icons-material";
+import { twMerge } from "tailwind-merge";
+import { BaseModalProps } from "@/components/component-types";
 
 export const Modal = ({
   id,
   show,
   onClose,
-  children,
   title,
   className,
   showClose,
-}: {
-  id?: string;
-  show: boolean;
-  onClose: () => void;
-  children: any;
-  title: string | undefined;
-  className?: string;
-  showClose?: boolean;
-}) => {
+  children,
+}: PropsWithChildren<BaseModalProps>) => {
   const [isBrowser, setIsBrowser] = useState(false);
 
   const modalWrapperRef = useRef() as React.MutableRefObject<HTMLDivElement>;
 
   const backDropHandler = useCallback(
     (event: any) => {
-      if (modalWrapperRef?.current && !modalWrapperRef?.current?.contains(event.target)) {
+      if (
+        modalWrapperRef?.current &&
+        !modalWrapperRef?.current?.contains(event.target)
+      ) {
         onClose();
       }
     },
@@ -45,11 +48,19 @@ export const Modal = ({
 
   const modalContent = show ? (
     <div
-      id={id}
-      className="modal-overlay fixed top-0 left-0 w-full h-full overflow-x-hidden flex justify-center items-center z-10"
-      style={{ backgroundColor: "rgba(0, 0, 0, 0.4)" }}
+      id={`${id}-modal`}
+      className={twMerge(
+        "modal-overlay",
+        "fixed top-0 left-0 z-10",
+        "w-full h-full overflow-x-hidden",
+        "flex justify-center items-center",
+        "bg-black/60"
+      )}
     >
-      <div className={`modal-wrapper ${className}`} ref={modalWrapperRef}>
+      <div
+        className={twMerge("modal-wrapper", className)}
+        ref={modalWrapperRef}
+      >
         <div className="modal relative p-8 pb-12 rounded-xl bg-white z-10 shadow-md">
           {showClose && (
             <Close
@@ -65,7 +76,10 @@ export const Modal = ({
   ) : null;
 
   if (isBrowser) {
-    return ReactDOM.createPortal(modalContent, document.getElementById("modal-root")!);
+    return ReactDOM.createPortal(
+      modalContent,
+      document.getElementById("modal-root")!
+    );
   } else {
     return null;
   }

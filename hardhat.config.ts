@@ -1,6 +1,6 @@
 import "@nomicfoundation/hardhat-toolbox";
 import { HardhatUserConfig } from "hardhat/config";
-import { getRequired } from "./common/env";
+import { getRequired } from "./src/utils/common/env";
 
 const config: HardhatUserConfig = {
   mocha: {

@@ -1,34 +1,26 @@
 import { ReactElement } from "react";
-import { CircularProgress } from "@mui/material";
-import useVenues from "@/lib/useVenues";
+import { twMerge } from "tailwind-merge";
+import useVenues from "@/lib/venues/useVenues";
 import { Card } from "@/components/common/Card";
+import { Loading } from "@/components/common/Loading";
+import { Hidable } from "@/components/component-types";
 
-export const Venues = (): ReactElement => {
+export const Venues = ({ isHidden }: Hidable): ReactElement => {
   const { data: venues, isLoading } = useVenues();
 
   const getContent = (): ReactElement => {
-    if (isLoading) return <CircularProgress size="1.5rem" />;
+    if (isLoading) return <Loading />;
 
-    if (!venues?.length)
-      return <div className="text-md italic">No entertainers</div>;
+    if (!venues?.length) return <div className="text-md italic">No venues</div>;
 
     return (
       <div className="flex flex-wrap items-start gap-8">
         {venues.map(({ account, name, imageUrl }) => (
-          <Card
-            key={account}
-            title={name}
-            imageUrl={imageUrl}
-          />
+          <Card key={account} title={name} imageUrl={imageUrl} />
         ))}
       </div>
     );
   };
 
-  return (
-    <div>
-      <div className="text-sm uppercase mb-2">Venues</div>
-      {getContent()}
-    </div>
-  );
+  return <div className={twMerge(isHidden && "hidden")}>{getContent()}</div>;
 };

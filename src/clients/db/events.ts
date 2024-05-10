@@ -1,63 +1,78 @@
 import { sql } from "@vercel/postgres";
-import { type Event, type EventDto, mapEvent } from "@/models";
+import { type Event, type EventDto, mapEventFromDb } from "@/models";
 
 export const getEvent = async (address: string): Promise<EventDto | null> => {
   const result = await sql`
     SELECT
       ev.address,
-      v.name AS venue_name,
-      v.account AS venue_account,
-      en.name AS entertainer_name,
-      en.account AS entertainer_account,
       ev.date_time,
       ev.sales_begin,
       ev.sales_end,
-      en.image_url
+      ev.finalized,
+      v.account AS venue_account,
+      v.name AS venue_name,
+      v.address AS venue_address,
+      v.city AS venue_city,
+      v.state AS venue_state,
+      v.zip AS venue_zip,
+      en.account AS entertainer_account,
+      en.name AS entertainer_name,
+      en.image_url AS entertainer_image_url
     FROM events AS ev
     INNER JOIN entertainers AS en ON en.account = ev.entertainer
     INNER JOIN venues AS v ON v.account = ev.venue
-    WHERE address = ${address};
+    WHERE ev.address = ${address};
   `;
-  return result.rowCount === 0 ? null : mapEvent(result.rows[0]);
+  return result.rowCount === 0 ? null : mapEventFromDb(result.rows[0]);
 };
 
 export const getAllEvents = async (): Promise<EventDto[]> => {
   const result = await sql`
     SELECT
       ev.address,
-      v.name AS venue_name,
+      ev.date_time,
+      ev.sales_begin,
+      ev.sales_end,
+      ev.finalized,
       v.account AS venue_account,
-      en.name AS entertainer_name,
+      v.name AS venue_name,
+      v.address AS venue_address,
+      v.city AS venue_city,
+      v.state AS venue_state,
+      v.zip AS venue_zip,
       en.account AS entertainer_account,
-      date_time,
-      sales_begin,
-      sales_end,
-      en.image_url
+      en.name AS entertainer_name,
+      en.image_url AS entertainer_image_url
     FROM events AS ev
     INNER JOIN entertainers AS en ON en.account = ev.entertainer
     INNER JOIN venues AS v ON v.account = ev.venue;
   `;
-  return result.rows.map(mapEvent);
+  return result.rows.map(mapEventFromDb);
 };
 
 export const getEventsByVenue = async (venue: string): Promise<EventDto[]> => {
   const result = await sql`
     SELECT
       ev.address,
-      v.name AS venue_name,
+      ev.date_time,
+      ev.sales_begin,
+      ev.sales_end,
+      ev.finalized,
       v.account AS venue_account,
-      en.name AS entertainer_name,
+      v.name AS venue_name,
+      v.address AS venue_address,
+      v.city AS venue_city,
+      v.state AS venue_state,
+      v.zip AS venue_zip,
       en.account AS entertainer_account,
-      date_time,
-      sales_begin,
-      sales_end,
-      en.image_url
+      en.name AS entertainer_name,
+      en.image_url AS entertainer_image_url
     FROM events AS ev
     INNER JOIN entertainers AS en ON en.account = ev.entertainer
     INNER JOIN venues AS v ON v.account = ev.venue
-    WHERE venue = ${venue};
+    WHERE ev.venue = ${venue};
   `;
-  return result.rows.map(mapEvent);
+  return result.rows.map(mapEventFromDb);
 };
 
 export const getEventsByEntertainer = async (
@@ -66,20 +81,52 @@ export const getEventsByEntertainer = async (
   const result = await sql`
     SELECT
       ev.address,
-      v.name AS venue_name,
+      ev.date_time,
+      ev.sales_begin,
+      ev.sales_end,
+      ev.finalized,
       v.account AS venue_account,
-      en.name AS entertainer_name,
+      v.name AS venue_name,
+      v.address AS venue_address,
+      v.city AS venue_city,
+      v.state AS venue_state,
+      v.zip AS venue_zip,
       en.account AS entertainer_account,
-      date_time,
-      sales_begin,
-      sales_end,
-      en.image_url
+      en.name AS entertainer_name,
+      en.image_url AS entertainer_image_url
     FROM events AS ev
     INNER JOIN entertainers AS en ON en.account = ev.entertainer
     INNER JOIN venues AS v ON v.account = ev.venue
-    WHERE entertainer = ${entertainer};
+    WHERE ev.entertainer = ${entertainer};
   `;
-  return result.rows.map(mapEvent);
+  return result.rows.map(mapEventFromDb);
+};
+
+export const getEventByAddress = async (
+  address: string
+): Promise<EventDto[]> => {
+  const result = await sql`
+    SELECT
+      ev.address,
+      ev.date_time,
+      ev.sales_begin,
+      ev.sales_end,
+      ev.finalized,
+      v.account AS venue_account,
+      v.name AS venue_name,
+      v.address AS venue_address,
+      v.city AS venue_city,
+      v.state AS venue_state,
+      v.zip AS venue_zip,
+      en.account AS entertainer_account,
+      en.name AS entertainer_name,
+      en.image_url AS entertainer_image_url
+    FROM events AS ev
+    INNER JOIN entertainers AS en ON en.account = t.entertainer
+    INNER JOIN venues AS v ON v.account = t.venue
+    WHERE ev.address = ${address};
+  `;
+  return result.rows.map(mapEventFromDb);
 };
 
 export const insertEvent = async (event: Event): Promise<void> => {
@@ -91,7 +138,8 @@ export const insertEvent = async (event: Event): Promise<void> => {
       entertainer,
       date_time,
       sales_begin,
-      sales_end
+      sales_end,
+      finalized
     )
     SELECT
       ${event.address}
@@ -107,9 +155,10 @@ export const insertEvent = async (event: Event): Promise<void> => {
         WHERE account = ${event.entertainer}
         LIMIT 1
       ),
-      ${event.dateTime?.toISOString()},
-      ${event.ticketSalesBegin?.toISOString()},
-      ${event.ticketSalesEnd?.toISOString()};
+      ${event.dateTime},
+      ${event.salesBegin},
+      ${event.salesEnd},
+      ${event.finalized};
   `;
   if (rowCount === 0) {
     throw new Error(`Failed to insert event ${event.address}`);
@@ -120,9 +169,10 @@ export const updateEvent = async (event: Event): Promise<void> => {
   const { rowCount } = await sql`
     UPDATE events
     SET
-      date_time = ${event.dateTime?.toISOString()},
-      sales_begin = ${event.ticketSalesBegin?.toISOString()},
-      sales_end = ${event.ticketSalesEnd?.toISOString()}
+      date_time = ${event.dateTime},
+      sales_begin = ${event.salesBegin},
+      sales_end = ${event.salesEnd},
+      finalized = ${event.finalized}
     WHERE address = ${event.address}
   `;
   if (rowCount === 0) {

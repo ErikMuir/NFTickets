@@ -5,7 +5,7 @@ import {
   badRequest,
   methodNotAllowed,
   success,
-} from "@/server-utils/api-responses";
+} from "@/utils/server/api-responses";
 import { Network } from "@/clients/hedera/types";
 import { HashconnectInitiateAuthRequest } from "@/lib/hashconnect/types";
 import { sessionOptions } from "@/lib/user/session";

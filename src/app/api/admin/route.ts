@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { up, down, reset, seed, adHoc } from "./actions";
+import { up, down, reset, seed, adHoc, setRole } from "./actions";
 import { Actions } from "./types";
-import { authorizeAdmin } from "@/server-utils/authorize-admin";
-import { ForbiddenError } from "@/server-utils/api-errors";
+import { authorizeAdmin } from "@/utils/server/authorize-admin";
+import { BadRequestError, ForbiddenError } from "@/utils/server/api-errors";
+import { lookup } from "@/utils/common/enums";
+import { Role } from "@/models";
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   const { searchParams } = request.nextUrl;
@@ -20,24 +22,36 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         return await reset();
       case Actions.SEED:
         return await seed();
+      case Actions.SET_ROLE: {
+        const account = searchParams.get("account");
+        if (!account) throw new BadRequestError("Account is required.");
+
+        const roleParam = searchParams.get("role");
+        const role = lookup(Role, `${roleParam || Role.ATTENDEE}`);
+        if (!role)
+          throw new BadRequestError(`Unsupported role: '${roleParam}'.`);
+
+        const name = searchParams.get("name");
+        if (!name) throw new BadRequestError("Name is required.");
+
+        return await setRole(account, role, name);
+      }
       case Actions.AD_HOC:
         return await adHoc();
       case Actions.NONE:
-        return NextResponse.json(
-          { error: "action not provided" },
-          { status: 400 }
-        );
+        throw new BadRequestError("Action not provided.");
       default:
-        return NextResponse.json(
-          { error: `unknown action: '${action}'` },
-          { status: 400 }
-        );
+        throw new BadRequestError(`Unknown action: '${action}'.`);
     }
   } catch (error) {
     console.log(error);
-    if (error instanceof ForbiddenError) {
-      return NextResponse.json({ error }, { status: 403 });
-    }
-    return NextResponse.json({ error }, { status: 500 });
+    const { message = "Unknown error occurred." } = error as Error;
+    const status =
+      error instanceof ForbiddenError
+        ? 403
+        : error instanceof BadRequestError
+        ? 400
+        : 500;
+    return NextResponse.json({ error: message }, { status });
   }
 }

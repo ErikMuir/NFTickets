@@ -1,4 +1,4 @@
-import { knownLookup } from "@/common-utils/enums";
+import { knownLookup } from "@/utils/common/enums";
 
 export enum EntertainerType {
   UNKNOWN = "n/a",
@@ -27,7 +27,7 @@ export const mapEntertainer = ({
   account,
   type: knownLookup(EntertainerType, type),
   name,
-  description,
-  iteration,
-  imageUrl: image_url,
+  description: description || undefined,
+  iteration: iteration || undefined,
+  imageUrl: image_url || undefined,
 });

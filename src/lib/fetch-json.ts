@@ -1,4 +1,4 @@
-import { StandardPayload } from "../server-utils/api-responses";
+import { StandardPayload } from "../utils/server/api-responses";
 
 export const fetchStandardJson = async <T>(
   url: string,

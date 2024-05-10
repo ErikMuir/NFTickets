@@ -1,33 +1,40 @@
-import { QueryResult } from "@vercel/postgres";
 import { NextResponse } from "next/server";
-import { Role } from "@/models";
+import { QueryResult, sql } from "@vercel/postgres";
+import { EntertainerType, Role } from "@/models";
+import { entertainers, events, venues } from "@/utils/demo-data";
 import { Tables } from "./types";
 import {
   createEntertainersTable,
+  createEventsTable,
+  createSectionsTable,
+  createTicketsTable,
   createVenuesTable,
   createWalletsTable,
+  deleteAllEntertainers,
+  deleteAllEvents,
+  deleteAllSections,
+  deleteAllTickets,
+  deleteAllVenues,
   deleteAllWallets,
   dropEntertainersTable,
+  dropEventsTable,
+  dropSectionsTable,
+  dropTicketsTable,
   dropVenuesTable,
   dropWalletsTable,
   insertEntertainer,
-  insertVenue,
-  insertWallet,
-  createEventsTable,
-  createTicketsTable,
-  deleteAllEvents,
-  deleteAllTickets,
-  deleteAllVenues,
-  deleteAllEntertainers,
-  dropTicketsTable,
-  dropEventsTable,
-  createSectionsTable,
-  deleteAllSections,
-  dropSectionsTable,
   insertEvent,
   insertSection,
+  insertVenue,
+  insertWallet,
 } from "./scripts";
-import { entertainers, events, venues } from "@/demo-data";
+import {
+  getEntertainer,
+  getVenue,
+  getWallet,
+  updateEntertainer,
+  updateWallet,
+} from "@/clients/db";
 
 export async function up(): Promise<NextResponse> {
   const results: Record<string, QueryResult> = {};
@@ -186,7 +193,49 @@ export async function seed(): Promise<NextResponse> {
   }
 }
 
-export async function adHoc() {
-  const result = {}; // <---- change this to whatever you need to do on the fly
+export async function setRole(
+  account: string,
+  role: Role,
+  name: string
+): Promise<NextResponse> {
+  try {
+    const wallet = await getWallet(account);
+    if (!wallet) return NextResponse.json({}, { status: 404 });
+    await updateWallet({ ...wallet, role });
+
+    if (role === Role.ENTERTAINER) {
+      const entertainer = await getEntertainer(account);
+      if (!entertainer)
+        await insertEntertainer({
+          account,
+          name,
+          type: EntertainerType.UNKNOWN,
+        });
+    }
+
+    if (role === Role.VENUE) {
+      const venue = await getVenue(account);
+      if (!venue) await insertVenue({ account, name });
+    }
+
+    return NextResponse.json({}, { status: 200 });
+  } catch (error) {
+    console.log(error);
+    return NextResponse.json({ error }, { status: 500 });
+  }
+}
+
+export async function adHoc(): Promise<NextResponse> {
+  //---------------------------------------------------
+  // change this to whatever you need to do on the fly
+  //---------------------------------------------------
+  const account = "0.0.2935";
+  const wallet = await getWallet(account);
+  if (!wallet) return NextResponse.json({}, { status: 404 });
+  wallet.role = Role.VENUE;
+  await updateWallet(wallet);
+  const result = await insertVenue({ account, name: "" });
+  //---------------------------------------------------
+
   return NextResponse.json({ result }, { status: 200 });
 }

@@ -43,7 +43,10 @@ export const createVenuesTable = async (): Promise<
       account     text PRIMARY KEY NOT NULL REFERENCES wallets,
       name        text NOT NULL,
       description text NULL,
-      location    text NULL,
+      address     text NULL,
+      city        text NULL,
+      state       text NULL,
+      zip         text NULL,
       image_url   text NULL
     );
   `;
@@ -54,8 +57,8 @@ export const createSectionsTable = async (): Promise<
 > => {
   return sql`
     CREATE TABLE IF NOT EXISTS sections (
-      venue    text NOT NULL REFERENCES venues,
-      section  text NOT NULL,
+      venue    text    NOT NULL REFERENCES venues,
+      section  text    NOT NULL,
       capacity integer NOT NULL DEFAULT 0,
       PRIMARY KEY(venue, section)
     );
@@ -67,12 +70,13 @@ export const createEventsTable = async (): Promise<
 > => {
   return sql`
     CREATE TABLE IF NOT EXISTS events (
-      address     text PRIMARY KEY NOT NULL,
-      venue       text NOT NULL REFERENCES venues,
-      entertainer text NOT NULL REFERENCES entertainers,
-      date_time   text NULL,
-      sales_begin text NULL,
-      sales_end   text NULL
+      address     text    PRIMARY KEY NOT NULL,
+      venue       text    NOT NULL REFERENCES venues,
+      entertainer text    NOT NULL REFERENCES entertainers,
+      date_time   text    NULL,
+      sales_begin text    NULL,
+      sales_end   text    NULL,
+      finalized   boolean NOT NULL DEFAULT FALSE
     );
   `;
 };
@@ -82,14 +86,14 @@ export const createTicketsTable = async (): Promise<
 > => {
   return sql`
     CREATE TABLE IF NOT EXISTS tickets (
-      token       text NOT NULL,
+      token       text    NOT NULL,
       serial      integer NOT NULL,
-      venue       text NOT NULL REFERENCES venues,
-      entertainer text NOT NULL REFERENCES entertainers,
-      event       text NOT NULL REFERENCES events,
-      section     text NOT NULL,
-      scanned_at  text NULL,
-      scanned_by  text NULL,
+      venue       text    NOT NULL REFERENCES venues,
+      entertainer text    NOT NULL REFERENCES entertainers,
+      event       text    NOT NULL REFERENCES events,
+      section     text    NOT NULL,
+      scanned_at  text    NULL,
+      scanned_by  text    NULL,
       PRIMARY KEY(token, serial)
     );
   `;
@@ -131,46 +135,6 @@ export const dropTicketsTable = async (): Promise<
   QueryResult<QueryResultRow>
 > => {
   return sql`DROP TABLE IF EXISTS tickets;`;
-};
-
-////////////---> delete <---////////////
-
-export const deleteWallet = async (
-  account: string
-): Promise<QueryResult<QueryResultRow>> => {
-  return sql`DELETE FROM wallets WHERE account = ${account};`;
-};
-
-export const deleteEntertainer = async (
-  account: string
-): Promise<QueryResult<QueryResultRow>> => {
-  return sql`DELETE FROM entertainers WHERE account = ${account};`;
-};
-
-export const deleteVenue = async (
-  account: string
-): Promise<QueryResult<QueryResultRow>> => {
-  return sql`DELETE FROM venues WHERE account = ${account};`;
-};
-
-export const deleteSection = async (
-  venue: string,
-  section: string
-): Promise<QueryResult<QueryResultRow>> => {
-  return sql`DELETE FROM sections WHERE venue = ${venue} AND section = ${section};`;
-};
-
-export const deleteEvent = async (
-  address: string
-): Promise<QueryResult<QueryResultRow>> => {
-  return sql`DELETE FROM events WHERE address = ${address};`;
-};
-
-export const deleteTicket = async (
-  token: string,
-  serial: number
-): Promise<QueryResult<QueryResultRow>> => {
-  return sql`DELETE FROM tickets WHERE token = ${token} AND serial = ${serial};`;
 };
 
 ////////////---> delete all <---////////////
@@ -239,12 +203,15 @@ export const insertEntertainer = async ({
 export const insertVenue = async ({
   account,
   name,
-  location,
+  address,
+  city,
+  state,
+  zip,
   imageUrl,
 }: Venue): Promise<QueryResult<QueryResultRow>> => {
   return sql`
-    INSERT INTO venues ( account, name, location, image_url )
-    SELECT account, ${name}, ${location}, ${imageUrl}
+    INSERT INTO venues ( account, name, address, city, state, zip, image_url )
+    SELECT account, ${name}, ${address}, ${city}, ${state}, ${zip}, ${imageUrl}
     FROM wallets
     WHERE account = ${account} AND role = ${Role.VENUE};
   `;
@@ -268,11 +235,12 @@ export const insertEvent = async ({
   venue,
   entertainer,
   dateTime,
-  ticketSalesBegin,
-  ticketSalesEnd,
+  salesBegin: ticketSalesBegin,
+  salesEnd: ticketSalesEnd,
+  finalized,
 }: Event): Promise<QueryResult<QueryResultRow>> => {
   return sql`
-    INSERT INTO events ( address, venue, entertainer, date_time, sales_begin, sales_end )
+    INSERT INTO events ( address, venue, entertainer, date_time, sales_begin, sales_end, finalized )
     SELECT
       ${address},
       (
@@ -287,9 +255,10 @@ export const insertEvent = async ({
         WHERE account = ${entertainer}
         LIMIT 1
       ),
-      ${dateTime?.toISOString()},
-      ${ticketSalesBegin?.toISOString()},
-      ${ticketSalesEnd?.toISOString()};
+      ${dateTime},
+      ${ticketSalesBegin},
+      ${ticketSalesEnd},
+      ${finalized ?? false};
   `;
 };
 

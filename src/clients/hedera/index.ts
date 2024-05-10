@@ -1,6 +1,6 @@
 import { AccountId, Client, Hbar, PrivateKey, PublicKey } from "@hashgraph/sdk";
 
-import { getRequired } from "../../../common/env";
+import { getRequired } from "../../utils/common/env";
 import { Network } from "@/clients/hedera/types";
 
 let hederaClient: Client;

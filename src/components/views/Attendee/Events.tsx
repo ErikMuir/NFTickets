@@ -1,37 +1,65 @@
-import { ReactElement } from "react";
-import { CircularProgress } from "@mui/material";
-import useEvents from "@/lib/useEvents";
+import { ReactElement, useEffect, useState } from "react";
+import { twMerge } from "tailwind-merge";
+import { toFriendlyDateTime } from "@/utils/common/dates";
 import { Card } from "@/components/common/Card";
-import { toFriendlyDateTime } from "../../../../common/date-helpers";
+import { Loading } from "@/components/common/Loading";
+import { Hidable } from "@/components/component-types";
+import useEvents from "@/lib/events/useEvents";
+import { sortEvents } from "@/lib/events/event-helpers";
+import { EventDto } from "@/models";
 
-export const Events = (): ReactElement => {
-  const { data: events, isLoading } = useEvents();
+export const Events = ({ isHidden }: Hidable): ReactElement => {
+  const [events, setEvents] = useState<EventDto[]>([]);
 
-  const getContent = (): ReactElement => {
-    if (isLoading) return <CircularProgress size="1.5rem" />;
+  const {
+    data: { past, upcoming },
+    isLoading,
+  } = useEvents();
 
-    if (!events?.length)
-      return <div className="text-md italic">No entertainers</div>;
-
-    return (
-      <div className="flex flex-wrap items-start gap-8">
-        {events.map(({ address, entertainerName, venueName, dateTime, imageUrl }) => (
-          <Card
-            key={address}
-            title={entertainerName}
-            subtitle={`at ${venueName}`}
-            description={toFriendlyDateTime(dateTime)}
-            imageUrl={imageUrl}
-          />
-        ))}
-      </div>
-    );
-  };
+  useEffect(() => {
+    setEvents(sortEvents([...past, ...upcoming]));
+  }, [past, upcoming]);
 
   return (
-    <div>
-      <div className="text-sm uppercase mb-1">Events</div>
-      {getContent()}
+    <div className={twMerge(isHidden && "hidden")}>
+      {isLoading ? (
+        <Loading />
+      ) : events.length === 0 ? (
+        <div className="text-md italic">No events</div>
+      ) : (
+        <div className="flex flex-wrap items-start gap-8">
+          {events.map(
+            ({
+              address,
+              venue,
+              entertainer,
+              dateTime,
+              preSales,
+              postSales,
+              pastEvent,
+            }) => {
+              let overlayText: string | undefined;
+              if (pastEvent) {
+                overlayText = "Past Event";
+              } else if (preSales) {
+                overlayText = "Pre Sales";
+              } else if (postSales) {
+                overlayText = "Sales Ended";
+              }
+              return (
+                <Card
+                  key={address}
+                  title={entertainer.name}
+                  subtitle={`${venue.name} | ${venue.city}, ${venue.state}`}
+                  description={toFriendlyDateTime(dateTime)}
+                  imageUrl={entertainer.imageUrl}
+                  overlayText={overlayText}
+                />
+              );
+            }
+          )}
+        </div>
+      )}
     </div>
   );
 };

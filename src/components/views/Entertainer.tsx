@@ -1,20 +1,15 @@
 import { ReactElement, useState, useCallback } from "react";
+import { lookup } from "@/utils/common/enums";
+import { Button } from "@/components/common/Button";
 import { Tabs } from "@/components/common/Tabs";
-import EntertainerEvents from "./Entertainer/Events";
-import useEvents from "@/lib/useEvents";
-import { EventCategory } from "@/lib/events/event-helpers";
-import { lookup } from "@/common-utils/enums";
+import { AccountProp } from "@/components/component-types";
+import EntertainerEvents from "@/components/views/Entertainer/Events";
+import { EventCategory, providerEventTabs } from "@/lib/events/event-helpers";
+import useEvents from "@/lib/events/useEvents";
 import { Role } from "@/models";
-import { AccountProp } from "../component-types";
-
-export const eventTabs = [
-  EventCategory.UPCOMING_EVENTS,
-  EventCategory.UNFINALIZED_EVENTS,
-  EventCategory.PAST_EVENTS,
-];
 
 export default function Entertainer({ account }: AccountProp): ReactElement {
-  const [currentTab, setCurrentTab] = useState(eventTabs[0]);
+  const [currentTab, setCurrentTab] = useState(providerEventTabs[0]);
   const {
     data: { past, unfinalized, upcoming },
     isLoading,
@@ -41,12 +36,17 @@ export default function Entertainer({ account }: AccountProp): ReactElement {
 
   return (
     <div className="flex flex-col gap-12 w-[320px] md:w-[672px] xl:w-[1024px] mx-auto">
-      <Tabs
-        tabs={eventTabs}
-        currentTab={currentTab}
-        onTabClick={handleTabChange}
-      />
-      {eventTabs.map((tab) => (
+      <div className="flex flex-row w-full justify-between">
+        <Tabs
+          tabs={providerEventTabs}
+          currentTab={currentTab}
+          onTabClick={handleTabChange}
+        />
+        <Button size="large" startIcon={null}>
+          Create Event
+        </Button>
+      </div>
+      {providerEventTabs.map((tab) => (
         <EntertainerEvents
           key={tab}
           tab={tab}

@@ -1,6 +1,6 @@
 import { getEntertainer, updateEntertainer } from "@/clients/db/entertainers";
 import { Entertainer } from "@/models";
-import { badRequest, success } from "@/server-utils/api-responses";
+import { badRequest, success } from "@/utils/server/api-responses";
 
 export async function GET(
   _: Request,

@@ -1,7 +1,7 @@
 import { ChangeEvent } from "react";
 import { SelectChangeEvent } from "@mui/material";
 import { EventCategory } from "@/lib/events/event-helpers";
-import { EventDto } from "@/models";
+import { EventDto, Role } from "@/models";
 
 export type Hidable = {
   isHidden?: boolean;
@@ -37,4 +37,18 @@ export type EventsTabProps = {
   currentTab: string;
   isLoading?: boolean;
   events: EventDto[];
+};
+
+export type BaseModalProps = {
+  id: string;
+  show: boolean;
+  onClose: () => void;
+  title?: string;
+  className?: string;
+  showClose?: boolean;
+};
+
+export type RoleAccountProps = {
+  role: Role;
+  account: string;
 };

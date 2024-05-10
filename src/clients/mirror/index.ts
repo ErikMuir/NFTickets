@@ -1,4 +1,4 @@
-import { getRequired } from "../../common-utils/env";
+import { getRequired } from "../../utils/common/env";
 import { fetchJson } from "@/lib/fetch-json";
 import { AccountInfo } from "@/clients/mirror/types";
 

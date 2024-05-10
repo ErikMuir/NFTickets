@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { QueryResult, sql } from "@vercel/postgres";
 import { EntertainerType, Role } from "@/models";
-import { entertainers, events, venues } from "@/demo-data";
+import { entertainers, events, venues } from "@/utils/demo-data";
 import { Tables } from "./types";
 import {
   createEntertainersTable,
@@ -196,7 +196,7 @@ export async function seed(): Promise<NextResponse> {
 export async function setRole(
   account: string,
   role: Role,
-  name: string,
+  name: string
 ): Promise<NextResponse> {
   try {
     const wallet = await getWallet(account);

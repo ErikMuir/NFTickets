@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import useEntertainer from "@/lib/useEntertainer";
+import useEntertainer from "@/lib/entertainers/useEntertainer";
 import { fetchStandardJson } from "@/lib/fetch-json";
 import { Entertainer, EntertainerType } from "@/models";
 import { AccountProp, SelectValue } from "@/components/component-types";

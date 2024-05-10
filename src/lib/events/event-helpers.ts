@@ -67,3 +67,9 @@ export const sortEvents = (events: EventDto[] = []): EventDto[] => {
     ...pastEvents,
   ];
 };
+
+export const providerEventTabs = [
+  EventCategory.UPCOMING_EVENTS,
+  EventCategory.UNFINALIZED_EVENTS,
+  EventCategory.PAST_EVENTS,
+];

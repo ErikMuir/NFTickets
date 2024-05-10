@@ -1,5 +1,5 @@
 import { twMerge } from "tailwind-merge";
-import { toFriendlyDateTime } from "@/common-utils/dates";
+import { toFriendlyDateTime } from "@/utils/common/dates";
 import { Card } from "@/components/common/Card";
 import { Loading } from "@/components/common/Loading";
 import { EventsTabProps } from "@/components/component-types";

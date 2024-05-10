@@ -1,4 +1,4 @@
-import { errorResponse } from "@/server-utils/api-responses";
+import { errorResponse } from "@/utils/server/api-responses";
 
 export class RequestError extends Error {
   status: number;

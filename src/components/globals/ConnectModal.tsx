@@ -1,8 +1,15 @@
 import { LoadingButton } from "@mui/lab";
-import { IconButton, TextField } from "@mui/material";
 import { CopyAllOutlined } from "@mui/icons-material";
-
+import { IconButton, TextField } from "@mui/material";
+import { BaseModalProps } from "@/components/component-types";
 import Modal from "@/components/globals/Modal";
+
+export type ConnectModalProps = BaseModalProps & {
+  onSubmit: () => void;
+  extensionAvailable: boolean;
+  pairingString: string;
+  isAuthenticating: boolean;
+};
 
 export const ConnectModal = ({
   id,
@@ -12,15 +19,7 @@ export const ConnectModal = ({
   extensionAvailable,
   pairingString,
   isAuthenticating,
-}: {
-  id?: string;
-  show: boolean;
-  onClose: () => void;
-  onSubmit: () => void;
-  extensionAvailable: boolean;
-  pairingString: string;
-  isAuthenticating: boolean;
-}) => {
+}: ConnectModalProps) => {
   const handleCopy = () => {
     navigator.clipboard.writeText(pairingString);
   };
@@ -28,8 +27,8 @@ export const ConnectModal = ({
   return (
     <Modal
       id={id}
-      onClose={onClose}
       show={show}
+      onClose={onClose}
       title="Connect your HashPack Wallet"
     >
       <div className="flex flex-col items-center" style={{ maxWidth: 400 }}>

@@ -1,10 +1,10 @@
 import { ReactElement, useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
-import { toFriendlyDateTime } from "@/common-utils/dates";
+import { toFriendlyDateTime } from "@/utils/common/dates";
 import { Card } from "@/components/common/Card";
 import { Loading } from "@/components/common/Loading";
 import { Hidable } from "@/components/component-types";
-import useEvents from "@/lib/useEvents";
+import useEvents from "@/lib/events/useEvents";
 import { sortEvents } from "@/lib/events/event-helpers";
 import { EventDto } from "@/models";
 

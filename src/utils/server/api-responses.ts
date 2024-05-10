@@ -12,7 +12,7 @@ export type ErrorPayload = {
 
 export type StandardPayload<T> = SuccessPayload<T> | ErrorPayload;
 
-export function nextResponse<T>(data: T, status = 200) {
+export function nextResponse<T>(data: T, status: number): NextResponse<StandardPayload<T>> {
   const ok = status < 400;
   const payload: StandardPayload<T> = ok ? { ok, data } : { ok, error: `${data}` };
   return NextResponse.json(payload, { status });

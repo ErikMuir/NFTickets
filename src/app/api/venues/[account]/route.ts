@@ -1,6 +1,6 @@
 import { getVenue, updateVenue } from "@/clients/db/venues";
 import { Venue } from "@/models";
-import { badRequest, success } from "@/server-utils/api-responses";
+import { badRequest, success } from "@/utils/server/api-responses";
 
 export async function GET(
   _: Request,

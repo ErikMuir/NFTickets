@@ -1,6 +1,6 @@
 import "@nomiclabs/hardhat-ethers";
 import { ethers, network } from "hardhat";
-import { getRequired } from "../../src/common-utils/env";
+import { getRequired } from "../../src/utils/common/env";
 
 async function main() {
   const venue = getRequired("VENUE_ADDRESS");

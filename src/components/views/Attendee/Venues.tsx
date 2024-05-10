@@ -1,6 +1,6 @@
 import { ReactElement } from "react";
 import { twMerge } from "tailwind-merge";
-import useVenues from "@/lib/useVenues";
+import useVenues from "@/lib/venues/useVenues";
 import { Card } from "@/components/common/Card";
 import { Loading } from "@/components/common/Loading";
 import { Hidable } from "@/components/component-types";

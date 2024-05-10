@@ -132,7 +132,7 @@ export const AccountMenu = () => {
         </Button>
         {showModal && (
           <ConnectModal
-            id="connect-modal"
+            id="connect"
             show={showModal}
             onClose={() => {
               setIsAuthenticating(false);

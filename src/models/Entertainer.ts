@@ -1,4 +1,4 @@
-import { knownLookup } from "@/common-utils/enums";
+import { knownLookup } from "@/utils/common/enums";
 
 export enum EntertainerType {
   UNKNOWN = "n/a",

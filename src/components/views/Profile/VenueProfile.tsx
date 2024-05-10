@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import useVenue from "@/lib/useVenue";
+import useVenue from "@/lib/venues/useVenue";
 import { fetchStandardJson } from "@/lib/fetch-json";
 import { Venue } from "@/models";
 import { AccountProp } from "@/components/component-types";

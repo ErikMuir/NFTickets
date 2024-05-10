@@ -2,13 +2,13 @@
 
 import useSWR from "swr";
 
-import { fetchStandardJson } from "./fetch-json";
+import { fetchStandardJson } from "../fetch-json";
 import { EventDto } from "@/models";
 import {
   RoleAccountFilter,
   queryStringFromRoleAccountFilter,
-} from "./role-account-filter";
-import { CategorizedEvents } from "./events/event-helpers";
+} from "../role-account-filter";
+import { CategorizedEvents } from "./event-helpers";
 
 export default function useEvents(filter: RoleAccountFilter = {}) {
   const swrResponse = useSWR<EventDto[]>(

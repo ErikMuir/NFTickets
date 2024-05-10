@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { up, down, reset, seed, adHoc, setRole } from "./actions";
 import { Actions } from "./types";
-import { authorizeAdmin } from "@/server-utils/authorize-admin";
-import { BadRequestError, ForbiddenError } from "@/server-utils/api-errors";
-import { lookup } from "@/common-utils/enums";
+import { authorizeAdmin } from "@/utils/server/authorize-admin";
+import { BadRequestError, ForbiddenError } from "@/utils/server/api-errors";
+import { lookup } from "@/utils/common/enums";
 import { Role } from "@/models";
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
@@ -28,7 +28,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
         const roleParam = searchParams.get("role");
         const role = lookup(Role, `${roleParam || Role.ATTENDEE}`);
-        if (!role) throw new BadRequestError(`Unsupported role: '${roleParam}'.`);
+        if (!role)
+          throw new BadRequestError(`Unsupported role: '${roleParam}'.`);
 
         const name = searchParams.get("name");
         if (!name) throw new BadRequestError("Name is required.");
@@ -49,8 +50,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       error instanceof ForbiddenError
         ? 403
         : error instanceof BadRequestError
-          ? 400
-          : 500;
+        ? 400
+        : 500;
     return NextResponse.json({ error: message }, { status });
   }
 }

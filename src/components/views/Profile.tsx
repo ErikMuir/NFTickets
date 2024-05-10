@@ -16,7 +16,7 @@ export default function Profile() {
   const { accountId, role } = user;
 
   return (
-    <div className="flex flex-col max-w-[960px] mx-auto p-8 items-center">
+    <div className="flex flex-col max-w-[960px] mx-auto p-4 items-center">
       <div className="text-6xl pt-4 pb-12">Profile</div>
       {role === Role.ATTENDEE && <AttendeeProfile />}
       {role === Role.ENTERTAINER && <EntertainerProfile account={accountId} />}

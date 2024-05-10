@@ -1,20 +1,18 @@
 import { ReactElement, useState, useCallback } from "react";
+import { AddCircle } from "@mui/icons-material";
+import { lookup } from "@/utils/common/enums";
+import { Button } from "@/components/common/Button";
 import { Tabs } from "@/components/common/Tabs";
-import VenueEvents from "./Venue/Events";
-import useEvents from "@/lib/useEvents";
-import { EventCategory } from "@/lib/events/event-helpers";
-import { lookup } from "@/common-utils/enums";
-import { Role } from "@/models";
 import { AccountProp } from "@/components/component-types";
-
-export const eventTabs = [
-  EventCategory.UPCOMING_EVENTS,
-  EventCategory.UNFINALIZED_EVENTS,
-  EventCategory.PAST_EVENTS,
-];
+import VenueEvents from "@/components/views/Venue/Events";
+import { EventCategory, providerEventTabs } from "@/lib/events/event-helpers";
+import useEvents from "@/lib/events/useEvents";
+import { Role } from "@/models";
+import { CreateEventModal } from "../globals/CreateEventModal";
 
 export default function Venue({ account }: AccountProp): ReactElement {
-  const [currentTab, setCurrentTab] = useState(eventTabs[0]);
+  const [currentTab, setCurrentTab] = useState(providerEventTabs[0]);
+  const [showModal, setShowModal] = useState(false);
   const {
     data: { past, unfinalized, upcoming },
     isLoading,
@@ -41,12 +39,29 @@ export default function Venue({ account }: AccountProp): ReactElement {
 
   return (
     <div className="flex flex-col gap-12 w-[320px] md:w-[672px] xl:w-[1024px] mx-auto">
-      <Tabs
-        tabs={eventTabs}
-        currentTab={currentTab}
-        onTabClick={handleTabChange}
-      />
-      {eventTabs.map((tab) => (
+      <div className="flex flex-row w-full justify-between">
+        <Tabs
+          tabs={providerEventTabs}
+          currentTab={currentTab}
+          onTabClick={handleTabChange}
+        />
+        <Button
+          size="large"
+          startIcon={<AddCircle />}
+          onClick={() => setShowModal(true)}
+        >
+          Create Event
+        </Button>
+        {showModal && (
+          <CreateEventModal
+            id="create-event"
+            show={showModal}
+            onClose={() => setShowModal(false)}
+            providerRole={Role.VENUE}
+          />
+        )}
+      </div>
+      {providerEventTabs.map((tab) => (
         <VenueEvents
           key={tab}
           tab={tab}

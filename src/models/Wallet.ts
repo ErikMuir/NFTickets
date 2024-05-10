@@ -1,4 +1,4 @@
-import { lookup } from "@/common-utils/enums";
+import { lookup } from "@/utils/common/enums";
 
 export enum Role {
   ATTENDEE = "attendee",

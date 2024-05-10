@@ -359,7 +359,7 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
     uint256 _capacity
   ) internal pure returns (int256) {
     // We need to differentiate between an unset capacity and an unlimited capacity
-    // and since uniset values are always 0, we'll use -1 to represent unlimited capacity
+    // and since unset values are always 0, we'll use -1 to represent unlimited capacity
     return (_capacity == 0 ? -1 : int(_capacity));
   }
 }

@@ -47,10 +47,6 @@ Live event promotors and ticket marketplaces (e.g. Live Nation, TicketMaster, St
   - Hedera JavaScript SDK
   - HashConnect
 
-## Technical Limitations
-
-This can't really ever achieve widespread adoption until Hedera gets its act together and implements zero-downtime deployments. Could you imagine what a mess it would be if Hedera decided to do an upgrade right as thousands of people were simultaneously trying to enter a venue for a concert?
-
 ## Revenue Model
 
 Revenue can be collected by the dApp through one or more of these methods:
@@ -63,9 +59,3 @@ Revenue can be collected by the dApp through one or more of these methods:
   - **Entertainer Event Fee** - a fee when an Entertainer creates a new NFT collection
 - Rotalties
   - collect a royalty fee from each sale of an NFTicket
-
-## solar-garlic team members
-
-- Erik Muir (RobotJones)
-  - erikdmuir@gmail.com
-  - https://github.com/ErikMuir

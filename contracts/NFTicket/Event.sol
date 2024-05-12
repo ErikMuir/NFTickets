@@ -169,6 +169,33 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
     return (ticketPrice == 0 ? defaultTicketPrice : ticketPrice);
   }
 
+  // internal functions
+  function normalizeTicketPrice(
+    uint256 _ticketPrice
+  ) internal pure returns (int256) {
+    // We need to differentiate between an unset ticket price and a free ticket
+    // and since unset values are always 0, we'll use -1 to represent free tickets
+    return (_ticketPrice == 0 ? -1 : int(_ticketPrice));
+  }
+
+  function normalizeCapacity(
+    uint256 _capacity
+  ) internal pure returns (int256) {
+    // We need to differentiate between an unset capacity and an unlimited capacity
+    // and since unset values are always 0, we'll use -1 to represent unlimited capacity
+    return (_capacity == 0 ? -1 : int(_capacity));
+  }
+
+  function calculatePayouts() internal postSales {
+    if (!payoutsCalculated) {
+      uint256 totalBalance = address(this).balance;
+      servicePayout = (totalBalance * serviceFeeBasePoints) / 10_000;
+      venuePayout = (totalBalance * venueFeeBasePoints) / 10_000;
+      entertainerPayout = totalBalance - (servicePayout + venuePayout);
+      payoutsCalculated = true;
+    }
+  }
+
   // admin functions
   function setEventDateTime(
     uint256 _eventDateTime
@@ -334,32 +361,5 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
       if (!success) revert TransferFailed();
       entertainerPayoutCollected = true;
     }
-  }
-
-  // internal functions
-  function calculatePayouts() internal postSales {
-    if (!payoutsCalculated) {
-      uint256 totalBalance = address(this).balance;
-      servicePayout = (totalBalance * serviceFeeBasePoints) / 10_000;
-      venuePayout = (totalBalance * venueFeeBasePoints) / 10_000;
-      entertainerPayout = totalBalance - (servicePayout + venuePayout);
-      payoutsCalculated = true;
-    }
-  }
-
-  function normalizeTicketPrice(
-    uint256 _ticketPrice
-  ) internal pure returns (int256) {
-    // We need to differentiate between an unset ticket price and a free ticket
-    // and since unset values are always 0, we'll use -1 to represent free tickets
-    return (_ticketPrice == 0 ? -1 : int(_ticketPrice));
-  }
-
-  function normalizeCapacity(
-    uint256 _capacity
-  ) internal pure returns (int256) {
-    // We need to differentiate between an unset capacity and an unlimited capacity
-    // and since unset values are always 0, we'll use -1 to represent unlimited capacity
-    return (_capacity == 0 ? -1 : int(_capacity));
   }
 }

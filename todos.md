@@ -1,4 +1,4 @@
-# Work In Progress
+# TODOs
 
 ## General
 - implement max length for string fields
@@ -10,4 +10,4 @@
 - 
 
 ## Contracts
-- 
+- should each provider have their own provider contract?

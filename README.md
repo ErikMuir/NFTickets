@@ -57,5 +57,5 @@ Revenue can be collected by the dApp through one or more of these methods:
 - Event Fees
   - **Venue Event Fee** - a fee when a Venue creates a new Event
   - **Entertainer Event Fee** - a fee when an Entertainer creates a new NFT collection
-- Rotalties
+- Royalties
   - collect a royalty fee from each sale of an NFTicket

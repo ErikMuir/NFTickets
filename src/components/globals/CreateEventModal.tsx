@@ -7,6 +7,7 @@ import { Role } from "@/models";
 import { capitalizeFirstLetter } from "@/utils/common/strings";
 import usePartnerOptions from "@/lib/providers/usePartnerOptions";
 import { fetchStandardJson } from "@/lib/fetch-json";
+import { ErrorMessage } from "../common/ErrorMessage";
 
 export type CreateEventModalProps = BaseModalProps & {
   providerRole: Role;
@@ -15,6 +16,7 @@ export type CreateEventModalProps = BaseModalProps & {
 export const CreateEventModal = ({
   id,
   show,
+  showClose,
   onClose,
   providerRole,
 }: CreateEventModalProps) => {
@@ -38,11 +40,11 @@ export const CreateEventModal = ({
     console.log(partnerOptions);
   }, [partnerOptions]);
 
-  const submit = () => {
+  const submit = async () => {
     setIsSubmitting(true);
     setError(undefined);
     try {
-      fetchStandardJson(`/api/events`, {
+      await fetchStandardJson(`/api/events`, {
         method: "POST",
         body: JSON.stringify({ partnerRole, partner }),
       });
@@ -55,8 +57,8 @@ export const CreateEventModal = ({
   };
 
   return (
-    <Modal id={id} show={show} onClose={onClose} title="Choose a Partner">
-      <div className="flex flex-col items-center" style={{ maxWidth: 400 }}>
+    <Modal id={id} show={show} showClose={showClose} onClose={onClose} title="Choose a Partner">
+      <div className="flex flex-col items-center gap-4 w-[300px] max-w-[400px]">
         <Select
           id="create-event-provider-select"
           label={capitalizeFirstLetter(partnerRole)}
@@ -68,6 +70,7 @@ export const CreateEventModal = ({
           fullWidth
           disabled={isLoading}
         />
+        {error && <ErrorMessage message={error} />}
         <LoadingButton
           onClick={submit}
           variant="contained"
@@ -78,7 +81,6 @@ export const CreateEventModal = ({
         >
           Submit
         </LoadingButton>
-        <div>{error}</div>
       </div>
     </Modal>
   );

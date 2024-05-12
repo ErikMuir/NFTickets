@@ -48,7 +48,9 @@ export default function Venue({ account }: AccountProp): ReactElement {
         <Button
           size="large"
           startIcon={<AddCircle />}
-          onClick={() => setShowModal(true)}
+          onClick={() => {
+            setShowModal(true);
+          }}
         >
           Create Event
         </Button>
@@ -56,7 +58,10 @@ export default function Venue({ account }: AccountProp): ReactElement {
           <CreateEventModal
             id="create-event"
             show={showModal}
-            onClose={() => setShowModal(false)}
+            showClose={true}
+            onClose={() => {
+              setShowModal(false);
+            }}
             providerRole={Role.VENUE}
           />
         )}

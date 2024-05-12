@@ -1,11 +1,6 @@
-import React, {
-  PropsWithChildren,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { PropsWithChildren, useEffect, useState } from "react";
 import ReactDOM from "react-dom";
+import { ClickAwayListener } from "@mui/base/ClickAwayListener";
 import { Close } from "@mui/icons-material";
 import { twMerge } from "tailwind-merge";
 import { BaseModalProps } from "@/components/component-types";
@@ -21,25 +16,9 @@ export const Modal = ({
 }: PropsWithChildren<BaseModalProps>) => {
   const [isBrowser, setIsBrowser] = useState(false);
 
-  const modalWrapperRef = useRef() as React.MutableRefObject<HTMLDivElement>;
-
-  const backDropHandler = useCallback(
-    (event: any) => {
-      if (
-        modalWrapperRef?.current &&
-        !modalWrapperRef?.current?.contains(event.target)
-      ) {
-        onClose();
-      }
-    },
-    [onClose]
-  );
-
   useEffect(() => {
     setIsBrowser(true);
-    window.addEventListener("click", backDropHandler);
-    return () => window.removeEventListener("click", backDropHandler);
-  }, [backDropHandler]);
+  }, [setIsBrowser]);
 
   const handleCloseClick = (e: any) => {
     e.preventDefault();
@@ -57,21 +36,24 @@ export const Modal = ({
         "bg-black/60"
       )}
     >
-      <div
-        className={twMerge("modal-wrapper", className)}
-        ref={modalWrapperRef}
+      <ClickAwayListener
+        onClickAway={() => {
+          onClose();
+        }}
       >
-        <div className="modal relative p-8 pb-12 rounded-xl bg-white z-10 shadow-md">
-          {showClose && (
-            <Close
-              className="absolute top-0 right-0 m-4 cursor-pointer"
-              onClick={handleCloseClick}
-            />
-          )}
-          <div className="text-2xl font-light text-center my-4">{title}</div>
-          {children}
+        <div className={twMerge("modal-wrapper", className)}>
+          <div className="modal relative mx-8 p-8 pb-12 rounded-xl bg-white z-10 shadow-md">
+            {showClose && (
+              <Close
+                className="absolute top-0 right-0 m-4 cursor-pointer"
+                onClick={handleCloseClick}
+              />
+            )}
+            <div className="text-2xl font-light text-center my-4">{title}</div>
+            {children}
+          </div>
         </div>
-      </div>
+      </ClickAwayListener>
     </div>
   ) : null;
 

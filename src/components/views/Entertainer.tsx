@@ -7,14 +7,16 @@ import EntertainerEvents from "@/components/views/Entertainer/Events";
 import { EventCategory, providerEventTabs } from "@/lib/events/event-helpers";
 import useEvents from "@/lib/events/useEvents";
 import { Role } from "@/models";
+import { CreateEventModal } from "@/components/globals/CreateEventModal";
 
 export default function Entertainer({ account }: AccountProp): ReactElement {
   const [currentTab, setCurrentTab] = useState(providerEventTabs[0]);
+  const [showModal, setShowModal] = useState(false);
   const {
     data: { past, unfinalized, upcoming },
     isLoading,
   } = useEvents({
-    role: Role.VENUE,
+    role: Role.ENTERTAINER,
     account,
   });
 
@@ -45,6 +47,17 @@ export default function Entertainer({ account }: AccountProp): ReactElement {
         <Button size="large" startIcon={null}>
           Create Event
         </Button>
+        {showModal && (
+          <CreateEventModal
+            id="create-event"
+            show={showModal}
+            showClose={true}
+            onClose={() => {
+              setShowModal(false);
+            }}
+            providerRole={Role.ENTERTAINER}
+          />
+        )}
       </div>
       {providerEventTabs.map((tab) => (
         <EntertainerEvents

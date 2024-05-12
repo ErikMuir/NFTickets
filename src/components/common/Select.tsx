@@ -34,6 +34,7 @@ export const Select = ({
         value={coerceSelectValue(value)}
         onChange={onChange}
         disabled={disabled}
+        MenuProps={{disablePortal: true}}
       >
         {options &&
           Object.entries(options).map(([key, value]) => (

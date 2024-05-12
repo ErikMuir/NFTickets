@@ -12,7 +12,7 @@ export default function usePartnerOptions(role: Role) {
   );
   const partnerOptions: Record<string, SelectValue> = {};
   data?.forEach(({ account, name }) => {
-    partnerOptions[account] = `${name} [${account}]`;
+    partnerOptions[`${name} (${account})`] = account;
   });
   return { data: partnerOptions, partnerOptions, isLoading, error };
 }

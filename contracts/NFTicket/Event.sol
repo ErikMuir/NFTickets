@@ -169,6 +169,14 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
     return (ticketPrice == 0 ? defaultTicketPrice : ticketPrice);
   }
 
+  function getMaxSupply() public view returns (int64 maxSupply) {
+    for (uint8 i = 0; i < sections.size(); i++) {
+      int64 capacity = sections.get(sections.getKeyAtIndex(i)).maxCapacity;
+      if (capacity < 0) return -1; // unlimited
+      maxSupply = maxSupply + capacity;
+    }
+  }
+
   // internal functions
   function normalizeTicketPrice(
     uint256 _ticketPrice
@@ -179,11 +187,11 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
   }
 
   function normalizeCapacity(
-    uint256 _capacity
-  ) internal pure returns (int256) {
+    uint64 _capacity
+  ) internal pure returns (int64) {
     // We need to differentiate between an unset capacity and an unlimited capacity
     // and since unset values are always 0, we'll use -1 to represent unlimited capacity
-    return (_capacity == 0 ? -1 : int(_capacity));
+    return (_capacity == 0 ? -1 : int64(_capacity));
   }
 
   function calculatePayouts() internal postSales {
@@ -230,10 +238,10 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
 
   function addSection(
     string calldata _key,
-    uint256 _capacity
+    uint64 _capacity
   ) external onlyVenue notFinalized resetSignatures {
     if (sections.exists(_key)) revert SectionAlreadyExists();
-    int256 capacity = normalizeCapacity(_capacity);
+    int64 capacity = normalizeCapacity(_capacity);
     Section memory section = Section(0, capacity, capacity);
     sections.set(_key, section);
   }
@@ -249,11 +257,11 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
 
   function setSectionCapacity(
     string calldata _key,
-    uint256 _capacity
+    uint64 _capacity
   ) external onlyVenue notFinalized resetSignatures {
     if (!sections.exists(_key)) revert SectionNotFound();
     Section storage section = sections.get(_key);
-    int256 capacity = normalizeCapacity(_capacity);
+    int64 capacity = normalizeCapacity(_capacity);
     section.maxCapacity = capacity;
     section.remainingCapacity = capacity;
   }
@@ -275,7 +283,6 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
     string memory name,
     string memory symbol,
     string memory memo,
-    int64 maxSupply,
     int64 autoRenewPeriod
   ) external payable onlyEntertainer finalized returns (address) {
     IHederaTokenService.TokenKey[] memory keys = new IHederaTokenService.TokenKey[](1);
@@ -291,7 +298,7 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
     token.memo = memo;
     token.treasury = address(this);
     token.tokenSupplyType = true; // FINITE
-    token.maxSupply = maxSupply;
+    token.maxSupply = getMaxSupply();
     token.tokenKeys = keys;
     token.freezeDefault = false;
     token.expiry = createAutoRenewExpiry(address(this), autoRenewPeriod);

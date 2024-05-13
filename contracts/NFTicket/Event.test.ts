@@ -431,7 +431,7 @@ describe("Event contract", () => {
     });
 
     describe("setSectionCapacity function", () => {
-      const newCapacity = toEther(250);
+      const newCapacity = 250;
 
       it("should set the capacity", async () => {
         const { venue, contract } = await loadFixture(newContract);
@@ -718,7 +718,7 @@ describe("Event contract", () => {
         await expect(
           contract
             .connect(entertainer)
-            .createNft("foo", "FOO", "memo", 70_000, 100_000)
+            .createNft("foo", "FOO", "memo", 100_000)
         ).to.be.revertedWithCustomError(contract, "ContractNotFinalized");
       });
 
@@ -727,7 +727,7 @@ describe("Event contract", () => {
         await expect(
           contract
             .connect(owner)
-            .createNft("foo", "FOO", "memo", 70_000, 100_000)
+            .createNft("foo", "FOO", "memo", 100_000)
         ).to.be.revertedWithCustomError(contract, "Unauthorized");
       });
 
@@ -736,7 +736,7 @@ describe("Event contract", () => {
         await expect(
           contract
             .connect(venue)
-            .createNft("foo", "FOO", "memo", 70_000, 100_000)
+            .createNft("foo", "FOO", "memo", 100_000)
         ).to.be.revertedWithCustomError(contract, "Unauthorized");
       });
 
@@ -745,7 +745,7 @@ describe("Event contract", () => {
         await expect(
           contract
             .connect(attendee)
-            .createNft("foo", "FOO", "memo", 70_000, 100_000)
+            .createNft("foo", "FOO", "memo", 100_000)
         ).to.be.revertedWithCustomError(contract, "Unauthorized");
       });
 

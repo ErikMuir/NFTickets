@@ -3,8 +3,8 @@ pragma solidity >=0.8.0 <0.9.0;
 
 struct Section {
   int256 ticketPrice;
-  int256 maxCapacity;
-  int256 remainingCapacity;
+  int64 maxCapacity;
+  int64 remainingCapacity;
 }
 
 struct SectionMap {

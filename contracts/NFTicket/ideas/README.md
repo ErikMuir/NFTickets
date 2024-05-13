@@ -32,6 +32,10 @@ The dApp will also be able to interact with the Event Factory in order to:
 - withdraw from balance
 - enable/disable event creation
 
+Question:
+
+- Should the event factory hold a list of all created events in its state?
+
 ## Idea: Grouped setter functions
 
 _Is this even possible/practical?_

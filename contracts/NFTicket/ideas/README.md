@@ -1,20 +1,3 @@
-## Idea: Calculate Max Supply
-
-When creating the NFT collection, calculate max supply as the sum of section capacities
-
-## Idea: Adjust Workflow
-
-- venue creates the event
-- both providers configure the terms
-- venue signs the terms
-  - any change to the terms will remove the venue's signature
-- entertainer creates NFT collection, thus finalizing the contract
-  - createNft function will need to
-    - validate the contract is currently signed by the venue
-    - validate ticketSalesStartDateTime > now
-    - validate ticketSalesEndDateTime > ticketSalesStartDateTime
-    - calculate maxSupply as the sum of section capacities
-
 ## Idea: EventFactory
 
 Revenue is generated for the dApp via an Event Factory through an assortment of fees:

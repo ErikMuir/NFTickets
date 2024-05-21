@@ -7,6 +7,15 @@ error DuplicateKey();
 error KeyNotFound();
 error Disabled();
 error NotConfigured();
+error InsufficientPaymentAmount();
+///////////---> Event Factory <---///////////
+error EntertainerNotRegistered();
+error EntertainerAlreadyRegistered();
+error EntertainerNotEnabled();
+error VenueNotRegistered();
+error VenueAlreadyRegistered();
+error VenueNotEnabled();
+error FactoryNotEnabled();
 ///////////---> Events <---///////////
 error VenueAndEntertainerAreRequired();
 error VenueFeeTooHigh();
@@ -21,9 +30,9 @@ error SalesStillActive();
 error SectionNotFound();
 error SectionAlreadyExists();
 error SectionFull();
-error InsufficientPaymentAmount();
 error TicketMintFailed();
 error TicketNotFound();
 error TicketAlreadyScanned();
 error PayoutAlreadyCollected();
 error TransferFailed();
+

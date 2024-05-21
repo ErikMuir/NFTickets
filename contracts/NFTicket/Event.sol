@@ -41,12 +41,12 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
     address public venue;
     address public entertainer;
     address public tokenAddress;
-    bool public venueSigned;
     uint256 public eventDateTime;
     uint256 public ticketSalesStartDateTime;
     uint256 public ticketSalesEndDateTime;
     int256 public defaultTicketPrice;
     uint256 public serviceFeeBasePoints;
+    uint256 public newCollectionFee;
     uint256 public venueFeeBasePoints;
     uint256 public servicePayout;
     uint256 public venuePayout;
@@ -55,11 +55,13 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
     bool public venuePayoutCollected;
     bool public entertainerPayoutCollected;
     bool public payoutsCalculated;
+    bool public venueSigned;
 
     constructor(
         address _venue,
         address _entertainer,
-        uint256 _serviceFeeBasePoints
+        uint256 _serviceFeeBasePoints,
+        uint256 _newCollectionFee
     ) {
         if (_venue == address(0) || _entertainer == address(0)) {
             revert VenueAndEntertainerAreRequired();
@@ -69,11 +71,8 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
         venue = _venue;
         entertainer = _entertainer;
         serviceFeeBasePoints = _serviceFeeBasePoints;
+        newCollectionFee = _newCollectionFee;
         venueSigned = false;
-
-        // test data
-        sections.set("test-section", Section(-1, 1, 0));
-        tickets.set(-1, Ticket("test-section", -1, owner, false));
     }
 
     receive() external payable {}
@@ -288,6 +287,9 @@ contract Event is ExpiryHelper, KeyHelper, HederaTokenService {
         string memory memo,
         int64 autoRenewPeriod
     ) external payable onlyEntertainer signed notFinalized returns (address) {
+        if (msg.value < newCollectionFee)
+            revert InsufficientPaymentAmount();
+
         IHederaTokenService.TokenKey[]
             memory keys = new IHederaTokenService.TokenKey[](1);
         keys[0] = getSingleKey(

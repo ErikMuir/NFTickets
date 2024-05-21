@@ -17,6 +17,7 @@ const ts = {
 };
 const ticketPrice = toEther(75);
 const serviceFeeBasePoints = 300;
+const collectionFee = 100;
 const venueFeeBasePoints = 1_500;
 const sectionKey = "foobar";
 const capacity = 500;
@@ -30,7 +31,8 @@ async function newContract() {
   const contract = await factory.deploy(
     venue.address,
     entertainer.address,
-    serviceFeeBasePoints
+    serviceFeeBasePoints,
+    collectionFee
   );
   await contract.deployed();
   return {
@@ -156,7 +158,8 @@ describe("Event contract", () => {
         factory.deploy(
           ethers.constants.AddressZero,
           entertainer.address,
-          serviceFeeBasePoints
+          serviceFeeBasePoints,
+          collectionFee
         )
       ).to.be.revertedWithCustomError(factory, "VenueAndEntertainerAreRequired");
     });
@@ -167,7 +170,8 @@ describe("Event contract", () => {
         factory.deploy(
           venue.address,
           ethers.constants.AddressZero,
-          serviceFeeBasePoints
+          serviceFeeBasePoints,
+          collectionFee
         )
       ).to.be.revertedWithCustomError(factory, "VenueAndEntertainerAreRequired");
     });
@@ -763,6 +767,16 @@ describe("Event contract", () => {
         ).to.be.revertedWithCustomError(contract, "Unauthorized");
       });
 
+      it("should revert if insiffucient payment amount", async () => {
+        const { entertainer, venue, contract } = await loadFixture(readyToSignContract);
+        await contract.connect(venue).signContract();
+        await expect(
+          contract
+            .connect(entertainer)
+            .createNft("foo", "FOO", "memo", 100_000)
+        ).to.be.revertedWithCustomError(contract, "InsufficientPaymentAmount");
+      });
+
       it.skip("should return created token ID", async () => {
         // TODO : figure out how to mock Hedera Token Service
       });
@@ -847,19 +861,12 @@ describe("Event contract", () => {
         );
       });
 
-      it("should mark ticket as scanned", async () => {
-        const { venue, contract } = await loadFixture(salesActiveContract);
-        await contract.connect(venue).scanTicket(testSectionTicketSerial);
-        const ticket = await contract.getTicket(testSectionTicketSerial);
-        expect(ticket.scanned).to.equal(true);
+      it.skip("should mark ticket as scanned", async () => {
+        // TODO : figure out how to mock Hedera Token Service
       });
 
-      it("should revert if ticket already scanned", async () => {
-        const { venue, contract } = await loadFixture(salesActiveContract);
-        await contract.connect(venue).scanTicket(testSectionTicketSerial);
-        await expect(
-          contract.connect(venue).scanTicket(testSectionTicketSerial)
-        ).to.be.revertedWithCustomError(contract, "TicketAlreadyScanned");
+      it.skip("should revert if ticket already scanned", async () => {
+        // TODO : figure out how to mock Hedera Token Service
       });
 
       it("should revert if called by owner", async () => {

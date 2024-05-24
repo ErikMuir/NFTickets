@@ -2,7 +2,17 @@
 pragma solidity >=0.8.0 <0.9.0;
 
 import {Event as NFTicketEvent} from "./Event.sol";
-import {Unauthorized, InsufficientPaymentAmount, EntertainerNotRegistered, EntertainerAlreadyRegistered, EntertainerNotEnabled, VenueNotRegistered, VenueAlreadyRegistered, VenueNotEnabled, FactoryNotEnabled} from "./Errors.sol";
+import {
+  Unauthorized,
+  InsufficientPaymentAmount,
+  EntertainerNotRegistered,
+  EntertainerAlreadyRegistered,
+  EntertainerNotEnabled,
+  VenueNotRegistered,
+  VenueAlreadyRegistered,
+  VenueNotEnabled,
+  FactoryNotEnabled
+} from "./Errors.sol";
 
 struct Provider {
     bool registered;

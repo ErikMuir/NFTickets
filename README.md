@@ -51,11 +51,13 @@ Live event promotors and ticket marketplaces (e.g. Live Nation, TicketMaster, St
 
 Revenue can be collected by the dApp through one or more of these methods:
 
-- Registration Fees
-  - **Venue Registration Fee** - a one-time fee for registering as a Venue
-  - **Entertainer Registration Fee** - a one-time fee for registering as an Entertainer
-- Event Fees
-  - **Venue Event Fee** - a fee when a Venue creates a new Event
-  - **Entertainer Event Fee** - a fee when an Entertainer creates a new NFT collection
-- Royalties
-  - collect a royalty fee from each sale of an NFTicket
+- **Venue Registration Fee**
+  - a one-time fee for registering as a Venue
+- **Entertainer Registration Fee**
+  - a one-time fee for registering as an Entertainer
+- **Event Fee**
+  - a fee when a Venue creates a new Event
+- **Collection Fee**
+  - a fee when an Entertainer creates a new NFT collection
+- **Service Fee**
+  - a percentage of total sales

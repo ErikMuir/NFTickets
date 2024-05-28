@@ -11,6 +11,15 @@ export type Event = {
   finalized: boolean;
 };
 
+export enum EventStatus {
+  Unknown = "Unknown",
+  Unfinalized = "Unfinalized",
+  PreSales = "Pre-Sales",
+  OpenSales = "Open Sales",
+  PostSales = "Post-Sales",
+  PastEvent = "Past Event",
+}
+
 export type EventDto = {
   address: string;
   venue: Partial<Venue>;
@@ -22,6 +31,7 @@ export type EventDto = {
   preSales: boolean;
   postSales: boolean;
   pastEvent: boolean;
+  status: EventStatus;
 };
 
 export const mapEventFromDb = ({
@@ -66,6 +76,7 @@ export const mapEventFromDb = ({
     preSales,
     postSales,
     pastEvent,
+    status: getStatus(date_time, sales_begin, sales_end, finalized),
   };
 };
 
@@ -79,6 +90,9 @@ export const mapEventFromApi = ({
   finalized,
 }: any): EventDto => {
   const now = new Date().toISOString();
+  const preSales = salesBegin && salesBegin > now;
+  const postSales = salesEnd && salesEnd <= now;
+  const pastEvent = dateTime && dateTime <= now;
   return {
     address,
     venue: {
@@ -98,8 +112,19 @@ export const mapEventFromApi = ({
     salesBegin,
     salesEnd,
     finalized,
-    preSales: salesBegin && salesBegin > now,
-    postSales: salesEnd && salesEnd <= now,
-    pastEvent: dateTime && dateTime <= now,
+    preSales,
+    postSales,
+    pastEvent,
+    status: getStatus(dateTime, salesBegin, salesEnd, finalized),
   };
+};
+
+const getStatus = (dateTime: string, salesBegin: string, salesEnd: string, finalized: boolean): EventStatus => {
+  const now = new Date().toISOString();
+  if (!finalized) return EventStatus.Unfinalized;
+  if (salesBegin && salesBegin > now) return EventStatus.PreSales;
+  if (salesEnd && salesEnd <= now) return EventStatus.PostSales;
+  if (dateTime && dateTime <= now) return EventStatus.PastEvent;
+  if (salesBegin && salesEnd) return EventStatus.OpenSales;
+  return EventStatus.Unknown
 };
